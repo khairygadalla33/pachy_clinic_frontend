@@ -96,6 +96,7 @@ export default function Clients() {
                   <th className="pb-3 font-medium">الهاتف</th>
                   <th className="pb-3 font-medium">الجنس</th>
                   <th className="pb-3 font-medium">نوع البشرة</th>
+                  <th className="pb-3 font-medium text-center">تقييم 360</th>
                   <th className="pb-3 font-medium">الزيارات</th>
                   <th className="pb-3 font-medium">آخر نشاط</th>
                   <th className="pb-3 font-medium"></th>
@@ -118,6 +119,19 @@ export default function Clients() {
                         </span>
                       ) : (
                         <span className="text-surface-400 text-sm">غير محدد</span>
+                      )}
+                    </td>
+                    <td className="py-4 text-center">
+                      {client.score !== undefined ? (
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          client.score >= 80 ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                          client.score >= 50 ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' :
+                          'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400'
+                        }`}>
+                          {client.score}/100
+                        </span>
+                      ) : (
+                        <span className="text-surface-400 text-sm">-</span>
                       )}
                     </td>
                     <td className="py-4 text-surface-600 dark:text-surface-300">

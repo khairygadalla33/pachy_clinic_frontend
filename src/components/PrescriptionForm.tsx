@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Trash2, Send } from 'lucide-react';
 import api from '../lib/api';
+import { useAuth } from '../lib/auth';
 
 interface PrescriptionFormProps {
   clientId: string;
@@ -12,7 +13,8 @@ interface PrescriptionFormProps {
 
 export default function PrescriptionForm({ clientId, appointmentId, onSuccess, onCancel }: PrescriptionFormProps) {
   const queryClient = useQueryClient();
-  const [branchId] = useState('022d4f55-1f8d-4f11-9a70-4f5b2b2b1e1b'); // Default
+  const { user } = useAuth();
+  const branchId = user?.branchId;
 
   const [medications, setMedications] = useState([{ name: '', dose: '', frequency: '', duration: '', notes: '' }]);
   const [instructions, setInstructions] = useState('');

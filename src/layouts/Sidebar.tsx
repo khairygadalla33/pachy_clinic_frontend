@@ -2,7 +2,8 @@ import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, Calendar, Settings as SettingsIcon,
   Activity, Syringe, Sparkles, Receipt, Wallet,
-  Package, Box, UsersRound, Stethoscope, BarChart3, ShieldAlert
+  Package, Box, UsersRound, Stethoscope, BarChart3, ShieldAlert,
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 
@@ -25,6 +26,7 @@ const navGroups = [
       { path: '/laser-sessions', label: 'جلسات الليزر', icon: Activity, roles: ['ADMIN', 'DOCTOR', 'TECHNICIAN'] },
       { path: '/injection-sessions', label: 'جلسات الحقن', icon: Syringe, roles: ['ADMIN', 'DOCTOR'] },
       { path: '/skincare-sessions', label: 'العناية بالبشرة', icon: Sparkles, roles: ['ADMIN', 'NURSE', 'TECHNICIAN'] },
+      { path: '/whatsapp', label: 'الواتساب (WhatsApp)', icon: MessageSquare, roles: ['ADMIN', 'RECEPTIONIST'] },
     ]
   },
   {

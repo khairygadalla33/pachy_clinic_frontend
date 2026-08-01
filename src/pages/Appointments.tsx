@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../lib/api';
+import { useAuth } from '../lib/auth';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
 import Modal from '../components/Modal';
@@ -30,12 +31,14 @@ export default function Appointments() {
     source: 'phone',
   });
 
-  const branchId = '022d4f55-1f8d-4f11-9a70-4f5b2b2b1e1b';
+  const { user } = useAuth();
+  const branchId = user?.branchId;
 
   // Data fetching
   const { data: appointments, isLoading } = useQuery({
     queryKey: ['appointments', page, dateFilter],
     queryFn: () => api.get('/appointments', { params: { page, limit: 15, date: dateFilter, branchId } }).then(r => r.data),
+    enabled: !!branchId,
   });
 
   const { data: services } = useQuery({

@@ -13,6 +13,7 @@ const tabs = [
   { id: 'medical', label: 'التاريخ الطبي', icon: FileText },
   { id: 'finance', label: 'المالية', icon: DollarSign },
   { id: 'prescriptions', label: 'الروشتات', icon: Pill },
+  { id: 'consentForms', label: 'الإقرارات', icon: FileText },
   { id: 'whatsapp', label: 'مراسلة (WhatsApp)', icon: MessageSquare },
   { id: 'photos', label: 'الصور', icon: Camera },
 ];
@@ -45,6 +46,11 @@ export default function ClientProfile() {
   const { data, isLoading } = useQuery({
     queryKey: ['clientProfile', id],
     queryFn: () => api.get(`/clients/${id}/profile`).then(r => r.data),
+  });
+
+  const { data: consentForms = [], isLoading: isLoadingForms } = useQuery({
+    queryKey: ['consentForms', id],
+    queryFn: () => api.get(`/consent-forms?clientId=${id}`).then(r => r.data),
   });
 
   const updateMedicalMutation = useMutation({
@@ -137,6 +143,15 @@ export default function ClientProfile() {
                   <span>{client.gender === 'FEMALE' ? 'أنثى' : 'ذكر'}</span>
                   {client.dateOfBirth && <span>• {calculateAge(client.dateOfBirth)} سنة</span>}
                   <span dir="ltr">📱 {client.phone}</span>
+                  {stats.score !== undefined && (
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                      stats.score >= 80 ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                      stats.score >= 50 ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' :
+                      'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400'
+                    }`}>
+                      تقييم العميل 360: {stats.score}/100
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="flex gap-2">
@@ -360,6 +375,53 @@ export default function ClientProfile() {
                   </div>
                 ))}
               </div>
+            )}
+          </Card>
+        )}
+
+        {/* CONSENT FORMS */}
+        {activeTab === 'consentForms' && (
+          <Card>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-semibold text-lg">الإقرارات (Consent Forms)</h3>
+              <button className="btn-primary text-sm whitespace-nowrap">+ إضافة إقرار جديد</button>
+            </div>
+            
+            {isLoadingForms ? (
+              <LoadingSkeleton rows={3} />
+            ) : consentForms.length === 0 ? (
+              <p className="text-surface-400 text-center py-8">لا يوجد إقرارات مسجلة لهذا العميل</p>
+            ) : (
+              <table className="w-full text-right text-sm">
+                <thead>
+                  <tr className="border-b border-surface-200 dark:border-surface-700 text-surface-500">
+                    <th className="pb-2">التاريخ</th>
+                    <th className="pb-2">نص الإقرار</th>
+                    <th className="pb-2">الحالة</th>
+                    <th className="pb-2">الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-surface-100 dark:divide-surface-800">
+                  {consentForms.map((form: any) => (
+                    <tr key={form.id}>
+                      <td className="py-3">{formatDate(form.createdAt)}</td>
+                      <td className="py-3 font-medium truncate max-w-[200px]">{form.consentText}</td>
+                      <td className="py-3">
+                        {form.isAcknowledged ? (
+                          <Badge variant="success">موقع ✅</Badge>
+                        ) : (
+                          <Badge variant="warning">غير موقع ⚠️</Badge>
+                        )}
+                      </td>
+                      <td className="py-3">
+                        {!form.isAcknowledged && (
+                          <button className="text-primary-600 hover:underline text-xs">توقيع الآن</button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </Card>
         )}

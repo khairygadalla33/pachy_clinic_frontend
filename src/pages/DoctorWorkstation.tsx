@@ -9,7 +9,7 @@ import PrescriptionForm from '../components/PrescriptionForm';
 export default function DoctorWorkstation() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const branchId = '022d4f55-1f8d-4f11-9a70-4f5b2b2b1e1b'; // Default
+  const branchId = user?.branchId;
 
   const [activePatientId, setActivePatientId] = useState<string | null>(null);
   const [activeQueueId, setActiveQueueId] = useState<string | null>(null);
@@ -25,6 +25,7 @@ export default function DoctorWorkstation() {
     queryKey: ['workflow-queue', branchId],
     queryFn: () => api.get(`/workflow/queue/${branchId}`).then(r => r.data),
     refetchInterval: 10000,
+    enabled: !!branchId,
   });
 
   // Filter queue for current doctor (if not admin)

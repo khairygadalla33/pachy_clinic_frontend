@@ -10,7 +10,6 @@ import Dashboard from './pages/Dashboard';
 import MainLayout from './layouts/MainLayout';
 import UserManagement from './pages/UserManagement';
 import Settings from './pages/Settings';
-import ComingSoon from './components/ComingSoon';
 import Clients from './pages/Clients';
 import ClientProfile from './pages/ClientProfile';
 import Services from './pages/Services';
@@ -24,6 +23,10 @@ import Inventory from './pages/Inventory';
 import Devices from './pages/Devices';
 import Reports from './pages/Reports';
 import AuditLog from './pages/AuditLog';
+import LaserSessions from './pages/LaserSessions';
+import InjectionSessions from './pages/InjectionSessions';
+import SkinCareSessions from './pages/SkinCareSessions';
+import WhatsApp from './pages/WhatsApp';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -50,10 +53,11 @@ function AppRoutes() {
         <Route path="clients" element={<Clients />} />
         <Route path="clients/:id" element={<ClientProfile />} />
 
-        {/* Coming Soon Routes mapped from Sidebar */}
-        <Route path="laser-sessions" element={<ComingSoon title="جلسات الليزر (Laser)" />} />
-        <Route path="injection-sessions" element={<ComingSoon title="جلسات الحقن (Injection)" />} />
-        <Route path="skincare-sessions" element={<ComingSoon title="العناية بالبشرة (Skin Care)" />} />
+        {/* Sessions */}
+        <Route path="laser-sessions" element={<LaserSessions />} />
+        <Route path="injection-sessions" element={<InjectionSessions />} />
+        <Route path="skincare-sessions" element={<SkinCareSessions />} />
+        <Route path="whatsapp" element={<WhatsApp />} />
         
         {/* Phase 7 & 8 */}
         <Route path="invoices" element={<Invoices />} />

@@ -1,12 +1,13 @@
-
-import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import { Card, CardContent } from '../components/ui/card';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '../components/ui/table';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { formatCurrency } from '../lib/utils';
-import { Eye, CreditCard } from 'lucide-react';
+import { Eye, CreditCard, Trash2, AlertCircle } from 'lucide-react';
+import Modal from '../components/Modal';
 
 const fetchInvoices = async () => {
   const { data } = await api.get('/invoices');
@@ -14,7 +15,52 @@ const fetchInvoices = async () => {
 };
 
 const Invoices = () => {
+  const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ['invoices'], queryFn: fetchInvoices });
+  
+  const [isSmartDialogOpen, setIsSmartDialogOpen] = useState(false);
+  const [smartDialogContext, setSmartDialogContext] = useState<any>(null);
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.delete(`/invoices/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      alert('تم حذف الفاتورة بنجاح');
+    },
+    onError: (error: any) => {
+      const errData = error.response?.data;
+      if (errData?.code === 'INVOICE_HAS_PAYMENTS') {
+        setSmartDialogContext({
+          invoiceId: errData.invoiceId,
+          message: errData.message
+        });
+        setIsSmartDialogOpen(true);
+      } else {
+        alert(errData?.message || 'حدث خطأ أثناء الحذف');
+      }
+    }
+  });
+
+  const refundMutation = useMutation({
+    mutationFn: (id: string) => api.post(`/invoices/${id}/refund`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      setIsSmartDialogOpen(false);
+      alert('تم إنشاء فاتورة المرتجع بنجاح');
+    }
+  });
+
+  const handleDelete = (id: string) => {
+    if (confirm('هل أنت متأكد من حذف هذه الفاتورة؟')) {
+      deleteMutation.mutate(id);
+    }
+  };
+
+  const handleCreateRefund = () => {
+    if (smartDialogContext?.invoiceId) {
+      refundMutation.mutate(smartDialogContext.invoiceId);
+    }
+  };
 
   if (isLoading) return <div>جاري التحميل...</div>;
 
@@ -47,10 +93,14 @@ const Invoices = () => {
                   <TableCell>
                     <Badge variant={
                       invoice.status === 'PAID' ? 'success' :
-                      invoice.status === 'PARTIALLY_PAID' ? 'warning' : 'secondary'
+                      invoice.status === 'PARTIALLY_PAID' ? 'warning' : 
+                      invoice.status === 'CANCELLED' ? 'destructive' :
+                      invoice.status === 'DRAFT' ? 'secondary' : 'default'
                     }>
                       {invoice.status === 'PAID' ? 'مدفوعة' :
-                       invoice.status === 'PARTIALLY_PAID' ? 'مدفوعة جزئياً' : 'مُصدرة'}
+                       invoice.status === 'PARTIALLY_PAID' ? 'مدفوعة جزئياً' : 
+                       invoice.status === 'CANCELLED' ? 'ملغاة' :
+                       invoice.status === 'DRAFT' ? 'مسودة/مرتجع' : 'مُصدرة'}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -58,11 +108,14 @@ const Invoices = () => {
                       <Button variant="outline" size="sm">
                         <Eye className="w-4 h-4 ml-1" /> التفاصيل
                       </Button>
-                      {invoice.status !== 'PAID' && (
+                      {invoice.status !== 'PAID' && invoice.status !== 'CANCELLED' && (
                         <Button variant="default" size="sm">
                           <CreditCard className="w-4 h-4 ml-1" /> دفع
                         </Button>
                       )}
+                      <Button variant="outline" size="sm" onClick={() => handleDelete(invoice.id)} className="text-rose-600 border-rose-200 hover:bg-rose-50">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -76,6 +129,26 @@ const Invoices = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <Modal isOpen={isSmartDialogOpen} onClose={() => setIsSmartDialogOpen(false)} title="تنبيه: لا يمكن الحذف">
+        <div className="p-4 text-center">
+          <div className="flex justify-center mb-4 text-amber-500">
+            <AlertCircle className="w-16 h-16" />
+          </div>
+          <h3 className="text-lg font-bold mb-2">الفاتورة تحتوي على دفعات مسجلة</h3>
+          <p className="text-surface-600 dark:text-surface-300 mb-6">
+            {smartDialogContext?.message || 'لا يمكن حذف فاتورة تم السداد عليها للحفاظ على سلامة الحسابات.'}
+          </p>
+          <div className="flex flex-col gap-3">
+            <Button onClick={handleCreateRefund} disabled={refundMutation.isPending} className="w-full">
+              {refundMutation.isPending ? 'جاري الإنشاء...' : 'إنشاء فاتورة مرتجع بدلاً من ذلك'}
+            </Button>
+            <Button variant="outline" onClick={() => setIsSmartDialogOpen(false)} className="w-full">
+              إلغاء
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

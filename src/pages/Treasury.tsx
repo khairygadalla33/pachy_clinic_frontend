@@ -3,10 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import api from '../lib/api';
 import Modal from '../components/Modal';
+import { useAuth } from '../lib/auth';
 
 export default function Treasury() {
   const queryClient = useQueryClient();
-  const [branchId] = useState('022d4f55-1f8d-4f11-9a70-4f5b2b2b1e1b'); // Default branch
+  const { user } = useAuth();
+  const branchId = user?.branchId;
 
   const [isAddAccountModalOpen, setIsAddAccountModalOpen] = useState(false);
   const [isAddTxModalOpen, setIsAddTxModalOpen] = useState(false);
@@ -29,21 +31,24 @@ export default function Treasury() {
 
   const { data: stats } = useQuery({
     queryKey: ['treasury-stats', branchId],
-    queryFn: () => api.get(`/treasury/stats/${branchId}`).then(res => res.data),
+    queryFn: () => api.get(`/finance/stats/${branchId}`).then(res => res.data),
+    enabled: !!branchId,
   });
 
   const { data: accounts } = useQuery({
     queryKey: ['treasury-accounts', branchId],
-    queryFn: () => api.get(`/treasury/accounts/${branchId}`).then(res => res.data),
+    queryFn: () => api.get(`/finance/accounts/${branchId}`).then(res => res.data),
+    enabled: !!branchId,
   });
 
   const { data: transactions } = useQuery({
     queryKey: ['treasury-transactions', branchId],
-    queryFn: () => api.get(`/treasury/transactions/${branchId}`).then(res => res.data),
+    queryFn: () => api.get(`/finance/treasury?branchId=${branchId}`).then(res => res.data.data),
+    enabled: !!branchId,
   });
 
   const createAccountMutation = useMutation({
-    mutationFn: (data: any) => api.post('/treasury/accounts', { ...data, branchId }),
+    mutationFn: (data: any) => api.post('/finance/accounts', { ...data, branchId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['treasury-accounts'] });
       setIsAddAccountModalOpen(false);
@@ -52,7 +57,7 @@ export default function Treasury() {
   });
 
   const addTxMutation = useMutation({
-    mutationFn: (data: any) => api.post('/treasury/transactions', { ...data, branchId, amount: Number(data.amount) }),
+    mutationFn: (data: any) => api.post('/finance/treasury', { ...data, branchId, amount: Number(data.amount) }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['treasury-transactions'] });
       queryClient.invalidateQueries({ queryKey: ['treasury-accounts'] });

@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Activity, Clock, Users, LogIn, CheckSquare, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/api';
+import { useAuth } from '../lib/auth';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
 import WorkflowQueuePanel from '../components/WorkflowQueuePanel';
@@ -10,25 +10,29 @@ import WorkflowQueuePanel from '../components/WorkflowQueuePanel';
 export default function ReceptionDashboard() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [branchId] = useState('022d4f55-1f8d-4f11-9a70-4f5b2b2b1e1b'); // Default for now
+  const { user } = useAuth();
+  const branchId = user?.branchId;
 
   // Polling queries
   const { data: stats } = useQuery({
     queryKey: ['workflow-stats', branchId],
     queryFn: () => api.get(`/workflow/stats?branchId=${branchId}`).then(r => r.data),
     refetchInterval: 10000,
+    enabled: !!branchId,
   });
 
   const { data: doctorGroups } = useQuery({
     queryKey: ['workflow-queue', branchId],
     queryFn: () => api.get(`/workflow/queue/by-doctor?branchId=${branchId}`).then(r => r.data),
     refetchInterval: 10000,
+    enabled: !!branchId,
   });
 
   const { data: upcoming } = useQuery({
     queryKey: ['appointments-upcoming', branchId],
     queryFn: () => api.get(`/appointments/today?branchId=${branchId}&status=PENDING,CONFIRMED`).then(r => r.data),
     refetchInterval: 30000,
+    enabled: !!branchId,
   });
 
   // Action Mutation
