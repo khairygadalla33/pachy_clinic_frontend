@@ -31,11 +31,11 @@ export default function ClientProfile() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['clientProfile', id],
-    queryFn: () => api.get(`/api/clients/${id}/profile`).then(r => r.data),
+    queryFn: () => api.get(`/clients/${id}/profile`).then(r => r.data),
   });
 
   const updateMedicalMutation = useMutation({
-    mutationFn: (medData: any) => api.put(`/api/clients/${id}/medical`, medData),
+    mutationFn: (medData: any) => api.put(`/clients/${id}/medical`, medData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clientProfile', id] });
       setIsEditingMedical(false);
@@ -43,7 +43,7 @@ export default function ClientProfile() {
   });
 
   const uploadPhotoMutation = useMutation({
-    mutationFn: (formData: FormData) => api.post(`/api/clients/${id}/photo`, formData, {
+    mutationFn: (formData: FormData) => api.post(`/clients/${id}/photo`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
     onSuccess: () => {

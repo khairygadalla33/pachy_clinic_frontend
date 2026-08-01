@@ -27,7 +27,7 @@ export default function AuditLog() {
       const params = new URLSearchParams();
       if (entityFilter) params.append('entity', entityFilter);
       if (actionFilter) params.append('action', actionFilter);
-      const res = await api.get(`/api/audit-logs?${params.toString()}`);
+      const res = await api.get(`/audit-logs?${params.toString()}`);
       return res.data.data;
     }
   });

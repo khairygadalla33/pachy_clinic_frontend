@@ -14,7 +14,7 @@ const fetchTreasury = async () => {
 
 const fetchSummary = async () => {
   const branchId = 'default-branch-id'; // Simplified for now
-  const { data } = await api.get(`/api/finance/treasury/summary?branchId=${branchId}`);
+  const { data } = await api.get(`/finance/treasury/summary?branchId=${branchId}`);
   return data;
 };
 

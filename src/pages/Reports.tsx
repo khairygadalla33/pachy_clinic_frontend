@@ -18,7 +18,7 @@ export default function Reports() {
       const params = new URLSearchParams();
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
-      const res = await api.get(`/api/reports/${activeTab}?${params.toString()}`);
+      const res = await api.get(`/reports/${activeTab}?${params.toString()}`);
       return res.data.data;
     }
   });

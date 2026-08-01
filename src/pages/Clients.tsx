@@ -20,11 +20,11 @@ export default function Clients() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['clients', page, search],
-    queryFn: () => api.get(`/api/clients?page=${page}&limit=20&search=${search}`).then(r => r.data),
+    queryFn: () => api.get(`/clients?page=${page}&limit=20&search=${search}`).then(r => r.data),
   });
 
   const createMutation = useMutation({
-    mutationFn: (newClient: any) => api.post('/api/clients', newClient),
+    mutationFn: (newClient: any) => api.post('/clients', newClient),
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       setShowModal(false);

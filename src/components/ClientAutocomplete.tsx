@@ -41,7 +41,7 @@ export default function ClientAutocomplete({ onSelect, placeholder = 'البحث
 
     const delayDebounceFn = setTimeout(() => {
       setIsLoading(true);
-      api.get(`/api/clients/search?q=${encodeURIComponent(query)}`)
+      api.get(`/clients/search?q=${encodeURIComponent(query)}`)
         .then((res) => {
           setResults(res.data);
           setIsOpen(true);
