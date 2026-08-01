@@ -89,7 +89,7 @@ export default function SessionForm({ type, appointmentId, clientId, serviceId, 
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1">Pricing Model / Area</label>
+              <label className="block text-sm font-medium text-surface-700 mb-1">نموذج التسعير / المنطقة</label>
               <select 
                 className="input-field" 
                 required
@@ -99,14 +99,14 @@ export default function SessionForm({ type, appointmentId, clientId, serviceId, 
                   setFormData({ ...formData, pricingId: e.target.value, bodyArea: pricing?.bodyArea || '' })
                 }}
               >
-                <option value="">Select Area/Pricing...</option>
+                <option value="">اختر المنطقة/التسعير...</option>
                 {service?.pricings?.map((p: any) => (
                   <option key={p.id} value={p.id}>{p.bodyArea} ({p.pricingModel})</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1">Number of Pulses</label>
+              <label className="block text-sm font-medium text-surface-700 mb-1">عدد النبضات</label>
               <input 
                 type="number" 
                 className="input-field"
@@ -131,7 +131,7 @@ export default function SessionForm({ type, appointmentId, clientId, serviceId, 
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1">Session Number</label>
+              <label className="block text-sm font-medium text-surface-700 mb-1">رقم الجلسة</label>
               <input type="number" className="input-field" required onChange={e => setFormData({ ...formData, sessionNumber: Number(e.target.value) })} />
             </div>
             <div>
@@ -147,7 +147,7 @@ export default function SessionForm({ type, appointmentId, clientId, serviceId, 
             </div>
           </div>
           <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 font-bold flex justify-between items-center">
-            <span>Calculated Cost:</span>
+            <span>التكلفة المحسوبة:</span>
             <span>{calculatedCost.toFixed(2)} EGP</span>
           </div>
         </div>
@@ -157,19 +157,19 @@ export default function SessionForm({ type, appointmentId, clientId, serviceId, 
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1">Product Used</label>
+              <label className="block text-sm font-medium text-surface-700 mb-1">المنتج المستخدم</label>
               <input type="text" className="input-field" required onChange={e => setFormData({ ...formData, productUsed: e.target.value })} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1">Area Injected</label>
+              <label className="block text-sm font-medium text-surface-700 mb-1">منطقة الحقن</label>
               <input type="text" className="input-field" required onChange={e => setFormData({ ...formData, areaInjected: e.target.value })} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1">Quantity Used</label>
+              <label className="block text-sm font-medium text-surface-700 mb-1">الكمية المستخدمة</label>
               <input type="number" step="0.1" className="input-field" required onChange={e => setFormData({ ...formData, quantityUsed: Number(e.target.value) })} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1">Quantity Unit (ml/units)</label>
+              <label className="block text-sm font-medium text-surface-700 mb-1">وحدة الكمية (ml/units)</label>
               <input type="text" className="input-field" onChange={e => setFormData({ ...formData, quantityUnit: e.target.value })} />
             </div>
           </div>
@@ -179,7 +179,7 @@ export default function SessionForm({ type, appointmentId, clientId, serviceId, 
       {type === 'SKIN_CARE' && (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">Procedure Name</label>
+            <label className="block text-sm font-medium text-surface-700 mb-1">اسم الإجراء</label>
             <input type="text" className="input-field" required onChange={e => setFormData({ ...formData, procedureName: e.target.value })} />
           </div>
         </div>
@@ -187,24 +187,24 @@ export default function SessionForm({ type, appointmentId, clientId, serviceId, 
 
       <div className="grid grid-cols-2 gap-4 pt-4 border-t border-surface-200">
         <div>
-          <label className="block text-sm font-medium text-surface-700 mb-1">Photo Before</label>
+          <label className="block text-sm font-medium text-surface-700 mb-1">صورة قبل</label>
           <input type="file" accept="image/*" className="w-full text-sm text-surface-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100" onChange={e => handlePhotoChange(e, 'before')} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-surface-700 mb-1">Photo After</label>
+          <label className="block text-sm font-medium text-surface-700 mb-1">صورة بعد</label>
           <input type="file" accept="image/*" className="w-full text-sm text-surface-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100" onChange={e => handlePhotoChange(e, 'after')} />
         </div>
       </div>
 
       <div className="pt-4 border-t border-surface-200">
-        <label className="block text-sm font-medium text-surface-700 mb-1">Notes</label>
+        <label className="block text-sm font-medium text-surface-700 mb-1">ملاحظات</label>
         <textarea rows={2} className="input-field" onChange={e => setFormData({ ...formData, notes: e.target.value })}></textarea>
       </div>
 
       <div className="flex justify-end gap-3 pt-4 border-t border-surface-200">
-        <button type="button" onClick={onCancel} className="btn-secondary">Cancel</button>
+        <button type="button" onClick={onCancel} className="btn-secondary">إلغاء</button>
         <button type="submit" disabled={submitMutation.isPending} className="btn-primary">
-          {submitMutation.isPending ? 'Saving...' : 'Save Session'}
+          {submitMutation.isPending ? 'جاري الحفظ...' : 'حفظ الجلسة'}
         </button>
       </div>
     </form>

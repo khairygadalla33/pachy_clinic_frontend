@@ -94,8 +94,8 @@ export default function Appointments() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-surface-900">Appointments</h1>
-          <p className="text-surface-500 text-sm mt-1">Manage all clinic appointments</p>
+          <h1 className="text-2xl font-bold text-surface-900">المواعيد</h1>
+          <p className="text-surface-500 text-sm mt-1">إدارة جميع مواعيد العيادة</p>
         </div>
         <div className="flex gap-2">
           <button onClick={() => { setIsWalkIn(true); setShowModal(true); }} className="btn-secondary">
@@ -131,11 +131,11 @@ export default function Appointments() {
             <table className="w-full text-sm text-left">
               <thead className="bg-surface-50 text-surface-600 border-b border-surface-200">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">Date & Time</th>
-                  <th className="px-4 py-3 font-semibold">Client</th>
-                  <th className="px-4 py-3 font-semibold">Service</th>
-                  <th className="px-4 py-3 font-semibold">Doctor</th>
-                  <th className="px-4 py-3 font-semibold">Status</th>
+                  <th className="px-4 py-3 font-semibold">التاريخ والوقت</th>
+                  <th className="px-4 py-3 font-semibold">العميل</th>
+                  <th className="px-4 py-3 font-semibold">الخدمة</th>
+                  <th className="px-4 py-3 font-semibold">الطبيب</th>
+                  <th className="px-4 py-3 font-semibold">الحالة</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-surface-200">
@@ -158,7 +158,7 @@ export default function Appointments() {
                         apt.status === 'IN_PROGRESS' ? 'info' :
                         apt.status === 'COMPLETED' ? 'success' : 'danger'
                       }>{apt.status}</Badge>
-                      {apt.isWalkIn && <span className="ml-2 text-[10px] bg-purple-100 text-purple-700 px-1 py-0.5 rounded uppercase font-bold tracking-wider">Walk-in</span>}
+                      {apt.isWalkIn && <span className="ml-2 text-[10px] bg-purple-100 text-purple-700 px-1 py-0.5 rounded uppercase font-bold tracking-wider">زيارة مباشرة (Walk-in)</span>}
                     </td>
                   </tr>
                 ))}
@@ -172,11 +172,11 @@ export default function Appointments() {
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        title={isWalkIn ? 'New Walk-in Patient' : 'New Appointment'}
+        title={isWalkIn ? 'عميل جديد - زيارة مباشرة (Walk-in)' : 'موعد جديد'}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">Client</label>
+            <label className="block text-sm font-medium text-surface-700 mb-1">العميل</label>
             <ClientAutocomplete 
               onSelect={(client) => setFormData({ ...formData, clientId: client.id })} 
             />
@@ -184,28 +184,28 @@ export default function Appointments() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1">Service</label>
+              <label className="block text-sm font-medium text-surface-700 mb-1">الخدمة</label>
               <select 
                 className="input-field"
                 required
                 value={formData.serviceId}
                 onChange={e => setFormData({ ...formData, serviceId: e.target.value })}
               >
-                <option value="">Select Service...</option>
+                <option value="">اختر الخدمة...</option>
                 {services?.map((s: any) => (
                   <option key={s.id} value={s.id}>{s.name} ({s.nameAr})</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1">Doctor</label>
+              <label className="block text-sm font-medium text-surface-700 mb-1">الطبيب</label>
               <select 
                 className="input-field"
                 required
                 value={formData.staffId}
                 onChange={e => setFormData({ ...formData, staffId: e.target.value })}
               >
-                <option value="">Select Doctor...</option>
+                <option value="">اختر الطبيب...</option>
                 {staff?.map((s: any) => (
                   <option key={s.id} value={s.id}>Dr. {s.fullName}</option>
                 ))}
@@ -216,7 +216,7 @@ export default function Appointments() {
           {!isWalkIn && (
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1">Date</label>
+                <label className="block text-sm font-medium text-surface-700 mb-1">التاريخ</label>
                 <input 
                   type="date"
                   className="input-field"
@@ -226,7 +226,7 @@ export default function Appointments() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1">Time</label>
+                <label className="block text-sm font-medium text-surface-700 mb-1">الوقت</label>
                 <input 
                   type="time"
                   className="input-field"
@@ -239,10 +239,10 @@ export default function Appointments() {
           )}
 
           <div className="border-t border-surface-200 pt-4 mt-4">
-            <h4 className="text-sm font-bold text-surface-900 mb-3">Deposit (Optional)</h4>
+            <h4 className="text-sm font-bold text-surface-900 mb-3">عربون (اختياري)</h4>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1">Amount</label>
+                <label className="block text-sm font-medium text-surface-700 mb-1">المبلغ</label>
                 <input 
                   type="number"
                   className="input-field"
@@ -252,23 +252,23 @@ export default function Appointments() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1">Method</label>
+                <label className="block text-sm font-medium text-surface-700 mb-1">وسيلة الدفع</label>
                 <select 
                   className="input-field"
                   value={formData.depositMethod}
                   onChange={e => setFormData({ ...formData, depositMethod: e.target.value })}
                 >
-                  <option value="CASH">Cash</option>
-                  <option value="CARD">Card</option>
-                  <option value="INSTAPAY">InstaPay</option>
-                  <option value="E_WALLET">E-Wallet</option>
+                  <option value="CASH">نقدي</option>
+                  <option value="CARD">بطاقة ائتمانية</option>
+                  <option value="INSTAPAY">إنستاباي</option>
+                  <option value="E_WALLET">محفظة إلكترونية</option>
                 </select>
               </div>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">Notes</label>
+            <label className="block text-sm font-medium text-surface-700 mb-1">ملاحظات</label>
             <textarea 
               className="input-field"
               rows={2}
@@ -282,7 +282,7 @@ export default function Appointments() {
               Cancel
             </button>
             <button type="submit" disabled={createMutation.isPending || !formData.clientId} className="btn-primary">
-              {createMutation.isPending ? 'Saving...' : (isWalkIn ? 'Create Walk-in' : 'Book Appointment')}
+              {createMutation.isPending ? 'جاري الحفظ...' : (isWalkIn ? 'إضافة زيارة مباشرة (Walk-in)' : 'حجز الموعد')}
             </button>
           </div>
         </form>
