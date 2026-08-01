@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Download } from 'lucide-react';
 
 export default function InstallPWA() {
