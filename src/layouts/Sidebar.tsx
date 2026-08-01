@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 
+import InstallPWA from '../components/InstallPWA';
+
 const navGroups = [
   {
     title: 'نظرة عامة',
@@ -94,6 +96,7 @@ export default function Sidebar() {
           );
         })}
       </div>
+      <InstallPWA />
     </aside>
   );
 }
