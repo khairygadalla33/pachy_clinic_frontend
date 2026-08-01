@@ -5,15 +5,19 @@ export default function InstallPWA() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   useEffect(() => {
-    const handler = (e: any) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
+    // Check if event already fired
+    if ((window as any).deferredPWAInstallPrompt) {
+      setDeferredPrompt((window as any).deferredPWAInstallPrompt);
+    }
+
+    const handler = () => {
+      setDeferredPrompt((window as any).deferredPWAInstallPrompt);
     };
 
-    window.addEventListener('beforeinstallprompt', handler);
+    window.addEventListener('pwa-prompt-ready', handler);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handler);
+      window.removeEventListener('pwa-prompt-ready', handler);
     };
   }, []);
 
