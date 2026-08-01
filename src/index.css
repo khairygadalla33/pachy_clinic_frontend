@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased text-gray-900 bg-gray-50;
+  }
+}
+
+@media print {
+  @page { margin: 1cm; }
+  body { background: white; }
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+  /* Ensure charts and tables break nicely */
+  .recharts-wrapper { page-break-inside: avoid; }
+  table { page-break-inside: auto; }
+  tr { page-break-inside: avoid; page-break-after: auto; }
+}
