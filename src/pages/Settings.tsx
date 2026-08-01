@@ -7,6 +7,7 @@ import {
   FlaskConical,
   Info
 } from 'lucide-react';
+import WhatsAppSettings from '../components/settings/WhatsAppSettings';
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState('info');
@@ -55,7 +56,7 @@ export default function Settings() {
       <div className="mt-6">
         {activeTab === 'info' && <ComingSoon title="Clinic Info Settings" />}
         {activeTab === 'branches' && <ComingSoon title="Branch Management" />}
-        {activeTab === 'whatsapp' && <ComingSoon title="WhatsApp API Configuration" />}
+        {activeTab === 'whatsapp' && <WhatsAppSettings />}
         {activeTab === 'templates' && <ComingSoon title="Prescription Templates" />}
         {activeTab === 'kits' && <ComingSoon title="Consumable Kits" />}
       </div>

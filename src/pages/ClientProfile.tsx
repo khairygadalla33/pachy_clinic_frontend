@@ -6,13 +6,14 @@ import Card from '../components/Card';
 import Badge from '../components/Badge';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { formatDate, calculateAge, getInitials, formatCurrency } from '../lib/utils';
-import { ArrowRight, Activity, FileText, DollarSign, Pill, Camera, Edit } from 'lucide-react';
+import { ArrowRight, Activity, FileText, DollarSign, Pill, Camera, Edit, MessageSquare, Send } from 'lucide-react';
 
 const tabs = [
   { id: 'sessions', label: 'الجلسات', icon: Activity },
   { id: 'medical', label: 'التاريخ الطبي', icon: FileText },
   { id: 'finance', label: 'المالية', icon: DollarSign },
   { id: 'prescriptions', label: 'الروشتات', icon: Pill },
+  { id: 'whatsapp', label: 'مراسلة (WhatsApp)', icon: MessageSquare },
   { id: 'photos', label: 'الصور', icon: Camera },
 ];
 
@@ -22,6 +23,18 @@ export default function ClientProfile() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('sessions');
   const [isEditingMedical, setIsEditingMedical] = useState(false);
+  const [message, setMessage] = useState('');
+  
+  const sendMessageMutation = useMutation({
+    mutationFn: (text: string) => api.post('/whatsapp/send-text', { phone: data?.client?.phone, text }),
+    onSuccess: () => {
+      setMessage('');
+      alert('تم إرسال الرسالة بنجاح');
+    },
+    onError: () => {
+      alert('فشل إرسال الرسالة، تأكد من اتصال الواتساب');
+    }
+  });
   
   const [medicalForm, setMedicalForm] = useState({
     allergies: '', currentMedications: '', medicalConditions: '', isPregnant: false, isBreastfeeding: false, medicalNotes: ''
@@ -360,6 +373,80 @@ export default function ClientProfile() {
               <p>ميزة معرض الصور سيتم تفعيلها قريباً مع نظام التخزين السحابي</p>
             </div>
           </Card>
+        )}
+
+        {/* WHATSAPP */}
+        {activeTab === 'whatsapp' && (
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="md:col-span-2">
+              <Card className="h-full flex flex-col">
+                <div className="border-b border-surface-200 dark:border-surface-700 pb-4 mb-4">
+                  <h3 className="font-semibold text-lg flex items-center">
+                    <MessageSquare className="w-5 h-5 mr-2 text-emerald-500" />
+                    محادثة الواتساب
+                  </h3>
+                  <p className="text-sm text-surface-500 mt-1">إرسال رسالة مباشرة إلى هاتف العميل عبر الواتساب</p>
+                </div>
+                
+                <div className="flex-1 bg-surface-50 dark:bg-surface-900 rounded-xl p-4 mb-4 min-h-[300px] flex flex-col justify-end border border-surface-200 dark:border-surface-800">
+                  <div className="text-center text-sm text-surface-400 mb-4">
+                    ميزة سجل الرسائل غير مفعلة حالياً في النسخة المدمجة...
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="اكتب رسالتك هنا..."
+                    className="input-field flex-1"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && message.trim()) {
+                        sendMessageMutation.mutate(message);
+                      }
+                    }}
+                  />
+                  <button 
+                    disabled={!message.trim() || sendMessageMutation.isPending}
+                    onClick={() => sendMessageMutation.mutate(message)}
+                    className="btn-primary flex items-center gap-2 px-6 bg-emerald-600 hover:bg-emerald-700 text-white"
+                  >
+                    {sendMessageMutation.isPending ? 'جاري الإرسال...' : 'إرسال'}
+                    <Send className="w-4 h-4 rtl:rotate-180" />
+                  </button>
+                </div>
+              </Card>
+            </div>
+            <div>
+              <Card className="bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800 h-full">
+                <h4 className="font-bold text-emerald-800 dark:text-emerald-400 mb-4">قوالب سريعة</h4>
+                <div className="space-y-3">
+                  <button 
+                    onClick={() => setMessage(`مرحباً ${client.fullName}، نذكرك بموعدك القادم في عيادة Pachy Clinic غداً.`)}
+                    className="w-full text-right p-3 rounded-xl bg-white dark:bg-surface-800 border border-emerald-100 hover:border-emerald-300 transition-all text-sm shadow-sm hover:shadow-md"
+                  >
+                    <div className="font-semibold text-emerald-700 dark:text-emerald-500 mb-1">تذكير بموعد</div>
+                    <div className="text-surface-500 text-xs leading-relaxed truncate whitespace-normal line-clamp-2">مرحباً {client.fullName}، نذكرك بموعدك القادم...</div>
+                  </button>
+                  <button 
+                    onClick={() => setMessage(`مرحباً ${client.fullName}، نود الاطمئنان على صحتك بعد الجلسة الأخيرة. يرجى إبلاغنا إذا كانت هناك أي ملاحظات.`)}
+                    className="w-full text-right p-3 rounded-xl bg-white dark:bg-surface-800 border border-emerald-100 hover:border-emerald-300 transition-all text-sm shadow-sm hover:shadow-md"
+                  >
+                    <div className="font-semibold text-emerald-700 dark:text-emerald-500 mb-1">متابعة بعد الجلسة</div>
+                    <div className="text-surface-500 text-xs leading-relaxed truncate whitespace-normal line-clamp-2">مرحباً {client.fullName}، نود الاطمئنان على صحتك...</div>
+                  </button>
+                  <button 
+                    onClick={() => setMessage(`مرحباً ${client.fullName}، نشكرك على زيارتك لعيادة Pachy Clinic. نتمنى لك دوام الصحة والعافية.`)}
+                    className="w-full text-right p-3 rounded-xl bg-white dark:bg-surface-800 border border-emerald-100 hover:border-emerald-300 transition-all text-sm shadow-sm hover:shadow-md"
+                  >
+                    <div className="font-semibold text-emerald-700 dark:text-emerald-500 mb-1">رسالة ترحيبية</div>
+                    <div className="text-surface-500 text-xs leading-relaxed truncate whitespace-normal line-clamp-2">مرحباً {client.fullName}، نشكرك على زيارتك...</div>
+                  </button>
+                </div>
+              </Card>
+            </div>
+          </div>
         )}
 
       </div>
