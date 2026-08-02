@@ -44,12 +44,12 @@ export default function Appointments() {
 
   const { data: services } = useQuery({
     queryKey: ['services', 'all'],
-    queryFn: () => api.get('/services').then(r => r.data.data),
+    queryFn: () => api.get('/services').then(r => r.data),
   });
 
   const { data: staff } = useQuery({
     queryKey: ['staff', 'doctors'],
-    queryFn: () => api.get('/users', { params: { role: 'DOCTOR' } }).then(r => r.data.data),
+    queryFn: () => api.get('/users', { params: { role: 'DOCTOR' } }).then(r => r.data),
   });
 
   // Create Mutation
