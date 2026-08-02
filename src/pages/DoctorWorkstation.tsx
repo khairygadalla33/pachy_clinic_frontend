@@ -1,220 +1,177 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Play, CheckCircle, FileText, Activity } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Users, CheckCircle, Clock, Calendar, Activity } from 'lucide-react';
 import api from '../lib/api';
 import { useAuth } from '../lib/auth';
-import SessionForm from '../components/SessionForm';
-import PrescriptionForm from '../components/PrescriptionForm';
+import WorkflowCardsPanel from '../components/WorkflowCardsPanel';
+import DoctorSessionModal from '../components/DoctorSessionModal';
 
 export default function DoctorWorkstation() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const branchId = user?.branchId;
 
-  const [activePatientId, setActivePatientId] = useState<string | null>(null);
-  const [activeQueueId, setActiveQueueId] = useState<string | null>(null);
-  const [activeAppointmentId, setActiveAppointmentId] = useState<string | null>(null);
-  const [activeServiceId, setActiveServiceId] = useState<string | null>(null);
-  const [sessionType, setSessionType] = useState<'LASER' | 'INJECTION' | 'SKIN_CARE'>('LASER');
-  
-  const [showSessionModal, setShowSessionModal] = useState(false);
-  const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
+  const [activeQueueItem, setActiveQueueItem] = useState<any | null>(null);
 
   // Queue Polling
-  const { data: queueItems } = useQuery({
+  const { data: queueItems, isLoading: isQueueLoading } = useQuery({
     queryKey: ['workflow-queue', branchId],
     queryFn: () => api.get('/workflow/queue/by-doctor', { params: { branchId } }).then(r => r.data),
     refetchInterval: 10000,
     enabled: !!branchId,
   });
 
+  // History Polling
+  const { data: historyItems, isLoading: isHistoryLoading } = useQuery({
+    queryKey: ['workflow-history', branchId, user?.id],
+    queryFn: () => api.get('/workflow/history/by-doctor', { params: { branchId, staffId: user?.id } }).then(r => r.data),
+    enabled: !!branchId && !!user?.id,
+  });
+
   // Filter queue for current doctor (if not admin)
   const doctorQueue = queueItems?.flatMap((group: any) => group.items).filter((q: any) => {
-    // Only show patients that are in IN_SESSION or waiting for it
     const validStatuses = ['WAITING', 'IN_SESSION'];
     if (!validStatuses.includes(q.stage)) return false;
-    
-    // If not admin, only show patients assigned to this doctor
     if (user?.role !== 'ADMIN' && q.staffId !== user?.id) return false;
-    
     return true;
-  });
+  }) || [];
 
-  const updateStatusMutation = useMutation({
-    mutationFn: (data: { id: string, action: string }) => api.put(`/workflow/${data.id}/${data.action}`),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['workflow-queue'] }),
-  });
+  // Derived KPI Stats
+  const waitingCount = doctorQueue.filter((q: any) => q.stage === 'WAITING').length;
+  const completedCount = historyItems?.length || 0;
+  const inSessionCount = doctorQueue.filter((q: any) => q.stage === 'IN_SESSION').length;
+  const totalToday = waitingCount + inSessionCount + completedCount;
 
-  const handleStartSession = (queueId: string, patientId: string, appointmentId: string, serviceId: string, categoryName: string) => {
-    setActivePatientId(patientId);
-    setActiveQueueId(queueId);
-    setActiveAppointmentId(appointmentId);
-    setActiveServiceId(serviceId);
-
-    // Determine session type from category name
-    const cat = categoryName.toUpperCase();
-    if (cat.includes('LASER')) setSessionType('LASER');
-    else if (cat.includes('INJECT') || cat.includes('FILLER') || cat.includes('BOTOX')) setSessionType('INJECTION');
-    else setSessionType('SKIN_CARE');
-
-    updateStatusMutation.mutate({ id: queueId, action: 'start-session' });
+  const handleCardClick = (item: any) => {
+    setActiveQueueItem(item);
   };
 
-  const handleFinishSession = (queueId: string) => {
-    updateStatusMutation.mutate({ id: queueId, action: 'end-session' });
-    setActivePatientId(null);
-    setActiveQueueId(null);
+  const handleSessionComplete = () => {
+    queryClient.invalidateQueries({ queryKey: ['workflow-queue'] });
+    queryClient.invalidateQueries({ queryKey: ['workflow-history'] });
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-surface-900">محطة الطبيب</h1>
-          <p className="text-surface-500">إدارة الجلسات والمرضى الحاليين</p>
+          <p className="text-surface-500">إدارة الجلسات والمرضى الحاليين والسابقين</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white p-4 rounded-xl border border-surface-200 shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 bg-primary-50 rounded-full flex items-center justify-center text-primary-600">
+            <Users className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-surface-500">إجمالي الحالات اليوم</p>
+            <p className="text-2xl font-bold text-surface-900">{totalToday}</p>
+          </div>
+        </div>
         
-        {/* Left Column: Queue */}
-        <div className="lg:col-span-1 space-y-4">
-          <div className="bg-white rounded-xl shadow-sm border border-surface-200 overflow-hidden">
-            <div className="p-4 border-b border-surface-200 bg-surface-50">
-              <h2 className="font-bold text-surface-900 flex items-center">
-                <Activity className="w-5 h-5 ml-2 text-primary-500" />
-                المرضى في الانتظار
-              </h2>
-            </div>
-            <div className="p-4 space-y-3">
-              {doctorQueue?.length === 0 ? (
-                <div className="text-center py-8 text-surface-400">
-                  لا يوجد مرضى في انتظارك حالياً.
-                </div>
+        <div className="bg-white p-4 rounded-xl border border-surface-200 shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
+            <Clock className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-surface-500">في الانتظار</p>
+            <p className="text-2xl font-bold text-surface-900">{waitingCount}</p>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-xl border border-surface-200 shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center text-amber-600">
+            <Activity className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-surface-500">في الجلسة الآن</p>
+            <p className="text-2xl font-bold text-surface-900">{inSessionCount}</p>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-xl border border-surface-200 shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600">
+            <CheckCircle className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-surface-500">الحالات المكتملة</p>
+            <p className="text-2xl font-bold text-surface-900">{completedCount}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Queue Panel */}
+      <WorkflowCardsPanel 
+        items={doctorQueue} 
+        isLoading={isQueueLoading} 
+        onCardClick={handleCardClick}
+      />
+
+      {/* Data Grid for History */}
+      <div className="bg-white border border-surface-200 rounded-xl shadow-sm overflow-hidden mt-8">
+        <div className="px-6 py-4 border-b border-surface-200 bg-surface-50 flex items-center gap-2">
+          <Calendar className="w-5 h-5 text-surface-500" />
+          <h2 className="font-bold text-surface-900">سجل الجلسات المكتملة (اليوم)</h2>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-right">
+            <thead className="bg-surface-50 text-surface-500 font-medium">
+              <tr>
+                <th className="px-6 py-4 border-b border-surface-200">المريض</th>
+                <th className="px-6 py-4 border-b border-surface-200">الخدمة</th>
+                <th className="px-6 py-4 border-b border-surface-200">رقم الهاتف</th>
+                <th className="px-6 py-4 border-b border-surface-200">الحالة</th>
+                <th className="px-6 py-4 border-b border-surface-200">وقت الانتهاء</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-surface-100">
+              {isHistoryLoading ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-surface-400">
+                    جاري تحميل السجل...
+                  </td>
+                </tr>
+              ) : historyItems?.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-surface-400">
+                    لم تقم بإنهاء أي جلسات اليوم.
+                  </td>
+                </tr>
               ) : (
-                doctorQueue?.map((q: any) => (
-                  <div key={q.id} className={`p-4 rounded-lg border ${activeQueueId === q.id ? 'border-primary-500 bg-primary-50' : 'border-surface-200 bg-white'} transition-colors`}>
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <div className="font-bold text-surface-900">{q.client.fullName}</div>
-                        <div className="text-sm text-surface-500">{q.appointment.service.name}</div>
-                      </div>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${q.stage === 'IN_SESSION' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}`}>
-                        {q.stage === 'IN_SESSION' ? 'في الجلسة' : 'في الانتظار'}
+                historyItems?.map((item: any) => (
+                  <tr key={item.id} className="hover:bg-surface-50 transition-colors">
+                    <td className="px-6 py-4 font-medium text-surface-900">{item.client.fullName}</td>
+                    <td className="px-6 py-4 text-surface-600">{item.appointment?.service?.nameAr || item.appointment?.service?.name}</td>
+                    <td className="px-6 py-4 text-surface-600 font-mono">{item.client.phone}</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.stage === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}`}>
+                        {item.stage === 'COMPLETED' ? 'مكتمل (دفع)' : 'بانتظار الدفع'}
                       </span>
-                    </div>
-                    
-                    {q.stage === 'WAITING' && (
-                      <button 
-                        onClick={() => handleStartSession(q.id, q.client.id, q.appointment.id, q.appointment.service.id, q.appointment.service.category.name)}
-                        className="w-full mt-3 flex items-center justify-center btn-primary py-2 text-sm"
-                      >
-                        <Play className="w-4 h-4 mr-2" /> بدء الجلسة
-                      </button>
-                    )}
-                    
-                    {q.stage === 'IN_SESSION' && activeQueueId !== q.id && (
-                      <button 
-                        onClick={() => handleStartSession(q.id, q.client.id, q.appointment.id, q.appointment.service.id, q.appointment.service.category.name)}
-                        className="w-full mt-3 flex items-center justify-center btn-secondary py-2 text-sm text-amber-700 border-amber-300 hover:bg-amber-50"
-                      >
-                        استئناف الجلسة
-                      </button>
-                    )}
-                  </div>
+                    </td>
+                    <td className="px-6 py-4 text-surface-500">
+                      {new Date(item.updatedAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                  </tr>
                 ))
               )}
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column: Active Session Workspace */}
-        <div className="lg:col-span-2">
-          {activePatientId && activeQueueId ? (
-            <div className="bg-white rounded-xl shadow-sm border border-surface-200 p-6">
-              <div className="flex justify-between items-center mb-6 pb-4 border-b border-surface-200">
-                <div>
-                  <h2 className="text-xl font-bold text-surface-900">الجلسة الحالية</h2>
-                  <p className="text-surface-500">تسجيل تفاصيل الجلسة وكتابة الروشتة</p>
-                </div>
-                <div className="flex gap-3">
-                  <button onClick={() => setShowSessionModal(true)} className="btn-secondary flex items-center">
-                    <Activity className="w-4 h-4 mr-2" /> تسجيل الجلسة
-                  </button>
-                  <button onClick={() => setShowPrescriptionModal(true)} className="btn-secondary flex items-center">
-                    <FileText className="w-4 h-4 mr-2" /> كتابة روشتة
-                  </button>
-                  <button onClick={() => handleFinishSession(activeQueueId)} className="btn-primary bg-emerald-500 hover:bg-emerald-600 border-emerald-500 text-white flex items-center">
-                    <CheckCircle className="w-4 h-4 mr-2" /> إنهاء وتحويل للاستقبال
-                  </button>
-                </div>
-              </div>
-              
-              {/* Optional: Add Patient History Summary Here */}
-              <div className="bg-surface-50 rounded-lg p-6 border border-surface-200 flex flex-col items-center justify-center text-center py-12">
-                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
-                  <Activity className="w-8 h-8 text-primary-500" />
-                </div>
-                <h3 className="text-lg font-bold text-surface-900 mb-1">مساحة العمل جاهزة</h3>
-                <p className="text-surface-500 max-w-md">
-                  اضغط على الأزرار بالأعلى لتسجيل تفاصيل الجلسة، أو رفع صور قبل/بعد، أو كتابة روشتة طبية.
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-xl shadow-sm border border-surface-200 p-12 flex flex-col items-center justify-center text-center h-full min-h-[400px]">
-              <div className="w-20 h-20 bg-surface-100 rounded-full flex items-center justify-center mb-4">
-                <Activity className="w-10 h-10 text-surface-400" />
-              </div>
-              <h2 className="text-xl font-bold text-surface-900 mb-2">لا توجد جلسة نشطة</h2>
-              <p className="text-surface-500 max-w-md">
-                اختر مريضاً من القائمة لبدء جلسته. يمكنك تسجيل المتغيرات وكتابة الروشتات من هنا.
-              </p>
-            </div>
-          )}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {/* Modals */}
-      {showSessionModal && activePatientId && activeAppointmentId && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-            <div className="px-6 py-4 border-b border-surface-200 flex justify-between items-center sticky top-0 bg-white z-10">
-              <h2 className="text-lg font-bold text-surface-900">تسجيل جلسة {sessionType === 'LASER' ? 'ليزر' : sessionType === 'INJECTION' ? 'حقن' : 'عناية بالبشرة'}</h2>
-              <button onClick={() => setShowSessionModal(false)} className="text-surface-400 hover:text-surface-600">&times;</button>
-            </div>
-            <div className="p-6">
-              <SessionForm 
-                type={sessionType}
-                appointmentId={activeAppointmentId}
-                clientId={activePatientId}
-                serviceId={activeServiceId!}
-                onSuccess={() => setShowSessionModal(false)}
-                onCancel={() => setShowSessionModal(false)}
-              />
-            </div>
-          </div>
-        </div>
+      {/* 360 Session Modal */}
+      {activeQueueItem && (
+        <DoctorSessionModal 
+          queueItem={activeQueueItem}
+          onClose={() => setActiveQueueItem(null)}
+          onSessionComplete={handleSessionComplete}
+        />
       )}
 
-      {showPrescriptionModal && activePatientId && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-            <div className="px-6 py-4 border-b border-surface-200 flex justify-between items-center sticky top-0 bg-white z-10">
-              <h2 className="text-lg font-bold text-surface-900">كتابة روشتة</h2>
-              <button onClick={() => setShowPrescriptionModal(false)} className="text-surface-400 hover:text-surface-600">&times;</button>
-            </div>
-            <div className="p-6">
-              <PrescriptionForm 
-                clientId={activePatientId}
-                appointmentId={activeAppointmentId!}
-                onSuccess={() => setShowPrescriptionModal(false)}
-                onCancel={() => setShowPrescriptionModal(false)}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
