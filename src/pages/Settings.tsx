@@ -5,13 +5,15 @@ import {
   MessageSquare, 
   FileText, 
   FlaskConical,
-  Info
+  Info,
+  UsersRound
 } from 'lucide-react';
 import WhatsAppSettings from '../components/settings/WhatsAppSettings';
 import ClinicInfoSettings from '../components/settings/ClinicInfoSettings';
 import BranchSettings from '../components/settings/BranchSettings';
 import PrescriptionTemplatesSettings from '../components/settings/PrescriptionTemplatesSettings';
 import ConsumableKitsSettings from '../components/settings/ConsumableKitsSettings';
+import UserManagement from './UserManagement';
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState('info');
@@ -22,6 +24,7 @@ export default function Settings() {
     { id: 'whatsapp', name: 'إعدادات واتساب', icon: MessageSquare },
     { id: 'templates', name: 'قوالب الروشتات', icon: FileText },
     { id: 'kits', name: 'مجموعات المستهلكات', icon: FlaskConical },
+    { id: 'users', name: 'المستخدمين', icon: UsersRound },
   ];
 
   return (
@@ -63,6 +66,7 @@ export default function Settings() {
         {activeTab === 'whatsapp' && <WhatsAppSettings />}
         {activeTab === 'templates' && <PrescriptionTemplatesSettings />}
         {activeTab === 'kits' && <ConsumableKitsSettings />}
+        {activeTab === 'users' && <UserManagement />}
       </div>
     </div>
   );

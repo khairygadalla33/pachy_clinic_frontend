@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { Bell, Menu, Sun, Moon } from 'lucide-react';
+import { Bell, Menu, Sun, Moon, LogOut } from 'lucide-react';
 import { useState } from 'react';
 
 const pageNames: Record<string, string> = {
@@ -27,7 +27,7 @@ const pageNames: Record<string, string> = {
 
 export default function Header() {
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   
   // Basic dark mode toggle state (can be extracted to a context later if needed)
   const [dark, setDark] = useState(() => {
@@ -40,6 +40,7 @@ export default function Header() {
   };
 
   const pageName = pageNames[location.pathname] || pageNames[`/${location.pathname.split('/')[1]}`] || 'باتشي كلينك';
+  const branchName = user?.branch?.name || 'المركز الرئيسي';
 
   return (
     <header className="h-14 md:h-16 border-b border-surface-200 dark:border-surface-700/50 bg-white/80 dark:bg-[#0B1121]/80 backdrop-blur-md flex items-center justify-between px-4 md:px-6 sticky top-0 z-30 shadow-sm transition-colors duration-300">
@@ -66,13 +67,14 @@ export default function Header() {
         </button>
         
         <div className="flex items-center gap-2 mr-1 md:mr-2 pr-2 md:pr-3 border-r border-surface-200 dark:border-surface-700">
-          <button className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors text-right">
-            <div className="hidden md:block text-right px-2">
-              <div className="text-sm font-medium text-surface-900 dark:text-surface-100">
-                {user?.fullName}
-              </div>
+          <div className="hidden md:flex items-center gap-2 text-right px-2">
+            <div className="text-sm font-medium text-surface-900 dark:text-surface-100">
+              {branchName} - {user?.fullName}
             </div>
-          </button>
+            <button onClick={logout} className="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 text-rose-500 transition-colors" title="تسجيل الخروج">
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </header>

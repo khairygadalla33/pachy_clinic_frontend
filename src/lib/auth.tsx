@@ -9,6 +9,7 @@ export interface AuthUser {
   fullName: string;
   role: UserRole;
   branchId: string | null;
+  branch?: { name: string };
 }
 
 interface AuthContextType {

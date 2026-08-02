@@ -7,7 +7,7 @@ import api from '../lib/api';
 import { 
   LayoutDashboard, Users, Calendar, Settings as SettingsIcon,
   Activity, Syringe, Sparkles, Receipt, Wallet,
-  Package, Box, UsersRound, Stethoscope, BarChart3, ShieldAlert,
+  Package, Box, Stethoscope, BarChart3, ShieldAlert,
   MessageSquare, ChevronRight, ChevronLeft, LogOut, X, HeartPulse
 } from 'lucide-react';
 import InstallPWA from '../components/InstallPWA';
@@ -58,7 +58,6 @@ const navGroups = [
   {
     title: 'النظام',
     items: [
-      { path: '/users', label: 'المستخدمين', icon: UsersRound, roles: ['ADMIN'] },
       { path: '/settings', label: 'الإعدادات', icon: SettingsIcon, roles: ['ADMIN'] },
     ]
   }
