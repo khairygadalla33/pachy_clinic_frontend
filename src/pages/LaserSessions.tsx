@@ -57,7 +57,14 @@ export default function LaserSessions() {
                     <td className="py-3 px-4">{session.bodyArea}</td>
                     <td className="py-3 px-4">{session.numberOfPulses || '-'}</td>
                     <td className="py-3 px-4 font-bold">{session.calculatedCost || '-'} ج.م</td>
-                    <td className="py-3 px-4"><Badge variant={getReactionColor(session.skinReaction)}>{session.skinReaction}</Badge></td>
+                    <td className="py-3 px-4">
+                      <Badge variant={getReactionColor(session.skinReaction)}>
+                        {session.skinReaction === 'NONE' ? 'لا يوجد' : 
+                         session.skinReaction === 'MILD' ? 'بسيط' :
+                         session.skinReaction === 'MODERATE' ? 'متوسط' :
+                         session.skinReaction === 'SEVERE' ? 'شديد' : session.skinReaction}
+                      </Badge>
+                    </td>
                     <td className="py-3 px-4">{session.performedBy?.fullName}</td>
                   </tr>
                 ))

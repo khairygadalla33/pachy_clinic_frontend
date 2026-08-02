@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Search, Eye, UserPlus } from 'lucide-react';
@@ -32,7 +33,7 @@ export default function Clients() {
     },
     onError: (err) => {
       console.error(err);
-      alert('خطأ في إنشاء ملف العميل');
+      toast.error('خطأ في إنشاء ملف العميل');
     },
   });
 

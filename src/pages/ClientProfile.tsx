@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
@@ -30,10 +31,10 @@ export default function ClientProfile() {
     mutationFn: (text: string) => api.post('/whatsapp/send-text', { phone: data?.client?.phone, text }),
     onSuccess: () => {
       setMessage('');
-      alert('تم إرسال الرسالة بنجاح');
+      toast.success('تم إرسال الرسالة بنجاح');
     },
     onError: () => {
-      alert('فشل إرسال الرسالة، تأكد من اتصال الواتساب');
+      toast.error('فشل إرسال الرسالة، تأكد من اتصال الواتساب');
     }
   });
   

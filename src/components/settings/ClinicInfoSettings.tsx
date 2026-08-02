@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
 import Card from '../Card';
@@ -21,7 +22,7 @@ export default function ClinicInfoSettings() {
     mutationFn: (data: any) => api.put('/settings', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings'] });
-      alert('تم الحفظ بنجاح');
+      toast.success('تم الحفظ بنجاح');
     }
   });
 

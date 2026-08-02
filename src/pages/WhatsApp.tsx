@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import Card from '../components/Card';
@@ -32,7 +33,7 @@ export default function WhatsApp() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wa-campaigns'] });
       setIsCampaignModalOpen(false);
-      alert('تم إطلاق الحملة بنجاح');
+      toast.success('تم إطلاق الحملة بنجاح');
     }
   });
 

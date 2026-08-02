@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { Plus, Bell, Check } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -67,6 +68,17 @@ export default function Appointments() {
         setSearchParams(searchParams);
       }
     },
+  });
+
+  const remindMutation = useMutation({
+    mutationFn: (id: string) => api.post(`/appointments/${id}/remind`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      toast.success('تم إرسال التذكير بنجاح عبر الواتساب');
+    },
+    onError: (err: any) => {
+      toast.error('فشل إرسال التذكير: ' + (err.response?.data?.message || err.message));
+    }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -139,21 +151,22 @@ export default function Appointments() {
                   <th className="px-4 py-3 font-semibold">الخدمة</th>
                   <th className="px-4 py-3 font-semibold">الطبيب</th>
                   <th className="px-4 py-3 font-semibold">الحالة</th>
+                  <th className="px-4 py-3 font-semibold text-center">إجراءات</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-surface-200">
                 {appointments?.data?.map((apt: any) => (
                   <tr key={apt.id} className="hover:bg-surface-50 transition-colors">
                     <td className="px-4 py-3">
-                      <div className="font-medium text-surface-900">{new Date(apt.scheduledDate).toLocaleDateString()}</div>
+                      <div className="font-medium text-surface-900">{new Date(apt.scheduledDate).toLocaleDateString('ar-EG')}</div>
                       <div className="text-xs text-surface-500">{apt.startTime} {apt.endTime ? `- ${apt.endTime}` : ''}</div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="font-medium text-surface-900">{apt.client.fullName}</div>
                       <div className="text-xs text-surface-500">{apt.client.phone}</div>
                     </td>
-                    <td className="px-4 py-3 text-surface-700">{apt.service.name}</td>
-                    <td className="px-4 py-3 text-surface-700">Dr. {apt.staff.fullName}</td>
+                    <td className="px-4 py-3 text-surface-700">{apt.service.nameAr || apt.service.name}</td>
+                    <td className="px-4 py-3 text-surface-700">د. {apt.staff.fullName}</td>
                     <td className="px-4 py-3">
                       <Badge variant={
                         apt.status === 'CONFIRMED' ? 'success' :
@@ -162,6 +175,22 @@ export default function Appointments() {
                         apt.status === 'COMPLETED' ? 'success' : 'danger'
                       }>{apt.status}</Badge>
                       {apt.isWalkIn && <span className="ml-2 text-[10px] bg-purple-100 text-purple-700 px-1 py-0.5 rounded uppercase font-bold tracking-wider">زيارة مباشرة (Walk-in)</span>}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {!apt.isWalkIn && apt.status !== 'CANCELLED' && apt.status !== 'COMPLETED' && apt.status !== 'NO_SHOW' && (
+                        <button 
+                          onClick={() => remindMutation.mutate(apt.id)}
+                          disabled={remindMutation.isPending || apt.reminderSent}
+                          className={`p-1.5 rounded text-xs flex items-center justify-center w-full gap-1 ${
+                            apt.reminderSent 
+                              ? 'bg-emerald-100 text-emerald-700 cursor-not-allowed' 
+                              : 'bg-primary-100 text-primary-700 hover:bg-primary-200'
+                          }`}
+                          title="إرسال تذكير عبر الواتساب"
+                        >
+                          {apt.reminderSent ? <><Check className="w-3 h-3" /> تم التذكير</> : <><Bell className="w-3 h-3" /> إرسال تذكير</>}
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

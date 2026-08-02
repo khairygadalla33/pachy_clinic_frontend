@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import { Card, CardContent } from '../components/ui/card';
@@ -25,7 +26,7 @@ const Invoices = () => {
     mutationFn: (id: string) => api.delete(`/invoices/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
-      alert('تم حذف الفاتورة بنجاح');
+      toast.success('تم حذف الفاتورة بنجاح');
     },
     onError: (error: any) => {
       const errData = error.response?.data;
@@ -36,7 +37,7 @@ const Invoices = () => {
         });
         setIsSmartDialogOpen(true);
       } else {
-        alert(errData?.message || 'حدث خطأ أثناء الحذف');
+        toast.error(errData?.message || 'حدث خطأ أثناء الحذف');
       }
     }
   });
@@ -46,7 +47,7 @@ const Invoices = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       setIsSmartDialogOpen(false);
-      alert('تم إنشاء فاتورة المرتجع بنجاح');
+      toast.success('تم إنشاء فاتورة المرتجع بنجاح');
     }
   });
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Trash2, Send } from 'lucide-react';
 import api from '../lib/api';
@@ -52,7 +53,7 @@ export default function PrescriptionForm({ clientId, appointmentId, onSuccess, o
           await api.post(`/prescriptions/${res.data.id}/send-whatsapp`);
         } catch (e: any) {
           console.error('WhatsApp sending failed:', e);
-          alert(e.response?.data?.message || 'Failed to send WhatsApp message. The prescription was saved successfully.');
+          toast.error(e.response?.data?.message || 'Failed to send WhatsApp message. The prescription was saved successfully.');
         }
       }
 
