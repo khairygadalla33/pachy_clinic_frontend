@@ -70,8 +70,8 @@ export default function DoctorWorkstation() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-surface-900">Doctor Workstation</h1>
-          <p className="text-surface-500">Manage your current patients and sessions</p>
+          <h1 className="text-2xl font-bold text-surface-900">محطة الطبيب</h1>
+          <p className="text-surface-500">إدارة الجلسات والمرضى الحاليين</p>
         </div>
       </div>
 
@@ -82,14 +82,14 @@ export default function DoctorWorkstation() {
           <div className="bg-white rounded-xl shadow-sm border border-surface-200 overflow-hidden">
             <div className="p-4 border-b border-surface-200 bg-surface-50">
               <h2 className="font-bold text-surface-900 flex items-center">
-                <Activity className="w-5 h-5 mr-2 text-primary-500" />
-                Waiting Patients
+                <Activity className="w-5 h-5 ml-2 text-primary-500" />
+                المرضى في الانتظار
               </h2>
             </div>
             <div className="p-4 space-y-3">
               {doctorQueue?.length === 0 ? (
                 <div className="text-center py-8 text-surface-400">
-                  No patients waiting for you right now.
+                  لا يوجد مرضى في انتظارك حالياً.
                 </div>
               ) : (
                 doctorQueue?.map((q: any) => (
@@ -100,7 +100,7 @@ export default function DoctorWorkstation() {
                         <div className="text-sm text-surface-500">{q.appointment.service.name}</div>
                       </div>
                       <span className={`text-xs px-2 py-1 rounded-full font-medium ${q.status === 'DOCTOR_SESSION' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}`}>
-                        {q.status === 'DOCTOR_SESSION' ? 'In Session' : 'Waiting'}
+                        {q.status === 'DOCTOR_SESSION' ? 'في الجلسة' : 'في الانتظار'}
                       </span>
                     </div>
                     
@@ -109,7 +109,7 @@ export default function DoctorWorkstation() {
                         onClick={() => handleStartSession(q.id, q.client.id, q.appointment.id, q.appointment.service.id, q.appointment.service.category.name)}
                         className="w-full mt-3 flex items-center justify-center btn-primary py-2 text-sm"
                       >
-                        <Play className="w-4 h-4 mr-2" /> Start Session
+                        <Play className="w-4 h-4 mr-2" /> بدء الجلسة
                       </button>
                     )}
                     
@@ -118,7 +118,7 @@ export default function DoctorWorkstation() {
                         onClick={() => handleStartSession(q.id, q.client.id, q.appointment.id, q.appointment.service.id, q.appointment.service.category.name)}
                         className="w-full mt-3 flex items-center justify-center btn-secondary py-2 text-sm text-amber-700 border-amber-300 hover:bg-amber-50"
                       >
-                        Resume Session
+                        استئناف الجلسة
                       </button>
                     )}
                   </div>
@@ -134,18 +134,18 @@ export default function DoctorWorkstation() {
             <div className="bg-white rounded-xl shadow-sm border border-surface-200 p-6">
               <div className="flex justify-between items-center mb-6 pb-4 border-b border-surface-200">
                 <div>
-                  <h2 className="text-xl font-bold text-surface-900">Active Session</h2>
-                  <p className="text-surface-500">Record session details and write prescriptions</p>
+                  <h2 className="text-xl font-bold text-surface-900">الجلسة الحالية</h2>
+                  <p className="text-surface-500">تسجيل تفاصيل الجلسة وكتابة الروشتة</p>
                 </div>
                 <div className="flex gap-3">
                   <button onClick={() => setShowSessionModal(true)} className="btn-secondary flex items-center">
-                    <Activity className="w-4 h-4 mr-2" /> Record Session
+                    <Activity className="w-4 h-4 mr-2" /> تسجيل الجلسة
                   </button>
                   <button onClick={() => setShowPrescriptionModal(true)} className="btn-secondary flex items-center">
-                    <FileText className="w-4 h-4 mr-2" /> Write Prescription
+                    <FileText className="w-4 h-4 mr-2" /> كتابة روشتة
                   </button>
                   <button onClick={() => handleFinishSession(activeQueueId)} className="btn-primary bg-emerald-500 hover:bg-emerald-600 border-emerald-500 text-white flex items-center">
-                    <CheckCircle className="w-4 h-4 mr-2" /> Finish & Send to Reception
+                    <CheckCircle className="w-4 h-4 mr-2" /> إنهاء وتحويل للاستقبال
                   </button>
                 </div>
               </div>
@@ -155,9 +155,9 @@ export default function DoctorWorkstation() {
                 <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
                   <Activity className="w-8 h-8 text-primary-500" />
                 </div>
-                <h3 className="text-lg font-bold text-surface-900 mb-1">Workspace Ready</h3>
+                <h3 className="text-lg font-bold text-surface-900 mb-1">مساحة العمل جاهزة</h3>
                 <p className="text-surface-500 max-w-md">
-                  Click the buttons above to record the session details, upload before/after photos, or write a prescription.
+                  اضغط على الأزرار بالأعلى لتسجيل تفاصيل الجلسة، أو رفع صور قبل/بعد، أو كتابة روشتة طبية.
                 </p>
               </div>
             </div>
@@ -166,9 +166,9 @@ export default function DoctorWorkstation() {
               <div className="w-20 h-20 bg-surface-100 rounded-full flex items-center justify-center mb-4">
                 <Activity className="w-10 h-10 text-surface-400" />
               </div>
-              <h2 className="text-xl font-bold text-surface-900 mb-2">No Active Session</h2>
+              <h2 className="text-xl font-bold text-surface-900 mb-2">لا توجد جلسة نشطة</h2>
               <p className="text-surface-500 max-w-md">
-                Select a patient from the queue to start their session. You can record session parameters and write prescriptions here.
+                اختر مريضاً من القائمة لبدء جلسته. يمكنك تسجيل المتغيرات وكتابة الروشتات من هنا.
               </p>
             </div>
           )}
@@ -180,7 +180,7 @@ export default function DoctorWorkstation() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-surface-200 flex justify-between items-center sticky top-0 bg-white z-10">
-              <h2 className="text-lg font-bold text-surface-900">Record {sessionType} Session</h2>
+              <h2 className="text-lg font-bold text-surface-900">تسجيل جلسة {sessionType === 'LASER' ? 'ليزر' : sessionType === 'INJECTION' ? 'حقن' : 'عناية بالبشرة'}</h2>
               <button onClick={() => setShowSessionModal(false)} className="text-surface-400 hover:text-surface-600">&times;</button>
             </div>
             <div className="p-6">
@@ -201,7 +201,7 @@ export default function DoctorWorkstation() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-surface-200 flex justify-between items-center sticky top-0 bg-white z-10">
-              <h2 className="text-lg font-bold text-surface-900">Write Prescription</h2>
+              <h2 className="text-lg font-bold text-surface-900">كتابة روشتة</h2>
               <button onClick={() => setShowPrescriptionModal(false)} className="text-surface-400 hover:text-surface-600">&times;</button>
             </div>
             <div className="p-6">

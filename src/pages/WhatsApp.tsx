@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
-import { formatDate } from '../lib/utils';
+import { formatDate, translateStatus } from '../lib/utils';
 import { MessageSquare, Settings, CheckCircle2, Megaphone, Plus } from 'lucide-react';
 import Modal from '../components/Modal';
 import LoadingSkeleton from '../components/LoadingSkeleton';
@@ -19,7 +19,13 @@ export default function WhatsApp() {
   const { data: status } = useQuery({ queryKey: ['wa-status'], queryFn: () => api.get('/whatsapp/status').then(r => r.data) });
   const { data: campaigns = [], isLoading: isLoadingCampaigns } = useQuery({ queryKey: ['wa-campaigns'], queryFn: () => api.get('/whatsapp/campaigns').then(r => r.data) });
   
-  const [campaignForm, setCampaignForm] = useState({ name: '', targetSegment: 'ALL', messageTemplate: '' });
+  const [campaignForm, setCampaignForm] = useState({ 
+    name: '', 
+    targetSegment: 'ALL', 
+    customMessage: '',
+    minDelay: 15,
+    maxDelay: 45,
+  });
   
   const createCampaignMutation = useMutation({
     mutationFn: (data: any) => api.post('/whatsapp/campaigns', data),
@@ -92,12 +98,12 @@ export default function WhatsApp() {
                     campaigns.map((camp: any) => (
                       <tr key={camp.id}>
                         <td className="py-3 px-4 font-medium">{camp.name}</td>
-                        <td className="py-3 px-4"><Badge>{camp.targetSegment}</Badge></td>
+                        <td className="py-3 px-4"><Badge>{camp.filters?.segment || 'الكل'}</Badge></td>
                         <td className="py-3 px-4 font-bold">{camp.totalRecipients}</td>
-                        <td className="py-3 px-4 font-bold text-emerald-600">{camp.successfulSends}</td>
-                        <td className="py-3 px-4 font-bold text-rose-600">{camp.failedSends}</td>
+                        <td className="py-3 px-4 font-bold text-emerald-600">{camp.sentCount}</td>
+                        <td className="py-3 px-4 font-bold text-rose-600">{camp.failedCount}</td>
                         <td className="py-3 px-4">
-                          <Badge variant={camp.status === 'COMPLETED' ? 'success' : camp.status === 'RUNNING' ? 'info' : 'warning'}>{camp.status}</Badge>
+                          <Badge variant={camp.status === 'COMPLETED' ? 'success' : camp.status === 'RUNNING' ? 'info' : 'warning'}>{translateStatus(camp.status)}</Badge>
                         </td>
                         <td className="py-3 px-4 text-xs">{formatDate(camp.createdAt)}</td>
                       </tr>
@@ -146,7 +152,17 @@ export default function WhatsApp() {
           <div>
             <label className="block text-sm font-medium mb-1">نص الرسالة</label>
             <p className="text-xs text-surface-500 mb-2">يمكنك استخدام {'{{name}}'} لاستبدالها باسم العميل التلقائي.</p>
-            <textarea required value={campaignForm.messageTemplate} onChange={e => setCampaignForm({...campaignForm, messageTemplate: e.target.value})} className="input-field w-full h-32" placeholder="مرحباً {{name}}، ..." />
+            <textarea required value={campaignForm.customMessage} onChange={e => setCampaignForm({...campaignForm, customMessage: e.target.value})} className="input-field w-full h-32" placeholder="مرحباً {{name}}، ..." />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">تأخير أدنى (ثوانٍ)</label>
+              <input type="number" value={campaignForm.minDelay} onChange={e => setCampaignForm({...campaignForm, minDelay: parseInt(e.target.value) || 0})} className="input-field w-full" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">تأخير أقصى (ثوانٍ)</label>
+              <input type="number" value={campaignForm.maxDelay} onChange={e => setCampaignForm({...campaignForm, maxDelay: parseInt(e.target.value) || 0})} className="input-field w-full" />
+            </div>
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-surface-200">
             <button type="button" onClick={() => setIsCampaignModalOpen(false)} className="btn-secondary">إلغاء</button>

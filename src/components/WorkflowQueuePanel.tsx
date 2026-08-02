@@ -30,12 +30,12 @@ const stageTextColors: Record<string, string> = {
 };
 
 const stageLabels: Record<string, string> = {
-  BOOKED: 'Booked',
-  ARRIVED: 'Arrived',
-  IN_PREP: 'In Prep',
-  WAITING: 'Waiting',
-  IN_SESSION: 'In Session',
-  PENDING_CHECKOUT: 'Checkout',
+  BOOKED: 'محجوز',
+  ARRIVED: 'حضر',
+  IN_PREP: 'تجهيز',
+  WAITING: 'انتظار',
+  IN_SESSION: 'في الجلسة',
+  PENDING_CHECKOUT: 'تسوية مالية',
 };
 
 function WaitingTime({ startTime }: { startTime: string | null }) {
@@ -52,7 +52,7 @@ function WaitingTime({ startTime }: { startTime: string | null }) {
   }, [startTime]);
 
   if (!startTime) return null;
-  return <span className="font-bold">{mins} min</span>;
+  return <span className="font-bold">{mins} دقيقة</span>;
 }
 
 export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClient }: WorkflowQueuePanelProps) {
@@ -65,7 +65,7 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
   if (!doctorGroups || doctorGroups.length === 0) {
     return (
       <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed border-surface-300 text-surface-400 text-sm">
-        No active patients in queue today.
+        لا يوجد مرضى في قائمة الانتظار اليوم.
       </div>
     );
   }
@@ -81,8 +81,8 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
               className="w-full flex items-center justify-between px-4 py-3 bg-surface-50 hover:bg-surface-100 transition-colors"
             >
               <div className="flex items-center gap-2">
-                <span className="font-bold text-lg text-surface-900">Dr. {group.doctor.fullName}</span>
-                <Badge variant="info">{group.items.length} Patients</Badge>
+                <span className="font-bold text-lg text-surface-900">د. {group.doctor.fullName}</span>
+                <Badge variant="info">{group.items.length} مرضى</Badge>
               </div>
               {isOpen ? <ChevronUp className="w-5 h-5 text-surface-500" /> : <ChevronDown className="w-5 h-5 text-surface-500" />}
             </button>
@@ -91,7 +91,7 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
               <div className="p-4 bg-surface-50/50">
                 <div className="flex flex-wrap gap-4">
                   {group.items.length === 0 ? (
-                    <p className="text-sm text-surface-400">Queue is empty.</p>
+                    <p className="text-sm text-surface-400">قائمة الانتظار فارغة.</p>
                   ) : (
                     group.items.map((item) => (
                       <div 
@@ -110,7 +110,7 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
                         <div className="space-y-1.5 mb-3">
                           <div className="flex items-center gap-1.5 text-xs text-surface-600">
                             <Phone className="w-3.5 h-3.5" />
-                            <span>{item.client?.phone || 'No phone'}</span>
+                            <span>{item.client?.phone || 'لا يوجد هاتف'}</span>
                           </div>
                           <div className="flex items-center gap-1.5 text-xs text-surface-600">
                             <Stethoscope className="w-3.5 h-3.5" />
@@ -133,28 +133,25 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
                         <div className="flex flex-wrap gap-1 mt-auto pt-2 border-t border-black/5">
                           {item.stage === 'BOOKED' && (
                             <>
-                              <button onClick={() => onAction(item.id, 'check-in')} className="px-2 py-1 text-xs font-medium bg-white border border-surface-200 rounded hover:bg-surface-50">Check In</button>
-                              <button onClick={() => onAction(item.id, 'no-show')} className="px-2 py-1 text-xs font-medium bg-red-50 text-red-600 border border-red-200 rounded hover:bg-red-100">No Show</button>
+                              <button onClick={() => onAction(item.id, 'check-in')} className="px-2 py-1 text-xs font-medium bg-white border border-surface-200 rounded hover:bg-surface-50">تسجيل وصول</button>
+                              <button onClick={() => onAction(item.id, 'no-show')} className="px-2 py-1 text-xs font-medium bg-red-50 text-red-600 border border-red-200 rounded hover:bg-red-100">لم يحضر</button>
                             </>
                           )}
                           {item.stage === 'ARRIVED' && (
-                            <button onClick={() => onAction(item.id, 'start-prep')} className="px-2 py-1 text-xs font-medium bg-orange-500 text-white rounded hover:bg-orange-600">Start Prep</button>
-                          )}
-                          {item.stage === 'IN_PREP' && (
-                            <button onClick={() => onAction(item.id, 'ready')} className="px-2 py-1 text-xs font-medium bg-red-500 text-white rounded hover:bg-red-600">Ready (Queue)</button>
+                            <button onClick={() => onAction(item.id, 'ready')} className="px-2 py-1 text-xs font-medium bg-red-500 text-white rounded hover:bg-red-600">انتظار (جاهز)</button>
                           )}
                           {item.stage === 'WAITING' && (
-                            <button onClick={() => onAction(item.id, 'start-session')} className="px-2 py-1 text-xs font-medium bg-emerald-500 text-white rounded hover:bg-emerald-600">Start Session</button>
+                            <button onClick={() => onAction(item.id, 'start-session')} className="px-2 py-1 text-xs font-medium bg-emerald-500 text-white rounded hover:bg-emerald-600">بدء الجلسة</button>
                           )}
                           {item.stage === 'IN_SESSION' && (
-                            <button onClick={() => onAction(item.id, 'end-session')} className="px-2 py-1 text-xs font-medium bg-blue-500 text-white rounded hover:bg-blue-600">End Session</button>
+                            <button onClick={() => onAction(item.id, 'end-session')} className="px-2 py-1 text-xs font-medium bg-blue-500 text-white rounded hover:bg-blue-600">إنهاء الجلسة</button>
                           )}
                           {item.stage === 'PENDING_CHECKOUT' && (
-                            <button onClick={() => onAction(item.id, 'checkout')} className="px-2 py-1 text-xs font-medium bg-surface-900 text-white rounded hover:bg-black">Checkout</button>
+                            <button onClick={() => onAction(item.id, 'checkout')} className="px-2 py-1 text-xs font-medium bg-surface-900 text-white rounded hover:bg-black">الدفع</button>
                           )}
 
                           <button onClick={() => onViewClient(item.clientId)} className="px-2 py-1 text-xs font-medium bg-white border border-surface-200 rounded hover:bg-surface-50 flex items-center">
-                            <User className="w-3 h-3 mr-1" /> Profile
+                            <User className="w-3 h-3 ml-1" /> الملف
                           </button>
                         </div>
                       </div>

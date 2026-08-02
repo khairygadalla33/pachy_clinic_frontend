@@ -6,6 +6,7 @@ import { useAuth } from '../lib/auth';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
 import WorkflowQueuePanel from '../components/WorkflowQueuePanel';
+import { translateStatus } from '../lib/utils';
 
 export default function ReceptionDashboard() {
   const queryClient = useQueryClient();
@@ -57,23 +58,22 @@ export default function ReceptionDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-surface-900">Reception Dashboard</h1>
-          <p className="text-surface-500 text-sm mt-1">Live patient queue and workflow tracking</p>
+          <h1 className="text-2xl font-bold text-surface-900">شاشة الاستقبال</h1>
+          <p className="text-surface-500 text-sm mt-1">متابعة قائمة الانتظار ومسار المرضى المباشر</p>
         </div>
         <button onClick={() => navigate('/appointments?newWalkIn=true')} className="btn-primary">
-          <Plus className="w-4 h-4 mr-2" /> Walk-in Patient
+          <Plus className="w-4 h-4 mr-2" /> مريض بدون موعد
         </button>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
-          { label: 'Booked', value: stats?.BOOKED || 0, icon: Clock, color: 'text-surface-600 bg-surface-100 border border-surface-200' },
-          { label: 'Arrived', value: stats?.ARRIVED || 0, icon: LogIn, color: 'text-yellow-600 bg-yellow-50 border border-yellow-200' },
-          { label: 'In Prep', value: stats?.IN_PREP || 0, icon: Activity, color: 'text-orange-600 bg-orange-50 border border-orange-200' },
-          { label: 'Waiting', value: stats?.WAITING || 0, icon: Users, color: 'text-red-600 bg-red-50 border border-red-200' },
-          { label: 'In Session', value: stats?.IN_SESSION || 0, icon: Activity, color: 'text-emerald-600 bg-emerald-50 border border-emerald-200' },
-          { label: 'Checkout', value: stats?.PENDING_CHECKOUT || 0, icon: CheckSquare, color: 'text-blue-600 bg-blue-50 border border-blue-200' },
+          { label: 'محجوز', value: stats?.BOOKED || 0, icon: Clock, color: 'text-surface-600 bg-surface-100 border border-surface-200' },
+          { label: 'حضر', value: stats?.ARRIVED || 0, icon: LogIn, color: 'text-yellow-600 bg-yellow-50 border border-yellow-200' },
+          { label: 'في الانتظار', value: stats?.WAITING || 0, icon: Users, color: 'text-red-600 bg-red-50 border border-red-200' },
+          { label: 'في الجلسة', value: stats?.IN_SESSION || 0, icon: Activity, color: 'text-emerald-600 bg-emerald-50 border border-emerald-200' },
+          { label: 'تسوية مالية', value: stats?.PENDING_CHECKOUT || 0, icon: CheckSquare, color: 'text-blue-600 bg-blue-50 border border-blue-200' },
         ].map((s, i) => (
           <div key={i} className={`p-4 rounded-xl shadow-sm ${s.color}`}>
             <div className="flex items-center gap-3">
@@ -95,23 +95,24 @@ export default function ReceptionDashboard() {
       />
 
       {/* Upcoming Appointments Table */}
-      <Card title="Today's Upcoming Appointments">
+      {/* Upcoming Appointments Table */}
+      <Card title="مواعيد اليوم القادمة">
         <div className="overflow-x-auto -mx-6">
-          <table className="w-full text-sm text-left">
+          <table className="w-full text-sm text-right">
             <thead className="bg-surface-50 text-surface-600 border-b border-surface-200">
               <tr>
-                <th className="px-4 py-3 font-semibold">Time</th>
-                <th className="px-4 py-3 font-semibold">Patient</th>
-                <th className="px-4 py-3 font-semibold">Service</th>
-                <th className="px-4 py-3 font-semibold">Doctor</th>
-                <th className="px-4 py-3 font-semibold">Status</th>
+                <th className="px-4 py-3 font-semibold">الوقت</th>
+                <th className="px-4 py-3 font-semibold">المريض</th>
+                <th className="px-4 py-3 font-semibold">الخدمة</th>
+                <th className="px-4 py-3 font-semibold">الطبيب</th>
+                <th className="px-4 py-3 font-semibold">الحالة</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-200">
               {upcoming?.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-4 py-8 text-center text-surface-500">
-                    No upcoming appointments today.
+                    لا توجد مواعيد قادمة اليوم.
                   </td>
                 </tr>
               ) : (
@@ -123,9 +124,9 @@ export default function ReceptionDashboard() {
                       <div className="text-xs text-surface-500">{apt.client.phone}</div>
                     </td>
                     <td className="px-4 py-3 text-surface-700">{apt.service.name}</td>
-                    <td className="px-4 py-3 text-surface-700">Dr. {apt.staff.fullName}</td>
+                    <td className="px-4 py-3 text-surface-700">د. {apt.staff.fullName}</td>
                     <td className="px-4 py-3">
-                      <Badge variant={apt.status === 'CONFIRMED' ? 'success' : 'warning'}>{apt.status}</Badge>
+                      <Badge variant={apt.status === 'CONFIRMED' ? 'success' : 'warning'}>{translateStatus(apt.status)}</Badge>
                     </td>
                   </tr>
                 ))

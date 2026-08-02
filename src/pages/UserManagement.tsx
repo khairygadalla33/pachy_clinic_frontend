@@ -4,7 +4,7 @@ import api from '../lib/api';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
 import { Search, Plus, Edit, Trash2, Shield, User, MapPin } from 'lucide-react';
-import { formatDate } from '../lib/utils';
+import { formatDate, translateStatus } from '../lib/utils';
 import Modal from '../components/Modal';
 
 export default function UserManagement() {
@@ -150,7 +150,7 @@ export default function UserManagement() {
             className="input-field w-full md:w-64"
           >
             <option value="">كل الأدوار</option>
-            {roles.map(r => <option key={r} value={r}>{r}</option>)}
+            {roles.map(r => <option key={r} value={r}>{translateStatus(r)}</option>)}
           </select>
         </div>
 
@@ -186,7 +186,7 @@ export default function UserManagement() {
                       </div>
                     </td>
                     <td className="py-3 px-4">
-                      <Badge variant={roleColors[user.role] || 'default'}>{user.role}</Badge>
+                      <Badge variant={roleColors[user.role] || 'default'}>{translateStatus(user.role)}</Badge>
                     </td>
                     <td className="py-3 px-4 text-surface-600 dark:text-surface-300">
                       {user.branch ? (
@@ -248,7 +248,7 @@ export default function UserManagement() {
             <div>
               <label className="block text-sm font-medium mb-1">الدور *</label>
               <select required value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} className="input-field w-full">
-                {roles.map(r => <option key={r} value={r}>{r}</option>)}
+                {roles.map(r => <option key={r} value={r}>{translateStatus(r)}</option>)}
               </select>
             </div>
             <div>

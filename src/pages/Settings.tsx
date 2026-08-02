@@ -8,16 +8,20 @@ import {
   Info
 } from 'lucide-react';
 import WhatsAppSettings from '../components/settings/WhatsAppSettings';
+import ClinicInfoSettings from '../components/settings/ClinicInfoSettings';
+import BranchSettings from '../components/settings/BranchSettings';
+import PrescriptionTemplatesSettings from '../components/settings/PrescriptionTemplatesSettings';
+import ConsumableKitsSettings from '../components/settings/ConsumableKitsSettings';
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState('info');
 
   const tabs = [
-    { id: 'info', name: 'Clinic Info', icon: Info },
-    { id: 'branches', name: 'Branches', icon: Building2 },
-    { id: 'whatsapp', name: 'WhatsApp API', icon: MessageSquare },
-    { id: 'templates', name: 'Prescription Templates', icon: FileText },
-    { id: 'kits', name: 'Consumable Kits', icon: FlaskConical },
+    { id: 'info', name: 'بيانات العيادة', icon: Info },
+    { id: 'branches', name: 'الفروع', icon: Building2 },
+    { id: 'whatsapp', name: 'إعدادات واتساب', icon: MessageSquare },
+    { id: 'templates', name: 'قوالب الروشتات', icon: FileText },
+    { id: 'kits', name: 'مجموعات المستهلكات', icon: FlaskConical },
   ];
 
   return (
@@ -54,11 +58,11 @@ export default function Settings() {
       </div>
 
       <div className="mt-6">
-        {activeTab === 'info' && <ComingSoon title="Clinic Info Settings" />}
-        {activeTab === 'branches' && <ComingSoon title="Branch Management" />}
+        {activeTab === 'info' && <ClinicInfoSettings />}
+        {activeTab === 'branches' && <BranchSettings />}
         {activeTab === 'whatsapp' && <WhatsAppSettings />}
-        {activeTab === 'templates' && <ComingSoon title="Prescription Templates" />}
-        {activeTab === 'kits' && <ComingSoon title="Consumable Kits" />}
+        {activeTab === 'templates' && <PrescriptionTemplatesSettings />}
+        {activeTab === 'kits' && <ConsumableKitsSettings />}
       </div>
     </div>
   );

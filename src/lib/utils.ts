@@ -48,3 +48,87 @@ export function getInitials(name: string, fallback: string = ''): string {
   if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
+
+export const statusLabelsAr: Record<string, string> = {
+  // Workflow
+  BOOKED: 'محجوز',
+  ARRIVED: 'حضر',
+  WAITING: 'في الانتظار',
+  IN_SESSION: 'في الجلسة',
+  PENDING_CHECKOUT: 'تسوية مالية',
+  COMPLETED: 'مكتمل',
+  NO_SHOW: 'لم يحضر',
+  CANCELLED: 'ملغي',
+  
+  // Invoice
+  DRAFT: 'مسودة',
+  ISSUED: 'صادرة',
+  PAID: 'مدفوعة',
+  PARTIALLY_PAID: 'مدفوعة جزئياً',
+  REFUNDED: 'مستردة',
+  
+  // Campaigns
+  RUNNING: 'قيد التنفيذ',
+  PAUSED: 'متوقفة',
+  
+  // Package
+  ACTIVE: 'نشط',
+  EXPIRED: 'منتهي',
+  
+  // Roles
+  ADMIN: 'مدير',
+  DOCTOR: 'طبيب',
+  NURSE: 'ممرض/ة',
+  TECHNICIAN: 'فني',
+  RECEPTIONIST: 'استقبال',
+  
+  // Gender
+  MALE: 'ذكر',
+  FEMALE: 'أنثى',
+  
+  // Payment
+  CASH: 'نقدي',
+  CARD: 'بطاقة',
+  INSTAPAY: 'إنستاباي',
+  BANK_TRANSFER: 'تحويل بنكي',
+  
+  // Account
+  BANK: 'بنك',
+  WALLET: 'محفظة إلكترونية',
+  PETTY_CASH: 'مصروفات نثرية',
+  
+  // WhatsApp
+  SENT: 'تم الإرسال',
+  DELIVERED: 'تم التوصيل',
+  FAILED: 'فشل',
+  PENDING: 'في الانتظار',
+  BROADCAST: 'حملة جماعية',
+  PRESCRIPTION: 'روشتة',
+  INVOICE: 'فاتورة',
+  APPOINTMENT_REMINDER: 'تذكير بموعد',
+  STATUS_NOTIFY: 'إشعار حالة',
+  MANUAL: 'يدوي',
+  
+  // Skin reaction
+  NONE: 'لا يوجد',
+  MILD: 'خفيف',
+  MODERATE: 'متوسط',
+  SEVERE: 'شديد',
+  
+  // Treasury
+  REVENUE: 'إيراد',
+  EXPENSE: 'مصروف',
+  DEPOSIT_IN: 'إيداع',
+  REFUND: 'استرداد',
+  ADJUSTMENT: 'تسوية',
+  
+  // Maintenance
+  SCHEDULED: 'مجدول',
+  IN_PROGRESS: 'جاري التنفيذ',
+  OVERDUE: 'متأخر',
+};
+
+export function translateStatus(status: string): string {
+  if (!status) return status;
+  return statusLabelsAr[status] || status;
+}
