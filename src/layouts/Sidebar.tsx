@@ -28,6 +28,11 @@ const navGroups = [
       { path: '/laser-sessions', label: 'جلسات الليزر', icon: Activity, roles: ['ADMIN', 'DOCTOR', 'TECHNICIAN'] },
       { path: '/injection-sessions', label: 'جلسات الحقن', icon: Syringe, roles: ['ADMIN', 'DOCTOR'] },
       { path: '/skincare-sessions', label: 'العناية بالبشرة', icon: Sparkles, roles: ['ADMIN', 'NURSE', 'TECHNICIAN'] },
+    ]
+  },
+  {
+    title: 'التسويق',
+    items: [
       { path: '/whatsapp', label: 'الواتساب (WhatsApp)', icon: MessageSquare, roles: ['ADMIN', 'RECEPTIONIST'] },
     ]
   },
