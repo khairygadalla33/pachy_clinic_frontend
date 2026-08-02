@@ -37,6 +37,10 @@ export default function ClinicInfoSettings() {
             <input type="text" value={formData.clinicName || ''} onChange={e => setFormData({...formData, clinicName: e.target.value})} className="input-field w-full" />
           </div>
           <div>
+            <label className="block text-sm font-medium mb-1">رابط الشعار (Logo URL)</label>
+            <input type="text" value={formData.logoUrl || ''} onChange={e => setFormData({...formData, logoUrl: e.target.value})} className="input-field w-full" placeholder="https://example.com/logo.png" />
+          </div>
+          <div>
             <label className="block text-sm font-medium mb-1">البريد الإلكتروني</label>
             <input type="email" value={formData.contactEmail || ''} onChange={e => setFormData({...formData, contactEmail: e.target.value})} className="input-field w-full" />
           </div>

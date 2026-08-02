@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../lib/auth';
+import { useQuery } from '@tanstack/react-query';
+import api from '../lib/api';
 import { 
   LayoutDashboard, Users, Calendar, Settings as SettingsIcon,
   Activity, Syringe, Sparkles, Receipt, Wallet,
@@ -94,6 +96,14 @@ export default function Sidebar() {
   const location = useLocation();
   const isTablet = useIsTablet();
 
+  const { data: settings } = useQuery({
+    queryKey: ['settings'],
+    queryFn: async () => {
+      const res = await api.get('/settings');
+      return res.data.data;
+    }
+  });
+
   // Close mobile sidebar on route change
   useEffect(() => {
     setMobileOpen(false);
@@ -110,13 +120,17 @@ export default function Sidebar() {
     <>
       <div className="flex items-center gap-3 px-4 h-16 border-b border-white/10 shrink-0">
         <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-rose-600 overflow-hidden flex items-center justify-center text-white">
-          <HeartPulse className="w-5 h-5" />
+          {settings?.logoUrl ? (
+             <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-cover" />
+          ) : (
+             <HeartPulse className="w-5 h-5" />
+          )}
         </div>
         <AnimatePresence>
           {(isMobile || !collapsed) && (
             <motion.div initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: 'auto' }} exit={{ opacity: 0, width: 0 }} className="overflow-hidden whitespace-nowrap flex-1">
               <h1 className="text-white font-bold text-base tracking-tight truncate max-w-[160px]">
-                Pachy Clinic
+                {settings?.clinicNameAr || settings?.clinicName || 'Pachy Clinic'}
               </h1>
               <p className="text-surface-400 text-[10px] font-medium truncate max-w-[160px]">
                 Management System

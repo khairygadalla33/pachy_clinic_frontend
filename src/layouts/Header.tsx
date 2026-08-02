@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { Bell, UserCircle, Menu, Sun, Moon } from 'lucide-react';
+import { Bell, Menu, Sun, Moon } from 'lucide-react';
 import { useState } from 'react';
 
 const pageNames: Record<string, string> = {
@@ -67,16 +67,10 @@ export default function Header() {
         
         <div className="flex items-center gap-2 mr-1 md:mr-2 pr-2 md:pr-3 border-r border-surface-200 dark:border-surface-700">
           <button className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors text-right">
-            <UserCircle className="w-6 h-6 text-surface-500" />
-            <div className="hidden md:block text-right">
+            <div className="hidden md:block text-right px-2">
               <div className="text-sm font-medium text-surface-900 dark:text-surface-100">
                 {user?.fullName}
               </div>
-              {user?.role && (
-                <div className="hidden lg:block text-xs text-surface-500 dark:text-surface-400 line-clamp-1">
-                  {user.role}
-                </div>
-              )}
             </div>
           </button>
         </div>
