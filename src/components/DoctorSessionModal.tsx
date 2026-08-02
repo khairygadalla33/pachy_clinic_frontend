@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { X, Activity, FileText, CheckCircle, Clock } from 'lucide-react';
+import { X, Activity, FileText, CheckCircle } from 'lucide-react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
+import SessionForm from './SessionForm';
+import PrescriptionForm from './PrescriptionForm';
 
 interface DoctorSessionModalProps {
   queueItem: any;
@@ -12,7 +14,6 @@ interface DoctorSessionModalProps {
 export default function DoctorSessionModal({ queueItem, onClose, onSessionComplete }: DoctorSessionModalProps) {
   const [activeTab, setActiveTab] = useState<'details' | 'prescription'>('details');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [notes, setNotes] = useState('');
 
   if (!queueItem) return null;
 
@@ -20,16 +21,16 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
   const appointment = queueItem.appointment;
   const service = appointment?.service;
 
+  let sessionType: 'LASER' | 'INJECTION' | 'SKIN_CARE' = 'SKIN_CARE';
+  if (service?.category?.name) {
+    const cat = service.category.name.toUpperCase();
+    if (cat.includes('LASER')) sessionType = 'LASER';
+    else if (cat.includes('INJECT') || cat.includes('FILLER') || cat.includes('BOTOX')) sessionType = 'INJECTION';
+  }
+
   const handleFinish = async () => {
     try {
       setIsSubmitting(true);
-      
-      // Update appointment notes if any
-      if (notes.trim()) {
-        await api.put(`/appointments/${appointment.id}`, {
-          notes: notes.trim(),
-        });
-      }
 
       // If it wasn't in session yet, mark it as in session first?
       // Typically the modal might just finish it. But let's assume clicking it means starting/resuming it.
@@ -107,35 +108,23 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-surface-50/30">
           {activeTab === 'details' && (
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-bold text-surface-700 mb-2">ملاحظات الطبيب وتفاصيل الجلسة</label>
-                <textarea
-                  className="input min-h-[200px] resize-y"
-                  placeholder="اكتب ملاحظاتك هنا..."
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                />
-              </div>
-              
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                <h4 className="font-bold text-blue-800 mb-2 flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  بيانات سابقة للمريض
-                </h4>
-                <p className="text-sm text-blue-600">
-                  لا توجد زيارات سابقة مسجلة في النظام لهذا المريض.
-                </p>
-              </div>
-            </div>
+             <SessionForm 
+               type={sessionType}
+               appointmentId={appointment.id}
+               clientId={patient.id}
+               serviceId={service.id}
+               onSuccess={() => toast.success('تم حفظ تفاصيل الجلسة')}
+               onCancel={onClose}
+             />
           )}
 
           {activeTab === 'prescription' && (
-            <div className="flex flex-col items-center justify-center h-full text-surface-500 min-h-[300px]">
-              <FileText className="w-16 h-16 text-surface-200 mb-4" />
-              <p className="font-medium text-lg">قريباً</p>
-              <p className="text-sm">سيتم إضافة نظام الروشتة الإلكترونية في التحديث القادم.</p>
-            </div>
+             <PrescriptionForm 
+               clientId={patient.id}
+               appointmentId={appointment.id}
+               onSuccess={() => toast.success('تم حفظ الروشتة')}
+               onCancel={onClose}
+             />
           )}
         </div>
 
