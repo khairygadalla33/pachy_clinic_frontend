@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
 import Card from '../Card';
-import { Building2, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 
 export default function ClinicInfoSettings() {
   const queryClient = useQueryClient();

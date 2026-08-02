@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import ComingSoon from '../components/ComingSoon';
+
 import { 
   Building2, 
   MessageSquare, 
