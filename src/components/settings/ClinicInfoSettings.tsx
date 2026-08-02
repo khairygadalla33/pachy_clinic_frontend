@@ -38,11 +38,11 @@ export default function ClinicInfoSettings() {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">البريد الإلكتروني</label>
-            <input type="email" value={formData.email || ''} onChange={e => setFormData({...formData, email: e.target.value})} className="input-field w-full" />
+            <input type="email" value={formData.contactEmail || ''} onChange={e => setFormData({...formData, contactEmail: e.target.value})} className="input-field w-full" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">رقم الهاتف</label>
-            <input type="text" value={formData.phone || ''} onChange={e => setFormData({...formData, phone: e.target.value})} className="input-field w-full" />
+            <input type="text" value={formData.contactPhone || ''} onChange={e => setFormData({...formData, contactPhone: e.target.value})} className="input-field w-full" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">العنوان الرئيسي</label>
