@@ -4,6 +4,7 @@ import api from '../lib/api';
 import toast from 'react-hot-toast';
 import SessionForm from './SessionForm';
 import PrescriptionForm from './PrescriptionForm';
+import PatientHistorySidebar from './PatientHistorySidebar';
 
 interface DoctorSessionModalProps {
   queueItem: any;
@@ -54,9 +55,14 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-surface-900/40 backdrop-blur-sm p-4 sm:p-6">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-7xl h-[90vh] flex overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         
-        {/* Header */}
+        {/* Left Sidebar - Patient History */}
+        <PatientHistorySidebar clientId={patient.id} />
+
+        {/* Right Side - Main Content */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Header */}
         <div className="px-6 py-4 border-b border-surface-200 flex items-center justify-between bg-surface-50/50">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-lg">
@@ -128,27 +134,28 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
           )}
         </div>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-surface-200 bg-white flex justify-end gap-3">
-          <button 
-            className="btn-ghost" 
-            onClick={onClose}
-            disabled={isSubmitting}
-          >
-            إغلاق
-          </button>
-          <button 
-            className="btn-primary flex items-center gap-2"
-            onClick={handleFinish}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
-            ) : (
-              <CheckCircle className="w-4 h-4" />
-            )}
-            إنهاء الجلسة وتحويل للاستقبال
-          </button>
+          {/* Footer */}
+          <div className="p-4 border-t border-surface-200 bg-white flex justify-end gap-3">
+            <button 
+              className="btn-ghost" 
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
+              إغلاق
+            </button>
+            <button 
+              className="btn-primary flex items-center gap-2"
+              onClick={handleFinish}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+              ) : (
+                <CheckCircle className="w-4 h-4" />
+              )}
+              إنهاء الجلسة وتحويل للاستقبال
+            </button>
+          </div>
         </div>
 
       </div>
