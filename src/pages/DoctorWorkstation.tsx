@@ -23,25 +23,25 @@ export default function DoctorWorkstation() {
   // Queue Polling
   const { data: queueItems } = useQuery({
     queryKey: ['workflow-queue', branchId],
-    queryFn: () => api.get(`/workflow/queue/${branchId}`).then(r => r.data),
+    queryFn: () => api.get('/workflow/queue/by-doctor', { params: { branchId } }).then(r => r.data),
     refetchInterval: 10000,
     enabled: !!branchId,
   });
 
   // Filter queue for current doctor (if not admin)
-  const doctorQueue = queueItems?.filter((q: any) => {
-    // Only show patients that are in DOCTOR_SESSION or waiting for it
-    const validStatuses = ['WAITING_FOR_DOCTOR', 'DOCTOR_SESSION'];
-    if (!validStatuses.includes(q.status)) return false;
+  const doctorQueue = queueItems?.flatMap((group: any) => group.items).filter((q: any) => {
+    // Only show patients that are in IN_SESSION or waiting for it
+    const validStatuses = ['WAITING', 'IN_SESSION'];
+    if (!validStatuses.includes(q.stage)) return false;
     
     // If not admin, only show patients assigned to this doctor
-    if (user?.role !== 'ADMIN' && q.assignedStaffId !== user?.id) return false;
+    if (user?.role !== 'ADMIN' && q.staffId !== user?.id) return false;
     
     return true;
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: (data: { id: string, status: string }) => api.put(`/workflow/queue/${data.id}/status`, { status: data.status }),
+    mutationFn: (data: { id: string, action: string }) => api.put(`/workflow/${data.id}/${data.action}`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['workflow-queue'] }),
   });
 
@@ -57,11 +57,11 @@ export default function DoctorWorkstation() {
     else if (cat.includes('INJECT') || cat.includes('FILLER') || cat.includes('BOTOX')) setSessionType('INJECTION');
     else setSessionType('SKIN_CARE');
 
-    updateStatusMutation.mutate({ id: queueId, status: 'DOCTOR_SESSION' });
+    updateStatusMutation.mutate({ id: queueId, action: 'start-session' });
   };
 
   const handleFinishSession = (queueId: string) => {
-    updateStatusMutation.mutate({ id: queueId, status: 'WAITING_FOR_PAYMENT' });
+    updateStatusMutation.mutate({ id: queueId, action: 'end-session' });
     setActivePatientId(null);
     setActiveQueueId(null);
   };
@@ -96,15 +96,15 @@ export default function DoctorWorkstation() {
                   <div key={q.id} className={`p-4 rounded-lg border ${activeQueueId === q.id ? 'border-primary-500 bg-primary-50' : 'border-surface-200 bg-white'} transition-colors`}>
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <div className="font-bold text-surface-900">{q.client.firstName} {q.client.lastName}</div>
+                        <div className="font-bold text-surface-900">{q.client.fullName}</div>
                         <div className="text-sm text-surface-500">{q.appointment.service.name}</div>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${q.status === 'DOCTOR_SESSION' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}`}>
-                        {q.status === 'DOCTOR_SESSION' ? 'في الجلسة' : 'في الانتظار'}
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${q.stage === 'IN_SESSION' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}`}>
+                        {q.stage === 'IN_SESSION' ? 'في الجلسة' : 'في الانتظار'}
                       </span>
                     </div>
                     
-                    {q.status === 'WAITING_FOR_DOCTOR' && (
+                    {q.stage === 'WAITING' && (
                       <button 
                         onClick={() => handleStartSession(q.id, q.client.id, q.appointment.id, q.appointment.service.id, q.appointment.service.category.name)}
                         className="w-full mt-3 flex items-center justify-center btn-primary py-2 text-sm"
@@ -113,7 +113,7 @@ export default function DoctorWorkstation() {
                       </button>
                     )}
                     
-                    {q.status === 'DOCTOR_SESSION' && activeQueueId !== q.id && (
+                    {q.stage === 'IN_SESSION' && activeQueueId !== q.id && (
                       <button 
                         onClick={() => handleStartSession(q.id, q.client.id, q.appointment.id, q.appointment.service.id, q.appointment.service.category.name)}
                         className="w-full mt-3 flex items-center justify-center btn-secondary py-2 text-sm text-amber-700 border-amber-300 hover:bg-amber-50"

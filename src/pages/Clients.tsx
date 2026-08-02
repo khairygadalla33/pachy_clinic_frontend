@@ -48,7 +48,9 @@ export default function Clients() {
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
-    createMutation.mutate(formData);
+    const payload = { ...formData };
+    if (!payload.email) delete (payload as any).email;
+    createMutation.mutate(payload);
   };
 
   return (

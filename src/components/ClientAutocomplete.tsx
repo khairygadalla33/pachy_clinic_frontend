@@ -80,7 +80,7 @@ export default function ClientAutocomplete({ onSelect, placeholder = 'البحث
               onClick={() => {
                 onSelect(client);
                 setIsOpen(false);
-                setQuery('');
+                setQuery(client.fullName);
               }}
               className="w-full text-right px-4 py-3 hover:bg-surface-50 dark:hover:bg-surface-700/50 flex items-center gap-3 transition-colors border-b border-surface-100 dark:border-surface-700/50 last:border-0"
             >
