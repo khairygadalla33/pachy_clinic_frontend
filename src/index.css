@@ -42,14 +42,14 @@
   }
   
   .sidebar-link.active {
-    @apply bg-rose-500/20 text-rose-400 border-r-2 border-rose-400;
+    @apply bg-rose-500/20 text-rose-400 border-l-4 border-rose-400;
   }
 }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { @apply bg-transparent; }
-::-webkit-scrollbar-thumb { @apply bg-surface-300 dark:bg-surface-600 rounded-full; }
-::-webkit-scrollbar-thumb:hover { @apply bg-surface-400 dark:bg-surface-500; }
+::-webkit-scrollbar { width: 0px; height: 0px; display: none; }
+::-webkit-scrollbar-track { display: none; }
+::-webkit-scrollbar-thumb { display: none; }
+::-webkit-scrollbar-thumb:hover { display: none; }
 
 
 @media print {

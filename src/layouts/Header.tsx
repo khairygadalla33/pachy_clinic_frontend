@@ -42,7 +42,7 @@ export default function Header() {
   const pageName = pageNames[location.pathname] || pageNames[`/${location.pathname.split('/')[1]}`] || 'باتشي كلينك';
 
   return (
-    <header className="h-14 md:h-16 border-b border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 flex items-center justify-between px-4 md:px-6 sticky top-0 z-30 shadow-sm transition-colors duration-300">
+    <header className="h-14 md:h-16 border-b border-surface-200 dark:border-surface-700/50 bg-white/80 dark:bg-[#0B1121]/80 backdrop-blur-md flex items-center justify-between px-4 md:px-6 sticky top-0 z-30 shadow-sm transition-colors duration-300">
       <div className="flex items-center gap-3">
         {/* Hamburger menu - mobile only */}
         <button
