@@ -95,6 +95,18 @@ export default function Services() {
     return Array.from(map.values());
   }, [categories, services]);
 
+  const dropdownCategories = useMemo(() => {
+    if (!categories) return [];
+    const map = new Map();
+    categories.forEach((c: any) => {
+      const name = c.nameAr || c.name;
+      if (!map.has(name)) {
+        map.set(name, c);
+      }
+    });
+    return Array.from(map.values());
+  }, [categories]);
+
   const filteredServices = services?.filter((s: any) => {
     if (activeTab === 'all') return true;
     const cat = categories?.find((c: any) => c.id === s.categoryId);
@@ -349,7 +361,7 @@ export default function Services() {
                 className="w-full px-3 py-2 border border-surface-300 rounded-md dark:bg-surface-800 dark:border-surface-600 focus:ring-primary-500 focus:border-primary-500"
               >
                 <option value="">اختر الفئة...</option>
-                {categories?.map((c: any) => (
+                {dropdownCategories?.map((c: any) => (
                   <option key={c.id} value={c.id}>{c.nameAr || c.name}</option>
                 ))}
               </select>
