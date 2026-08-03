@@ -12,13 +12,14 @@ interface CalendarViewProps {
   maxSlotsPerDay?: number;
   appointmentInterval?: number;
   selectedDate?: Date;
+  doctorSchedule?: any;
 }
 
 export default function CalendarView({ 
   appointments, currentDate, onDateChange, 
   onAppointmentClick, onEmptyCellClick, timeframe,
   maxSlotsPerDay = 8, appointmentInterval = 45,
-  selectedDate
+  selectedDate, doctorSchedule
 }: CalendarViewProps) {
   
   const { days, isWeekly } = useMemo(() => {
@@ -167,53 +168,98 @@ export default function CalendarView({
         {isWeekly ? (
           <div className="grid grid-cols-6 relative">
             {/* Daily Columns */}
-            {days.map((dayColumn, dayIdx) => (
+            {days.map((dayColumn, dayIdx) => {
+              const dayOfWeek = dayColumn.date?.getDay();
+              const scheduleForDay = doctorSchedule?.schedules?.find((s: any) => s.dayOfWeek === dayOfWeek);
+              const isDoctorOff = doctorSchedule && (!scheduleForDay || !scheduleForDay.isActive);
+              const allowOverbooking = doctorSchedule?.allowOverbooking ?? false;
+
+              let startMinutes = 9 * 60; // default 9:00 AM
+              let endMinutes = 17 * 60;  // default 5:00 PM
+              
+              if (scheduleForDay && scheduleForDay.isActive) {
+                const [sh, sm] = scheduleForDay.startTime.split(':').map(Number);
+                startMinutes = sh * 60 + sm;
+                const [eh, em] = scheduleForDay.endTime.split(':').map(Number);
+                endMinutes = eh * 60 + em;
+              }
+
+              const slotsToRender = doctorSchedule 
+                ? Math.ceil((endMinutes - startMinutes) / appointmentInterval)
+                : maxSlotsPerDay;
+
+              return (
               <div 
                 key={dayIdx} 
                 className={cn(
-                  "relative border-r border-surface-200 dark:border-surface-800 last:border-r-0 transition-colors",
-                  dayColumn.date && dayColumn.date.toDateString() === new Date().toDateString() && "bg-primary-50/20 dark:bg-primary-900/10"
+                  "relative border-r border-surface-200 dark:border-surface-800 last:border-r-0 transition-colors flex flex-col",
+                  dayColumn.date && dayColumn.date.toDateString() === new Date().toDateString() && "bg-primary-50/20 dark:bg-primary-900/10",
+                  isDoctorOff && "bg-surface-100 dark:bg-surface-800 opacity-60"
                 )}
               >
-                {Array.from({ length: maxSlotsPerDay }).map((_, slotIdx) => {
-                  const apt = dayColumn.appointments[slotIdx];
-                  
-                  const slotMinutes = 9 * 60 + slotIdx * appointmentInterval;
+                {Array.from({ length: Math.max(slotsToRender, 1) }).map((_, slotIdx) => {
+                  const slotMinutes = startMinutes + slotIdx * appointmentInterval;
                   const h = Math.floor(slotMinutes / 60);
                   const m = slotMinutes % 60;
                   const calculatedTime = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
                   
+                  // Match appointments by time loosely (within this slot's interval)
+                  const aptsInSlot = dayColumn.appointments.filter(a => {
+                    if (!a.startTime) return false;
+                    const [ah, am] = a.startTime.split(':').map(Number);
+                    const aptMins = ah * 60 + am;
+                    return aptMins >= slotMinutes && aptMins < slotMinutes + appointmentInterval;
+                  });
+
+                  const isOutsideHours = slotMinutes >= endMinutes;
+                  const disabled = isDoctorOff || isOutsideHours;
+                  const canBook = !disabled && (aptsInSlot.length === 0 || allowOverbooking);
+
                   return (
                     <div 
                       key={slotIdx} 
-                      onClick={() => !apt && dayColumn.date && onEmptyCellClick(dayColumn.date, calculatedTime)}
+                      onClick={() => {
+                        if (canBook && dayColumn.date) onEmptyCellClick(dayColumn.date, calculatedTime);
+                      }}
                       className={cn(
-                        "h-16 border-b border-surface-100 dark:border-surface-800/50 p-1 group hover:bg-primary-50/30 dark:hover:bg-primary-900/10 transition-colors relative flex flex-col items-center justify-center",
-                        !apt && "cursor-pointer"
+                        "min-h-[4rem] border-b border-surface-100 dark:border-surface-800/50 p-1 group hover:bg-primary-50/30 dark:hover:bg-primary-900/10 transition-colors relative flex flex-col gap-1",
+                        canBook ? "cursor-pointer" : "cursor-not-allowed",
+                        disabled && "bg-surface-50 dark:bg-surface-900/50"
                       )}
                     >
-                      {apt ? (
-                        <div 
-                          onClick={(e) => { e.stopPropagation(); onAppointmentClick(apt); }}
-                          className={`absolute inset-x-1 top-1 bottom-1 z-10 p-2 rounded-lg border text-xs shadow-sm hover:scale-[1.02] transition-transform cursor-pointer ${getStatusColor(apt.status)}`}
-                        >
-                          <div className="flex items-center justify-between mb-1">
-                             <span className="font-bold">{apt.startTime}</span>
-                             <span className="text-[9px] font-black uppercase opacity-60 tracking-widest">{apt.status}</span>
+                      <div className="absolute top-1 left-1 opacity-40 text-[9px] font-bold text-surface-500 z-0">
+                        {calculatedTime}
+                      </div>
+
+                      <div className="flex-1 flex flex-col gap-1 z-10 pt-3">
+                        {aptsInSlot.map((apt: any) => (
+                          <div 
+                            key={apt.id}
+                            onClick={(e) => { e.stopPropagation(); onAppointmentClick(apt); }}
+                            className={`p-1.5 rounded-md border text-xs shadow-sm hover:scale-[1.02] transition-transform cursor-pointer ${getStatusColor(apt.status)}`}
+                          >
+                            <div className="flex items-center justify-between mb-0.5">
+                               <span className="font-bold text-[10px]">{apt.startTime}</span>
+                               <span className="text-[8px] font-black uppercase opacity-60 tracking-widest">{apt.status}</span>
+                            </div>
+                            <p className="font-medium truncate text-[10px]">{apt.client?.fullName}</p>
                           </div>
-                          <p className="font-medium truncate">{apt.client?.fullName}</p>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center h-full opacity-40 hover:opacity-100 transition-opacity">
-                           <span className="text-[10px] font-bold text-surface-500">{calculatedTime}</span>
-                           <span className="text-[10px] font-bold text-primary-500">+ Book</span>
-                        </div>
-                      )}
+                        ))}
+
+                        {canBook && (
+                          <div className={cn(
+                            "flex items-center justify-center rounded-md border border-dashed border-primary-300 text-primary-500 hover:bg-primary-50 hover:border-primary-400 transition-colors py-1 text-[10px] font-bold mt-auto",
+                            aptsInSlot.length > 0 ? "opacity-0 group-hover:opacity-100 h-6" : "h-full opacity-0 group-hover:opacity-100"
+                          )}>
+                             + موعد
+                          </div>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
               </div>
-            ))}
+            )})}
           </div>
         ) : (
           <div className="grid min-h-full grid-cols-7 auto-rows-fr">

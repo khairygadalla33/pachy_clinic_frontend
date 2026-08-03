@@ -17,6 +17,7 @@ export default function Appointments() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [page] = useState(1);
   const [dateFilter, setDateFilter] = useState('');
+  const [selectedDoctorId, setSelectedDoctorId] = useState('');
   
   const [showModal, setShowModal] = useState(searchParams.get('newWalkIn') === 'true');
   const [isWalkIn, setIsWalkIn] = useState(searchParams.get('newWalkIn') === 'true');
@@ -108,11 +109,13 @@ export default function Appointments() {
         params.page = page;
         params.limit = 15;
         if (dateFilter) params.date = dateFilter;
+        if (selectedDoctorId) params.staffId = selectedDoctorId;
       } else {
         params.page = 1;
         params.limit = 500;
         params.startDate = dateRange.startDate;
         params.endDate = dateRange.endDate;
+        if (selectedDoctorId) params.staffId = selectedDoctorId;
       }
       return api.get('/appointments', { params }).then(r => r.data);
     },
@@ -127,6 +130,12 @@ export default function Appointments() {
   const { data: staff } = useQuery({
     queryKey: ['staff', 'doctors'],
     queryFn: () => api.get('/users', { params: { role: 'DOCTOR' } }).then(r => r.data),
+  });
+
+  const { data: doctorSchedule } = useQuery({
+    queryKey: ['doctorSchedule', selectedDoctorId],
+    queryFn: () => api.get(`/users/${selectedDoctorId}/schedule`).then(r => r.data),
+    enabled: !!selectedDoctorId,
   });
 
   const createMutation = useMutation({
@@ -262,6 +271,18 @@ export default function Appointments() {
             </>
           )}
 
+          {/* Doctor Filter */}
+          <select 
+            value={selectedDoctorId} 
+            onChange={(e) => setSelectedDoctorId(e.target.value)}
+            className="input-field text-sm py-1.5 w-auto"
+          >
+            <option value="">كل الأطباء</option>
+            {staff?.map((s: any) => (
+              <option key={s.id} value={s.id}>د. {s.fullName}</option>
+            ))}
+          </select>
+
           <button onClick={() => { setIsWalkIn(true); setShowModal(true); }} className="btn-secondary whitespace-nowrap">
             <Plus className="w-4 h-4 mr-2" /> Walk-in
           </button>
@@ -358,12 +379,14 @@ export default function Appointments() {
             onAppointmentClick={handleEdit}
             onEmptyCellClick={(date, time) => {
               if (date >= new Date(new Date().setHours(0,0,0,0))) {
+                setFormData(prev => ({ ...prev, staffId: selectedDoctorId || prev.staffId }));
                 handleAddNew(date, time);
               }
             }}
             timeframe={timeframe}
             maxSlotsPerDay={systemSettings.maxSlotsPerDay}
-            appointmentInterval={systemSettings.appointmentInterval}
+            appointmentInterval={doctorSchedule?.sessionDuration || systemSettings.appointmentInterval}
+            doctorSchedule={doctorSchedule}
           />
         )}
       </div>

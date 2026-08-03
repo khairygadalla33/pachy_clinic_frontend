@@ -6,13 +6,15 @@ import {
   FileText, 
   FlaskConical,
   Info,
-  UsersRound
+  UsersRound,
+  CalendarClock
 } from 'lucide-react';
 import WhatsAppSettings from '../components/settings/WhatsAppSettings';
 import ClinicInfoSettings from '../components/settings/ClinicInfoSettings';
 import BranchSettings from '../components/settings/BranchSettings';
 import PrescriptionTemplatesSettings from '../components/settings/PrescriptionTemplatesSettings';
 import ConsumableKitsSettings from '../components/settings/ConsumableKitsSettings';
+import DoctorScheduleSettings from '../components/settings/DoctorScheduleSettings';
 import UserManagement from './UserManagement';
 
 export default function Settings() {
@@ -22,6 +24,7 @@ export default function Settings() {
     { id: 'info', name: 'بيانات العيادة', icon: Info },
     { id: 'branches', name: 'الفروع', icon: Building2 },
     { id: 'whatsapp', name: 'إعدادات واتساب', icon: MessageSquare },
+    { id: 'schedules', name: 'إدارة المواعيد', icon: CalendarClock },
     { id: 'templates', name: 'قوالب الروشتات', icon: FileText },
     { id: 'kits', name: 'مجموعات المستهلكات', icon: FlaskConical },
     { id: 'users', name: 'المستخدمين', icon: UsersRound },
@@ -62,11 +65,12 @@ export default function Settings() {
 
       <div className="mt-6">
         {activeTab === 'info' && <ClinicInfoSettings />}
-        {activeTab === 'branches' && <BranchSettings />}
-        {activeTab === 'whatsapp' && <WhatsAppSettings />}
-        {activeTab === 'templates' && <PrescriptionTemplatesSettings />}
-        {activeTab === 'kits' && <ConsumableKitsSettings />}
-        {activeTab === 'users' && <UserManagement />}
+        { activeTab === 'branches' && <BranchSettings /> }
+        { activeTab === 'whatsapp' && <WhatsAppSettings /> }
+        { activeTab === 'schedules' && <DoctorScheduleSettings /> }
+        { activeTab === 'templates' && <PrescriptionTemplatesSettings /> }
+        { activeTab === 'kits' && <ConsumableKitsSettings /> }
+        { activeTab === 'users' && <UserManagement /> }
       </div>
     </div>
   );
