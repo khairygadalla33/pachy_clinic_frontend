@@ -71,15 +71,18 @@ export default function PatientHistorySidebar({ clientId, excludeAppointmentId }
               {item.laserSession && (
                 <div className="text-xs text-surface-600 bg-white p-2 rounded border border-surface-200 mb-2 space-y-1">
                   <div>
-                    <span className="font-medium text-surface-800">energy:</span> {item.laserSession.energyLevel} {' '}
-                    <span className="font-medium text-surface-800">pulse:</span> {item.laserSession.pulseWidth} {' '}
-                    <span className="font-medium text-surface-800">spot size:</span> {item.laserSession.spotSize}
+                    <span className="font-medium text-surface-800">عدد النبضات:</span> {item.laserSession.numberOfPulses || '-'}
                   </div>
                   <div>
-                    <span className="font-medium text-surface-800">reaction:</span> {item.laserSession.skinReaction}
+                    <span className="font-medium text-surface-800">energy:</span> {item.laserSession.energyLevel || '-'} {' | '}
+                    <span className="font-medium text-surface-800">pulse width:</span> {item.laserSession.pulseWidth || '-'} {' | '}
+                    <span className="font-medium text-surface-800">spot size:</span> {item.laserSession.spotSize || '-'}
+                  </div>
+                  <div>
+                    <span className="font-medium text-surface-800">skin reaction:</span> {item.laserSession.skinReaction}
                   </div>
                   {item.laserSession.notes && (
-                    <div className="text-surface-500 italic">notes: {item.laserSession.notes}</div>
+                    <div className="text-surface-500 italic"><span className="font-medium text-surface-800 not-italic">ملاحظات:</span> {item.laserSession.notes}</div>
                   )}
                 </div>
               )}
@@ -113,12 +116,12 @@ export default function PatientHistorySidebar({ clientId, excludeAppointmentId }
 
               {/* Prescriptions */}
               {item.prescription && item.prescription.items && item.prescription.items.length > 0 && (
-                <div className="text-xs mt-2">
-                  <div className="font-medium text-surface-800 mb-1">prescriptions:</div>
-                  <ul className="list-disc list-inside text-surface-600 space-y-0.5">
+                <div className="text-xs mt-2 bg-white p-2 rounded border border-surface-200">
+                  <div className="font-medium text-surface-800 mb-1">medication:</div>
+                  <ul className="list-disc list-inside text-surface-600 space-y-1">
                     {item.prescription.items.map((p: any) => (
                       <li key={p.id}>
-                        {p.medicationName}, {p.dose}, {p.frequency}, {p.duration}
+                        drug {p.medicationName} - dose {p.dose} - repeate {p.frequency} - duration {p.duration}
                       </li>
                     ))}
                   </ul>
