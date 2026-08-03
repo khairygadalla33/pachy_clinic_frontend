@@ -99,9 +99,10 @@ export default function Services() {
     if (!categories) return [];
     const map = new Map();
     categories.forEach((c: any) => {
-      const name = c.nameAr || c.name;
-      if (!map.has(name)) {
-        map.set(name, c);
+      // Group by category type to avoid duplicates like "عناية بالبشرة" and "العناية بالبشرة"
+      const key = c.type || c.nameAr || c.name;
+      if (!map.has(key)) {
+        map.set(key, c);
       }
     });
     return Array.from(map.values());
