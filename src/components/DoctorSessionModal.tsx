@@ -67,7 +67,7 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
 
   // Calculate total estimated cost and remaining amount
   const totalCost = appointmentServices.reduce((sum: number, as: any) => {
-    const price = Number(as.unitPrice || as.service?.pricings?.[0]?.price || 0);
+    const price = as.unitPrice !== null && as.unitPrice !== undefined ? Number(as.unitPrice) : Number(as.service?.pricings?.[0]?.price || 0);
     return sum + price;
   }, 0);
 

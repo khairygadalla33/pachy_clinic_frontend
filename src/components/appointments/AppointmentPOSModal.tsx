@@ -191,9 +191,13 @@ export default function AppointmentPOSModal({
       notes: formData.notes,
       source: formData.source,
       serviceIds: basket.map(item => item.service.id),
-      // If we supported passing custom prices to the backend appointment creation, we would do it here.
-      // Currently, the backend reads serviceIds and their default pricings. 
-      // A more advanced system would send pricing overrides.
+      unitPrices: basket.map(item => {
+        if (discountAmount > 0 && subTotal > 0) {
+          const itemDiscount = discountAmount * (item.unitPrice / subTotal);
+          return item.unitPrice - itemDiscount;
+        }
+        return item.unitPrice;
+      }),
     };
 
     if (formData.depositAmount && Number(formData.depositAmount) > 0) {
