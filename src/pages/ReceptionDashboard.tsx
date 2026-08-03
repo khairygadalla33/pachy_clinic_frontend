@@ -61,10 +61,10 @@ export default function ReceptionDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-start gap-3">
         <button onClick={() => navigate('/appointments?newBooking=true')} className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm text-white bg-[#6b4c9a] hover:opacity-90 transition-opacity">
-          <Calendar className="w-4 h-4 mr-2" /> حجز موعد جديد
+          <Calendar className="w-4 h-4 ml-2" /> حجز موعد جديد
         </button>
         <button onClick={() => navigate('/appointments?newWalkIn=true')} className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm text-white bg-[#c0389f] hover:opacity-90 transition-opacity">
-          <Plus className="w-4 h-4 mr-2" /> مريض بدون موعد
+          <Plus className="w-4 h-4 ml-2" /> مريض بدون موعد
         </button>
       </div>
 
