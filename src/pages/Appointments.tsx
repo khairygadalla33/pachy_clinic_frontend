@@ -22,6 +22,9 @@ export default function Appointments() {
   const [showModal, setShowModal] = useState(searchParams.get('newWalkIn') === 'true');
   const [isWalkIn, setIsWalkIn] = useState(searchParams.get('newWalkIn') === 'true');
 
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+
   const [formData, setFormData] = useState({
     clientId: '',
     serviceId: '',
@@ -163,6 +166,18 @@ export default function Appointments() {
     }
   });
 
+  const updateMutation = useMutation({
+    mutationFn: (data: { id: string, status: string }) => api.put(`/appointments/${data.id}`, { status: data.status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['workflow-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['workflow-queue'] });
+      setShowEditModal(false);
+      setSelectedAppointment(null);
+      toast.success('تم التحديث بنجاح');
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const payload: any = {
@@ -198,8 +213,8 @@ export default function Appointments() {
   };
 
   const handleEdit = (apt: any) => {
-    // Basic view details logic - to be expanded if edit is supported
-    toast.success(`تم اختيار الموعد الخاص بـ ${apt.client?.fullName}`);
+    setSelectedAppointment(apt);
+    setShowEditModal(true);
   };
 
   return (
@@ -346,7 +361,7 @@ export default function Appointments() {
                   </thead>
                   <tbody className="divide-y divide-surface-200">
                     {appointments?.data?.map((apt: any) => (
-                      <tr key={apt.id} className="hover:bg-surface-50 transition-colors">
+                      <tr key={apt.id} onClick={() => handleEdit(apt)} className="hover:bg-surface-50 transition-colors cursor-pointer">
                         <td className="px-4 py-3">
                           <div className="font-medium text-surface-900">{new Date(apt.scheduledDate).toLocaleDateString('ar-EG')}</div>
                           <div className="text-xs text-surface-500">{apt.startTime} {apt.endTime ? `- ${apt.endTime}` : ''}</div>
@@ -369,7 +384,7 @@ export default function Appointments() {
                         <td className="px-4 py-3 text-center">
                           {!apt.isWalkIn && apt.status !== 'CANCELLED' && apt.status !== 'COMPLETED' && apt.status !== 'NO_SHOW' && (
                             <button 
-                              onClick={() => remindMutation.mutate(apt.id)}
+                              onClick={(e) => { e.stopPropagation(); remindMutation.mutate(apt.id); }}
                               disabled={remindMutation.isPending || apt.reminderSent}
                               className={`p-1.5 rounded text-xs flex items-center justify-center w-full gap-1 ${
                                 apt.reminderSent 
@@ -527,6 +542,54 @@ export default function Appointments() {
             </button>
           </div>
         </form>
+      </Modal>
+
+      {/* Edit Appointment Modal */}
+      <Modal
+        isOpen={showEditModal}
+        onClose={() => { setShowEditModal(false); setSelectedAppointment(null); }}
+        title="تعديل حالة الموعد"
+      >
+        {selectedAppointment && (
+          <div className="space-y-4">
+            <div className="bg-surface-50 dark:bg-surface-800 p-4 rounded-lg space-y-2 text-sm text-surface-800 dark:text-surface-200">
+              <p><strong>العميل:</strong> {selectedAppointment.client?.fullName}</p>
+              <p><strong>رقم الهاتف:</strong> <span dir="ltr">{selectedAppointment.client?.phone}</span></p>
+              <p><strong>الخدمة:</strong> {selectedAppointment.service?.nameAr || selectedAppointment.service?.name}</p>
+              <p><strong>الطبيب:</strong> د. {selectedAppointment.staff?.fullName}</p>
+              <p><strong>التاريخ والوقت:</strong> {new Date(selectedAppointment.scheduledDate).toLocaleDateString('ar-EG')} - <span dir="ltr">{selectedAppointment.startTime}</span></p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-surface-700 mb-1">حالة الموعد</label>
+              <select 
+                className="input-field"
+                value={selectedAppointment.status}
+                onChange={(e) => setSelectedAppointment({ ...selectedAppointment, status: e.target.value })}
+              >
+                <option value="PENDING">قيد الانتظار (Pending)</option>
+                <option value="CONFIRMED">مؤكد (Confirmed)</option>
+                <option value="IN_PROGRESS">جاري التنفيذ (In Progress)</option>
+                <option value="COMPLETED">مكتمل (Completed)</option>
+                <option value="NO_SHOW">لم يحضر (No Show)</option>
+                <option value="CANCELLED">ملغي (Cancelled)</option>
+              </select>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t border-surface-200">
+              <button onClick={() => { setShowEditModal(false); setSelectedAppointment(null); }} className="btn-secondary">
+                إلغاء
+              </button>
+              <button 
+                onClick={() => updateMutation.mutate({ id: selectedAppointment.id, status: selectedAppointment.status })} 
+                disabled={updateMutation.isPending} 
+                className="btn-primary"
+              >
+                {updateMutation.isPending ? 'جاري الحفظ...' : 'حفظ التعديلات'}
+              </button>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );
