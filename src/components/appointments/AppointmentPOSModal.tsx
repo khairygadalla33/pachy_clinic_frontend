@@ -226,7 +226,7 @@ export default function AppointmentPOSModal({
       notes: formData.notes,
       source: formData.source,
       serviceIds: basket.map(item => item.service.id),
-      pricingIds: basket.map(item => item.pricingId).filter(Boolean),
+      pricingIds: basket.map(item => item.pricingId || null),
       unitPrices: basket.map(item => {
         if (discountAmount > 0 && subTotal > 0) {
           const itemDiscount = discountAmount * (item.unitPrice / subTotal);
