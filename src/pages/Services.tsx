@@ -81,16 +81,19 @@ export default function Services() {
   });
 
   const uniqueCategories = useMemo(() => {
-    if (!categories) return [];
+    if (!categories || !services) return [];
     const map = new Map();
     categories.forEach((c: any) => {
-      const name = c.nameAr || c.name;
-      if (!map.has(name)) {
-        map.set(name, c);
+      const hasServices = services.some((s: any) => s.categoryId === c.id);
+      if (hasServices) {
+        const name = c.nameAr || c.name;
+        if (!map.has(name)) {
+          map.set(name, c);
+        }
       }
     });
     return Array.from(map.values());
-  }, [categories]);
+  }, [categories, services]);
 
   const filteredServices = services?.filter((s: any) => {
     if (activeTab === 'all') return true;
