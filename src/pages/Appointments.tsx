@@ -207,27 +207,50 @@ export default function Appointments() {
 
   return (
     <div className="space-y-6 h-[calc(100vh-8rem)] flex flex-col">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-start gap-4">
-        
-        
-        <div className="flex items-center gap-3 flex-wrap">
-          {/* View Toggle */}
-          <div className="flex bg-surface-100 dark:bg-surface-800 p-1 rounded-xl shrink-0">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 relative w-full">
+        {/* Right Side (Buttons + Doctor Filter) */}
+        <div className="flex items-center gap-3 shrink-0">
+          <button onClick={() => handleAddNew(new Date())} className="btn-primary whitespace-nowrap">
+            <Plus className="w-4 h-4 mr-2" /> موعد جديد
+          </button>
+          <button onClick={() => { setIsWalkIn(true); setShowModal(true); }} className="btn-secondary whitespace-nowrap hidden sm:flex">
+            <Plus className="w-4 h-4 mr-2" /> Walk-in
+          </button>
+          
+          {/* Doctor Filter */}
+          <select 
+            value={selectedDoctorId} 
+            onChange={(e) => setSelectedDoctorId(e.target.value)}
+            className="input-field text-sm py-1.5 w-auto min-w-[150px]"
+          >
+            <option value="">كل الأطباء</option>
+            {staff?.map((s: any) => (
+              <option key={s.id} value={s.id}>د. {s.fullName}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Center (View Toggle) - Absolute positioned for exact center */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center justify-center pointer-events-none">
+          <div className="flex bg-surface-100 dark:bg-surface-800 p-1 rounded-xl pointer-events-auto shadow-sm">
             <button 
               onClick={() => setView('calendar')}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${view === 'calendar' ? 'bg-primary-600 text-white shadow-sm' : 'text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-surface-100'}`}
+              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'calendar' ? 'bg-primary-600 text-white shadow-sm' : 'text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-surface-100'}`}
             >
               <CalendarIcon className="w-4 h-4" /> تقويم
             </button>
             <button 
               onClick={() => setView('list')}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${view === 'list' ? 'bg-primary-600 text-white shadow-sm' : 'text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-surface-100'}`}
+              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'list' ? 'bg-primary-600 text-white shadow-sm' : 'text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-surface-100'}`}
             >
               <List className="w-4 h-4" /> قائمة
             </button>
           </div>
+        </div>
 
-          {view === 'calendar' && (
+        {/* Left Side (Filters & Navigation) */}
+        <div className="flex items-center gap-2 shrink-0 mr-auto">
+          {view === 'calendar' ? (
             <>
               {/* Timeframe selector */}
               <select 
@@ -248,14 +271,14 @@ export default function Appointments() {
               <div className="flex items-center gap-1" dir="ltr">
                 <button 
                   onClick={() => timeframe === 'week' ? navigateWeek(-1) : navigateMonth(-1)}
-                  className="p-1.5 hover:bg-surface-200 dark:hover:bg-surface-700 rounded-lg transition-colors text-surface-500"
+                  className="p-1 hover:bg-surface-200 dark:hover:bg-surface-700 rounded transition-colors text-surface-500"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 
                 <button 
                   onClick={() => setCurrentDate(new Date())}
-                  className="text-sm font-semibold text-surface-900 dark:text-surface-100 px-3 py-1 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                  className="text-sm font-semibold text-surface-900 dark:text-surface-100 px-2 hover:bg-surface-100 dark:hover:bg-surface-800 rounded transition-colors cursor-pointer text-center"
                   title="الذهاب لليوم"
                 >
                   {timeframe === 'week' ? formatWeekRange() : timeframe === 'month' ? `${dateRange.start.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : timeframe === 'year' ? currentDate.getFullYear() : 'Select Range'}
@@ -263,51 +286,49 @@ export default function Appointments() {
 
                 <button 
                   onClick={() => timeframe === 'week' ? navigateWeek(1) : navigateMonth(1)}
-                  className="p-1.5 hover:bg-surface-200 dark:hover:bg-surface-700 rounded-lg transition-colors text-surface-500"
+                  className="p-1 hover:bg-surface-200 dark:hover:bg-surface-700 rounded transition-colors text-surface-500"
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
             </>
+          ) : (
+            <div className="flex items-center gap-2">
+              <input 
+                type="date"
+                className="input-field text-sm py-1.5 max-w-[150px]"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+              />
+              {dateFilter && (
+                <button onClick={() => setDateFilter('')} className="text-sm text-primary-600 hover:underline whitespace-nowrap font-medium">
+                  إزالة الفلتر
+                </button>
+              )}
+            </div>
           )}
 
-          {/* Doctor Filter */}
-          <select 
-            value={selectedDoctorId} 
-            onChange={(e) => setSelectedDoctorId(e.target.value)}
-            className="input-field text-sm py-1.5 w-auto"
-          >
-            <option value="">كل الأطباء</option>
-            {staff?.map((s: any) => (
-              <option key={s.id} value={s.id}>د. {s.fullName}</option>
-            ))}
-          </select>
-
-          <button onClick={() => { setIsWalkIn(true); setShowModal(true); }} className="btn-secondary whitespace-nowrap">
-            <Plus className="w-4 h-4 mr-2" /> Walk-in
-          </button>
-          <button onClick={() => handleAddNew(new Date())} className="btn-primary whitespace-nowrap">
-            <Plus className="w-4 h-4 mr-2" /> موعد جديد
-          </button>
+          {/* Mobile view toggle */}
+          <div className="md:hidden flex bg-surface-100 dark:bg-surface-800 p-1 rounded-lg">
+            <button 
+              onClick={() => setView('calendar')}
+              className={`p-1.5 rounded transition-all flex items-center ${view === 'calendar' ? 'bg-primary-600 text-white shadow-sm' : 'text-surface-600 hover:text-surface-900'}`}
+            >
+              <CalendarIcon className="w-4 h-4" />
+            </button>
+            <button 
+              onClick={() => setView('list')}
+              className={`p-1.5 rounded transition-all flex items-center ${view === 'list' ? 'bg-primary-600 text-white shadow-sm' : 'text-surface-600 hover:text-surface-900'}`}
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="flex-1 min-h-0">
         {view === 'list' ? (
-          <Card className="h-full flex flex-col">
-            <div className="p-4 border-b border-surface-200 flex gap-4 shrink-0">
-              <input 
-                type="date"
-                className="input-field max-w-xs"
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
-              />
-              {dateFilter && (
-                <button onClick={() => setDateFilter('')} className="text-sm text-primary-600 hover:underline">
-                  إزالة الفلتر
-                </button>
-              )}
-            </div>
+          <Card className="h-full flex flex-col pt-0 mt-2">
 
             <div className="flex-1 overflow-auto">
               {isLoading ? (
