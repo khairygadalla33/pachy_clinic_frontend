@@ -58,7 +58,7 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-7xl h-[90vh] flex overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         
         {/* Left Sidebar - Patient History */}
-        <PatientHistorySidebar clientId={patient.id} />
+        <PatientHistorySidebar clientId={patient.id} excludeAppointmentId={appointment.id} />
 
         {/* Right Side - Main Content */}
         <div className="flex-1 flex flex-col min-w-0">

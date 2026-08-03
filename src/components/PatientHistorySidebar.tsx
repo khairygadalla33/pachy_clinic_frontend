@@ -6,13 +6,17 @@ import { ar } from 'date-fns/locale';
 
 interface PatientHistorySidebarProps {
   clientId: string;
+  excludeAppointmentId?: string;
 }
 
-export default function PatientHistorySidebar({ clientId }: PatientHistorySidebarProps) {
+export default function PatientHistorySidebar({ clientId, excludeAppointmentId }: PatientHistorySidebarProps) {
   const { data: historyItems, isLoading } = useQuery({
-    queryKey: ['patientHistory', clientId],
+    queryKey: ['patientHistory', clientId, excludeAppointmentId],
     queryFn: async () => {
-      const res = await api.get(`/workflow/patient-history/${clientId}`);
+      const url = excludeAppointmentId 
+        ? `/workflow/patient-history/${clientId}?exclude=${excludeAppointmentId}`
+        : `/workflow/patient-history/${clientId}`;
+      const res = await api.get(url);
       return res.data;
     },
     enabled: !!clientId,
