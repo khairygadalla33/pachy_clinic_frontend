@@ -203,13 +203,13 @@ export default function Appointments() {
           <div className="flex bg-surface-100 dark:bg-surface-800 p-1 rounded-xl pointer-events-auto shadow-sm">
             <button 
               onClick={() => setView('calendar')}
-              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'calendar' ? 'bg-primary-600 text-white shadow-sm' : 'text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-surface-100'}`}
+              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'calendar' ? 'bg-[#c0389f] text-white shadow-sm' : 'text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-surface-100'}`}
             >
               <CalendarIcon className="w-4 h-4" /> تقويم
             </button>
             <button 
               onClick={() => setView('list')}
-              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'list' ? 'bg-primary-600 text-white shadow-sm' : 'text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-surface-100'}`}
+              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'list' ? 'bg-[#c0389f] text-white shadow-sm' : 'text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-surface-100'}`}
             >
               <List className="w-4 h-4" /> قائمة
             </button>
@@ -220,21 +220,6 @@ export default function Appointments() {
         <div className="flex items-center gap-2 shrink-0 mr-auto">
           {view === 'calendar' ? (
             <>
-              {/* Timeframe selector */}
-              <select 
-                value={timeframe} 
-                onChange={(e: any) => {
-                  setTimeframe(e.target.value);
-                  setCurrentDate(new Date());
-                }}
-                className="input-field text-sm py-1.5 w-auto"
-              >
-                <option value="week">أسبوعي</option>
-                <option value="month">شهري</option>
-                <option value="6months">الـ 6 أشهر القادمة</option>
-                <option value="year">السنة الحالية</option>
-              </select>
-
               {/* Navigation */}
               <div className="flex items-center gap-1" dir="ltr">
                 <button 
@@ -269,7 +254,7 @@ export default function Appointments() {
                 onChange={(e) => setDateFilter(e.target.value)}
               />
               {dateFilter && (
-                <button onClick={() => setDateFilter('')} className="text-sm text-primary-600 hover:underline whitespace-nowrap font-medium">
+                <button onClick={() => setDateFilter('')} className="text-sm text-[#c0389f] hover:underline whitespace-nowrap font-medium">
                   إزالة الفلتر
                 </button>
               )}
@@ -280,13 +265,13 @@ export default function Appointments() {
           <div className="md:hidden flex bg-surface-100 dark:bg-surface-800 p-1 rounded-lg">
             <button 
               onClick={() => setView('calendar')}
-              className={`p-1.5 rounded transition-all flex items-center ${view === 'calendar' ? 'bg-primary-600 text-white shadow-sm' : 'text-surface-600 hover:text-surface-900'}`}
+              className={`p-1.5 rounded transition-all flex items-center ${view === 'calendar' ? 'bg-[#c0389f] text-white shadow-sm' : 'text-surface-600 hover:text-surface-900'}`}
             >
               <CalendarIcon className="w-4 h-4" />
             </button>
             <button 
               onClick={() => setView('list')}
-              className={`p-1.5 rounded transition-all flex items-center ${view === 'list' ? 'bg-primary-600 text-white shadow-sm' : 'text-surface-600 hover:text-surface-900'}`}
+              className={`p-1.5 rounded transition-all flex items-center ${view === 'list' ? 'bg-[#c0389f] text-white shadow-sm' : 'text-surface-600 hover:text-surface-900'}`}
             >
               <List className="w-4 h-4" />
             </button>
