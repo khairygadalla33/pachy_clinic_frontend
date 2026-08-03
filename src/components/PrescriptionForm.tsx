@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Trash2, Send } from 'lucide-react';
+import { Plus, Trash2, Cloud, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import api from '../lib/api';
 import { useAuth } from '../lib/auth';
 
@@ -22,14 +22,18 @@ export default function PrescriptionForm({ clientId, appointmentId, onSuccess, o
   const [nextSessionDate, setNextSessionDate] = useState('');
   const [nextSessionNotes, setNextSessionNotes] = useState('');
 
+  // Auto-Save state
+  const [prescriptionId, setPrescriptionId] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<'IDLE' | 'SAVING' | 'SAVED' | 'ERROR'>('IDLE');
+
   // Load templates
   const { data: templates } = useQuery({
     queryKey: ['prescription-templates'],
     queryFn: () => api.get('/prescription-templates').then(r => r.data.data),
   });
 
-  const submitMutation = useMutation({
-    mutationFn: async (data: { sendWhatsapp: boolean }) => {
+  const saveMutation = useMutation({
+    mutationFn: async () => {
       const payload = {
         clientId,
         appointmentId,
@@ -46,29 +50,48 @@ export default function PrescriptionForm({ clientId, appointmentId, onSuccess, o
         })).filter(m => m.medicationName),
       };
 
-      const res = await api.post('/prescriptions', payload);
-      
-      if (data.sendWhatsapp) {
-        try {
-          await api.post(`/prescriptions/${res.data.id}/send-whatsapp`);
-        } catch (e: any) {
-          console.error('WhatsApp sending failed:', e);
-          toast.error(e.response?.data?.message || 'Failed to send WhatsApp message. The prescription was saved successfully.');
-        }
+      let res;
+      if (prescriptionId) {
+        res = await api.put(`/prescriptions/${prescriptionId}`, payload);
+      } else {
+        res = await api.post('/prescriptions', payload);
+      }
+
+      if (!prescriptionId) {
+        setPrescriptionId(res.data.id);
       }
 
       return res.data;
     },
     onSuccess: () => {
+      setSaveStatus('SAVED');
       queryClient.invalidateQueries({ queryKey: ['prescriptions'] });
       queryClient.invalidateQueries({ queryKey: ['patientHistory'] });
-      onSuccess();
     },
+    onError: (err: any) => {
+      setSaveStatus('ERROR');
+      toast.error('خطأ في حفظ الروشتة: ' + (err.response?.data?.message || err.message));
+    }
   });
 
-  const handleSubmit = (sendWhatsapp: boolean) => {
-    submitMutation.mutate({ sendWhatsapp });
-  };
+  // Auto-Save Effect
+  useEffect(() => {
+    // Only auto-save if there is at least one medication with a name OR instructions
+    const hasMedication = medications.some(m => m.name.trim() !== '');
+    const hasInstructions = instructions.trim() !== '';
+
+    if (!hasMedication && !hasInstructions) {
+      if (prescriptionId) setSaveStatus('IDLE'); // Waiting for input
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setSaveStatus('SAVING');
+      saveMutation.mutate();
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [medications, instructions, nextSessionDate, nextSessionNotes]);
 
   const handleTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const template = templates?.find((t: any) => t.id === e.target.value);
@@ -93,7 +116,23 @@ export default function PrescriptionForm({ clientId, appointmentId, onSuccess, o
   };
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); handleSubmit(false); }} className="space-y-6">
+    <div className="relative space-y-6 pt-8">
+      {/* Auto-save indicator */}
+      <div className="absolute top-0 left-0 bg-white px-3 py-1.5 rounded-b-lg border-b border-l border-surface-200 shadow-sm flex items-center gap-2 z-10 text-xs font-medium text-surface-600 transition-all">
+        {saveStatus === 'SAVING' && (
+          <><Loader2 className="w-3.5 h-3.5 text-primary-500 animate-spin" /> جاري الحفظ التلقائي...</>
+        )}
+        {saveStatus === 'SAVED' && (
+          <><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> تم الحفظ كمسودة</>
+        )}
+        {saveStatus === 'ERROR' && (
+          <><AlertCircle className="w-3.5 h-3.5 text-red-500" /> خطأ في الحفظ</>
+        )}
+        {saveStatus === 'IDLE' && (
+          <><Cloud className="w-3.5 h-3.5 text-surface-400" /> في انتظار الكتابة للحفظ...</>
+        )}
+      </div>
+
       {/* Medications */}
       <div>
         <div className="flex justify-between items-center mb-2">
@@ -164,15 +203,6 @@ export default function PrescriptionForm({ clientId, appointmentId, onSuccess, o
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4 border-t border-surface-200">
-        <button type="button" onClick={onCancel} className="btn-secondary">إلغاء</button>
-        <button type="submit" disabled={submitMutation.isPending} className="btn-secondary text-primary-600 border-primary-200 bg-primary-50 hover:bg-primary-100">
-          حفظ فقط
-        </button>
-        <button type="button" onClick={() => handleSubmit(true)} disabled={submitMutation.isPending} className="btn-primary bg-emerald-500 hover:bg-emerald-600 border-emerald-500 text-white">
-          <Send className="w-4 h-4 mr-2" /> حفظ وإرسال واتساب
-        </button>
-      </div>
-    </form>
+    </div>
   );
 }

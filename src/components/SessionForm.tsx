@@ -12,7 +12,10 @@ import {
   Calculator, 
   Package,
   Cpu,
-  AlertCircle
+  AlertCircle,
+  Cloud,
+  CheckCircle2,
+  Loader2
 } from 'lucide-react';
 import api from '../lib/api';
 
@@ -47,6 +50,10 @@ export default function SessionForm({
 }: SessionFormProps) {
   const queryClient = useQueryClient();
   const sessionType = resolveSessionType(categoryType);
+
+  // Auto-Save state
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<'IDLE' | 'SAVING' | 'SAVED' | 'ERROR'>('IDLE');
 
   // Form state
   const [formData, setFormData] = useState<any>({
@@ -110,7 +117,7 @@ export default function SessionForm({
     }
   }
 
-  const submitMutation = useMutation({
+  const saveMutation = useMutation({
     mutationFn: async (data: any) => {
       let endpoint = '';
       if (sessionType === 'LASER') endpoint = '/sessions/laser';
@@ -123,46 +130,76 @@ export default function SessionForm({
         ...data,
       };
 
-      const res = await api.post(endpoint, payload);
-      const sessionId = res.data.id;
+      let res;
+      if (sessionId) {
+        // Update existing session
+        res = await api.put(`${endpoint}/${sessionId}`, payload);
+      } else {
+        // Create new session
+        res = await api.post(endpoint, payload);
+      }
+      
+      const newSessionId = res.data.id;
+      if (!sessionId) {
+        setSessionId(newSessionId);
+      }
+
       const typeStr = sessionType === 'LASER' ? 'laser' : sessionType === 'INJECTION' ? 'injection' : 'skin-care';
 
-      // Upload photos if selected
+      // Upload photos if selected (and we have an ID)
       if (photos.before) {
         const fd = new FormData();
         fd.append('file', photos.before);
-        await api.post(`/sessions/${typeStr}/${sessionId}/photos/photoBeforeUrl`, fd);
+        await api.post(`/sessions/${typeStr}/${newSessionId}/photos/photoBeforeUrl`, fd);
       }
       if (photos.during) {
         const fd = new FormData();
         fd.append('file', photos.during);
-        await api.post(`/sessions/${typeStr}/${sessionId}/photos/photoDuringUrl`, fd);
+        await api.post(`/sessions/${typeStr}/${newSessionId}/photos/photoDuringUrl`, fd);
       }
       if (photos.after) {
         const fd = new FormData();
         fd.append('file', photos.after);
-        await api.post(`/sessions/${typeStr}/${sessionId}/photos/photoAfterUrl`, fd);
+        await api.post(`/sessions/${typeStr}/${newSessionId}/photos/photoAfterUrl`, fd);
       }
 
       return res.data;
     },
     onSuccess: () => {
+      setSaveStatus('SAVED');
       queryClient.invalidateQueries({ queryKey: ['workflow-queue'] });
       queryClient.invalidateQueries({ queryKey: ['patientHistory'] });
       queryClient.invalidateQueries({ queryKey: ['laserSessions'] });
       queryClient.invalidateQueries({ queryKey: ['injectionSessions'] });
       queryClient.invalidateQueries({ queryKey: ['skinCareSessions'] });
-      toast.success('تم حفظ بيانات الجلسة بنجاح');
-      onSuccess();
     },
     onError: (err: any) => {
+      setSaveStatus('ERROR');
       toast.error('خطأ في حفظ الجلسة: ' + (err.response?.data?.message || err.message));
     },
   });
 
+  // Auto-Save Effect
+  useEffect(() => {
+    // Only auto-save if required fields are present depending on type
+    let isValid = false;
+    if (sessionType === 'LASER' && formData.pricingId && formData.bodyArea) isValid = true;
+    if (sessionType === 'INJECTION' && formData.productUsed && formData.areaInjected) isValid = true;
+    if (sessionType === 'SKIN_CARE' && formData.procedureName) isValid = true;
+
+    if (!isValid) return;
+
+    const timer = setTimeout(() => {
+      setSaveStatus('SAVING');
+      saveMutation.mutate(formData);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [formData, sessionType]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    submitMutation.mutate(formData);
+    // Manual submit is no longer required, handled by auto-save
   };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>, prefix: 'before' | 'during' | 'after') => {
@@ -193,7 +230,24 @@ export default function SessionForm({
   const skinCareProcedures = ['هيدرافيشل (HydraFacial)', 'تنظيف بشرة عميق (Deep Cleansing)', 'تقشير كيميائي (Chemical Peel)', 'تقشير كربوني (Carbon Peel)', 'ديرمابن (Dermapen)', 'ميزوثيرابي (Mesotherapy)', 'بلازما نضارة (PRP)', 'جلسة نضارة وترطيب (Glow Session)'];
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <div className="relative space-y-5">
+      {/* Auto-save indicator */}
+      <div className="absolute top-0 left-0 bg-white px-3 py-1.5 rounded-b-lg border-b border-l border-surface-200 shadow-sm flex items-center gap-2 z-10 text-xs font-medium text-surface-600 transition-all">
+        {saveStatus === 'SAVING' && (
+          <><Loader2 className="w-3.5 h-3.5 text-primary-500 animate-spin" /> جاري الحفظ التلقائي...</>
+        )}
+        {saveStatus === 'SAVED' && (
+          <><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> تم الحفظ كمسودة</>
+        )}
+        {saveStatus === 'ERROR' && (
+          <><AlertCircle className="w-3.5 h-3.5 text-red-500" /> خطأ في الحفظ</>
+        )}
+        {saveStatus === 'IDLE' && (
+          <><Cloud className="w-3.5 h-3.5 text-surface-400" /> في انتظار الكتابة للحفظ...</>
+        )}
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5 pt-10">
 
       {/* ======================= LASER FORM ======================= */}
       {sessionType === 'LASER' && (
@@ -779,34 +833,7 @@ export default function SessionForm({
         ></textarea>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex justify-end gap-3 pt-2">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="btn-secondary px-6"
-          disabled={submitMutation.isPending}
-        >
-          إلغاء
-        </button>
-        <button
-          type="submit"
-          disabled={submitMutation.isPending}
-          className="btn-primary px-8 flex items-center gap-2 font-bold shadow-md shadow-primary-500/20"
-        >
-          {submitMutation.isPending ? (
-            <>
-              <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
-              جاري حفظ الجلسة...
-            </>
-          ) : (
-            <>
-              <Check className="w-4 h-4" />
-              حفظ تفاصيل الجلسة
-            </>
-          )}
-        </button>
-      </div>
     </form>
+    </div>
   );
 }

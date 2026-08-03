@@ -91,6 +91,21 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
         await api.put(`/workflow/${queueItem.id}/start-session`);
       }
 
+      // Automatically send the latest prescription via WhatsApp if it exists
+      try {
+        const presRes = await api.get('/prescriptions', { params: { appointmentId: appointment.id } });
+        const prescriptions = presRes.data;
+        if (prescriptions && prescriptions.length > 0) {
+           const latestPrescription = prescriptions[0]; // ordered by createdAt desc
+           if (!latestPrescription.sentViaWhatsApp) {
+             await api.post(`/prescriptions/${latestPrescription.id}/send-whatsapp`);
+             toast.success('تم إرسال الروشتة عبر الواتساب بنجاح');
+           }
+        }
+      } catch (err) {
+        console.error('Failed to send WhatsApp', err);
+      }
+
       await api.put(`/workflow/${queueItem.id}/end-session`);
       
       toast.success('تم إنهاء الجلسة وتحويل المريض للاستقبال');
@@ -303,27 +318,51 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
 
             </div>
             
-            {/* Footer */}
-            <div className="p-4 border-t border-surface-200 bg-white flex justify-end gap-3 flex-shrink-0">
+            {/* Footer Redesign */}
+            <div className="px-4 py-2 border-t border-[#2d3e4c] bg-[#3a5061] flex items-center justify-between flex-shrink-0 rounded-b-2xl gap-4 overflow-x-auto">
+              
+              {/* Right: Cancel Button */}
               <button 
-                className="btn-ghost" 
-                onClick={onClose}
+                className="whitespace-nowrap px-4 py-1.5 rounded-lg text-sm font-bold transition-all duration-300 bg-red-500/90 text-white hover:bg-red-500 border border-red-500/50 shadow-sm"
+                onClick={() => toast.error('جاري برمجة الزر - لم يكتمل بعد')}
                 disabled={isSubmitting}
               >
-                إغلاق
+                إلغاء الجلسة
               </button>
-              <button 
-                className="btn-primary flex items-center gap-2"
-                onClick={handleFinish}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
-                ) : (
-                  <CheckCircle className="w-4 h-4" />
-                )}
-                إنهاء الجلسة وتحويل للاستقبال
-              </button>
+
+              {/* Center: Cost Card */}
+              <div className="bg-white/10 backdrop-blur-md px-4 py-1 rounded-lg border border-white/20 shadow-sm flex items-center gap-2 whitespace-nowrap">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-lg font-medium text-white">{totalCost.toLocaleString('en-US')}</span>
+                  <span className="text-xs font-bold text-white/80">ج.م</span>
+                </div>
+                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">💳</span>
+                </div>
+              </div>
+
+              {/* Left: Actions */}
+              <div className="flex items-center gap-2.5 shrink-0">
+                <button 
+                  className="whitespace-nowrap px-4 py-1.5 rounded-lg text-sm font-bold transition-all duration-300 bg-white/10 text-white hover:bg-white/20 border border-white/10" 
+                  onClick={onClose}
+                  disabled={isSubmitting}
+                >
+                  إغلاق (مسودة)
+                </button>
+                <button 
+                  className="whitespace-nowrap px-8 py-1.5 min-w-[160px] rounded-lg text-sm font-bold transition-all duration-300 bg-white text-[#3a5061] hover:bg-gray-100 shadow-md flex items-center justify-center gap-1.5 transform hover:-translate-y-0.5"
+                  onClick={handleFinish}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <span className="animate-spin inline-block w-4 h-4 border-2 border-[#3a5061] border-t-transparent rounded-full"></span>
+                  ) : (
+                    <CheckCircle className="w-4 h-4" />
+                  )}
+                  إنهاء وتحويل للاستقبال
+                </button>
+              </div>
             </div>
           </div>
 
