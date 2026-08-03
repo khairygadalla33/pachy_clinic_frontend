@@ -65,11 +65,14 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
   // Currently selected service
   const currentService = bookedServices[selectedServiceIdx] || bookedServices[0];
 
-  // Calculate total estimated cost
+  // Calculate total estimated cost and remaining amount
   const totalCost = appointmentServices.reduce((sum: number, as: any) => {
     const price = Number(as.unitPrice || as.service?.pricings?.[0]?.price || 0);
     return sum + price;
   }, 0);
+
+  const depositAmount = Number(appointment?.depositAmount || 0);
+  const remainingAmount = Math.max(0, totalCost - depositAmount);
 
   const handleAddService = async () => {
     if (!selectedNewService) return;
@@ -328,13 +331,16 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
               </button>
 
               {/* Center: Cost Card */}
-              <div className="bg-white/10 backdrop-blur-md px-4 py-1 rounded-lg border border-white/20 shadow-sm flex items-center gap-2 whitespace-nowrap">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-lg font-medium text-white">{totalCost.toLocaleString('en-US')}</span>
-                  <span className="text-xs font-bold text-white/80">ج.م</span>
+              <div className="bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-lg border border-white/20 shadow-sm flex items-center gap-3 whitespace-nowrap" title="المبلغ المتبقي المطلوب تحصيله بالاستقبال">
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-white/70 font-medium mb-0.5">المطلوب تحصيله بالاستقبال</span>
+                  <div className="flex items-baseline gap-1 leading-none">
+                    <span className="text-lg font-bold text-white">{remainingAmount.toLocaleString('en-US')}</span>
+                    <span className="text-xs font-bold text-white/80">ج.م</span>
+                  </div>
                 </div>
-                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">💳</span>
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                  <span className="text-white text-sm font-bold">💳</span>
                 </div>
               </div>
 
