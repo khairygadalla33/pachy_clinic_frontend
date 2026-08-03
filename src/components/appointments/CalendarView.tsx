@@ -153,7 +153,7 @@ export default function CalendarView({
               className="py-2 px-2 text-center border-r border-surface-200 dark:border-surface-800 last:border-r-0 min-h-[62px] flex flex-col justify-center bg-surface-200 dark:bg-surface-700/50"
             >
               <p className="text-sm font-black uppercase text-[#c0389f]">
-                {['الأحـــد', 'الإثنيـــن', 'الثلاثـــاء', 'الأربعـــاء', 'الخميـــس', 'الجمعـــة', 'السبـــت'][day.day]}
+                {['الأحـــد', 'الإثنيـــن', 'الثلاثـــاء', 'الأربعـــاء', 'الخميـــس', 'الجمعـــة', 'السبـــت'][idx]}
               </p>
             </div>
           );
