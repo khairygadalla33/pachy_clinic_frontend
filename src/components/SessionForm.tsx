@@ -84,11 +84,12 @@ export default function SessionForm({
   });
 
   // Fetch Active Devices (for Laser machines)
-  const { data: devices } = useQuery({
+  const { data: devicesData } = useQuery({
     queryKey: ['devices'],
-    queryFn: () => api.get('/devices').then((r) => r.data?.data || r.data || []),
+    queryFn: () => api.get('/devices').then((r) => r.data),
     enabled: sessionType === 'LASER',
   });
+  const devices = Array.isArray(devicesData) ? devicesData : (devicesData?.data || []);
 
   // Fetch Inventory Products (for filler/botox/serums)
   const { data: products } = useQuery({
