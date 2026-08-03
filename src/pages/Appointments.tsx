@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Bell, Check } from 'lucide-react';
+import { Plus, Bell, Check, Calendar as CalendarIcon, List, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -10,6 +10,7 @@ import Badge from '../components/Badge';
 import Modal from '../components/Modal';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import ClientAutocomplete from '../components/ClientAutocomplete';
+import CalendarView from '../components/appointments/CalendarView';
 
 export default function Appointments() {
   const queryClient = useQueryClient();
@@ -35,10 +36,86 @@ export default function Appointments() {
   const { user } = useAuth();
   const branchId = user?.branchId;
 
+  // New states for calendar
+  const [view, setView] = useState<'list' | 'calendar'>(() => {
+    const saved = localStorage.getItem('appointments-view') as 'list' | 'calendar' | null;
+    if (saved) return saved;
+    return window.innerWidth < 768 ? 'list' : 'calendar';
+  });
+  const [timeframe, setTimeframe] = useState<'week' | 'month' | '6months' | 'year'>(() => {
+    return (localStorage.getItem('appointments-timeframe') as any) || 'week';
+  });
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  useEffect(() => {
+    localStorage.setItem('appointments-view', view);
+    localStorage.setItem('appointments-timeframe', timeframe);
+  }, [view, timeframe]);
+
+  const systemSettings = useMemo(() => {
+    return { maxSlotsPerDay: 8, appointmentInterval: 45 }; 
+  }, []);
+
+  const dateRange = useMemo(() => {
+    const start = new Date(currentDate);
+    const end = new Date(currentDate);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59, 999);
+
+    if (timeframe === 'week') {
+      const day = start.getDay();
+      const diff = start.getDate() - day + (day === 0 ? -6 : 1);
+      start.setDate(diff);
+      end.setDate(diff + 5);
+    } else if (timeframe === 'month') {
+      start.setDate(1);
+      end.setMonth(end.getMonth() + 1, 0);
+    } else if (timeframe === '6months') {
+      start.setDate(1);
+      end.setMonth(end.getMonth() + 6, 0);
+    } else if (timeframe === 'year') {
+      start.setMonth(0, 1);
+      end.setMonth(11, 31);
+    }
+    return { startDate: start.toISOString(), endDate: end.toISOString(), start, end };
+  }, [currentDate, timeframe]);
+
+  const navigateWeek = (direction: -1 | 1) => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() + (direction * 7));
+    setCurrentDate(newDate);
+  };
+
+  const navigateMonth = (direction: -1 | 1) => {
+    const newDate = new Date(currentDate);
+    newDate.setMonth(newDate.getMonth() + direction);
+    setCurrentDate(newDate);
+  };
+
+  const formatWeekRange = () => {
+    const s = dateRange.start;
+    const e = dateRange.end;
+    const opts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+    return `${s.toLocaleDateString('en-US', opts)} – ${e.toLocaleDateString('en-US', opts)}, ${e.getFullYear()}`;
+  };
+
   // Data fetching
   const { data: appointments, isLoading } = useQuery({
-    queryKey: ['appointments', page, dateFilter],
-    queryFn: () => api.get('/appointments', { params: { page, limit: 15, date: dateFilter, branchId } }).then(r => r.data),
+    queryKey: ['appointments', page, dateFilter, view, dateRange.startDate, dateRange.endDate],
+    queryFn: () => {
+      const params: any = { branchId };
+      if (view === 'list') {
+        params.page = page;
+        params.limit = 15;
+        if (dateFilter) params.date = dateFilter;
+      } else {
+        params.page = 1;
+        params.limit = 500;
+        params.startDate = dateRange.startDate;
+        params.endDate = dateRange.endDate;
+      }
+      return api.get('/appointments', { params }).then(r => r.data);
+    },
     enabled: !!branchId,
   });
 
@@ -52,7 +129,6 @@ export default function Appointments() {
     queryFn: () => api.get('/users', { params: { role: 'DOCTOR' } }).then(r => r.data),
   });
 
-  // Create Mutation
   const createMutation = useMutation({
     mutationFn: (data: any) => {
       const endpoint = isWalkIn ? '/appointments/walk-in' : '/appointments';
@@ -105,100 +181,195 @@ export default function Appointments() {
     createMutation.mutate(payload);
   };
 
+  const handleAddNew = (date?: Date, time?: string) => {
+    setIsWalkIn(false);
+    setFormData(prev => ({
+      ...prev,
+      scheduledDate: date ? date.toISOString().split('T')[0] : prev.scheduledDate,
+      startTime: time || prev.startTime
+    }));
+    setShowModal(true);
+  };
+
+  const handleEdit = (apt: any) => {
+    // Basic view details logic - to be expanded if edit is supported
+    toast.success(`تم اختيار الموعد الخاص بـ ${apt.client?.fullName}`);
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 h-[calc(100vh-8rem)] flex flex-col">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-surface-900">المواعيد</h1>
+          <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">المواعيد</h1>
           <p className="text-surface-500 text-sm mt-1">إدارة جميع مواعيد العيادة</p>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => { setIsWalkIn(true); setShowModal(true); }} className="btn-secondary">
+        
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* View Toggle */}
+          <div className="flex bg-surface-100 dark:bg-surface-800 p-1 rounded-xl shrink-0">
+            <button 
+              onClick={() => setView('calendar')}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${view === 'calendar' ? 'bg-primary-600 text-white shadow-sm' : 'text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-surface-100'}`}
+            >
+              <CalendarIcon className="w-4 h-4" /> تقويم
+            </button>
+            <button 
+              onClick={() => setView('list')}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${view === 'list' ? 'bg-primary-600 text-white shadow-sm' : 'text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-surface-100'}`}
+            >
+              <List className="w-4 h-4" /> قائمة
+            </button>
+          </div>
+
+          {view === 'calendar' && (
+            <>
+              {/* Timeframe selector */}
+              <select 
+                value={timeframe} 
+                onChange={(e: any) => {
+                  setTimeframe(e.target.value);
+                  setCurrentDate(new Date());
+                }}
+                className="input-field text-sm py-1.5 w-auto"
+              >
+                <option value="week">أسبوعي</option>
+                <option value="month">شهري</option>
+                <option value="6months">الـ 6 أشهر القادمة</option>
+                <option value="year">السنة الحالية</option>
+              </select>
+
+              {/* Navigation */}
+              <div className="flex items-center gap-1" dir="ltr">
+                <button 
+                  onClick={() => timeframe === 'week' ? navigateWeek(-1) : navigateMonth(-1)}
+                  className="p-1.5 hover:bg-surface-200 dark:hover:bg-surface-700 rounded-lg transition-colors text-surface-500"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                
+                <button 
+                  onClick={() => setCurrentDate(new Date())}
+                  className="text-sm font-semibold text-surface-900 dark:text-surface-100 px-3 py-1 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                  title="الذهاب لليوم"
+                >
+                  {timeframe === 'week' ? formatWeekRange() : timeframe === 'month' ? `${dateRange.start.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : timeframe === 'year' ? currentDate.getFullYear() : 'Select Range'}
+                </button>
+
+                <button 
+                  onClick={() => timeframe === 'week' ? navigateWeek(1) : navigateMonth(1)}
+                  className="p-1.5 hover:bg-surface-200 dark:hover:bg-surface-700 rounded-lg transition-colors text-surface-500"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            </>
+          )}
+
+          <button onClick={() => { setIsWalkIn(true); setShowModal(true); }} className="btn-secondary whitespace-nowrap">
             <Plus className="w-4 h-4 mr-2" /> Walk-in
           </button>
-          <button onClick={() => { setIsWalkIn(false); setShowModal(true); }} className="btn-primary">
-            <Plus className="w-4 h-4 mr-2" /> New Appointment
+          <button onClick={() => handleAddNew(new Date())} className="btn-primary whitespace-nowrap">
+            <Plus className="w-4 h-4 mr-2" /> موعد جديد
           </button>
         </div>
       </div>
 
-      <Card>
-        <div className="p-4 border-b border-surface-200 flex gap-4 -m-6 mb-6">
-          <input 
-            type="date"
-            className="input-field max-w-xs"
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-          />
-          {dateFilter && (
-            <button onClick={() => setDateFilter('')} className="text-sm text-primary-600 hover:underline">
-              Clear Date Filter
-            </button>
-          )}
-        </div>
-
-        <div className="overflow-x-auto">
-          {isLoading ? (
-            <div className="p-4 space-y-4">
-              {[1, 2, 3].map(i => <LoadingSkeleton key={i} />)}
+      <div className="flex-1 min-h-0">
+        {view === 'list' ? (
+          <Card className="h-full flex flex-col">
+            <div className="p-4 border-b border-surface-200 flex gap-4 shrink-0">
+              <input 
+                type="date"
+                className="input-field max-w-xs"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+              />
+              {dateFilter && (
+                <button onClick={() => setDateFilter('')} className="text-sm text-primary-600 hover:underline">
+                  إزالة الفلتر
+                </button>
+              )}
             </div>
-          ) : (
-            <table className="w-full text-sm text-left">
-              <thead className="bg-surface-50 text-surface-600 border-b border-surface-200">
-                <tr>
-                  <th className="px-4 py-3 font-semibold">التاريخ والوقت</th>
-                  <th className="px-4 py-3 font-semibold">العميل</th>
-                  <th className="px-4 py-3 font-semibold">الخدمة</th>
-                  <th className="px-4 py-3 font-semibold">الطبيب</th>
-                  <th className="px-4 py-3 font-semibold">الحالة</th>
-                  <th className="px-4 py-3 font-semibold text-center">إجراءات</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-surface-200">
-                {appointments?.data?.map((apt: any) => (
-                  <tr key={apt.id} className="hover:bg-surface-50 transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="font-medium text-surface-900">{new Date(apt.scheduledDate).toLocaleDateString('ar-EG')}</div>
-                      <div className="text-xs text-surface-500">{apt.startTime} {apt.endTime ? `- ${apt.endTime}` : ''}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="font-medium text-surface-900">{apt.client.fullName}</div>
-                      <div className="text-xs text-surface-500">{apt.client.phone}</div>
-                    </td>
-                    <td className="px-4 py-3 text-surface-700">{apt.service.nameAr || apt.service.name}</td>
-                    <td className="px-4 py-3 text-surface-700">د. {apt.staff.fullName}</td>
-                    <td className="px-4 py-3">
-                      <Badge variant={
-                        apt.status === 'CONFIRMED' ? 'success' :
-                        apt.status === 'PENDING' ? 'warning' :
-                        apt.status === 'IN_PROGRESS' ? 'info' :
-                        apt.status === 'COMPLETED' ? 'success' : 'danger'
-                      }>{apt.status}</Badge>
-                      {apt.isWalkIn && <span className="ml-2 text-[10px] bg-purple-100 text-purple-700 px-1 py-0.5 rounded uppercase font-bold tracking-wider">زيارة مباشرة (Walk-in)</span>}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {!apt.isWalkIn && apt.status !== 'CANCELLED' && apt.status !== 'COMPLETED' && apt.status !== 'NO_SHOW' && (
-                        <button 
-                          onClick={() => remindMutation.mutate(apt.id)}
-                          disabled={remindMutation.isPending || apt.reminderSent}
-                          className={`p-1.5 rounded text-xs flex items-center justify-center w-full gap-1 ${
-                            apt.reminderSent 
-                              ? 'bg-emerald-100 text-emerald-700 cursor-not-allowed' 
-                              : 'bg-primary-100 text-primary-700 hover:bg-primary-200'
-                          }`}
-                          title="إرسال تذكير عبر الواتساب"
-                        >
-                          {apt.reminderSent ? <><Check className="w-3 h-3" /> تم التذكير</> : <><Bell className="w-3 h-3" /> إرسال تذكير</>}
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </Card>
+
+            <div className="flex-1 overflow-auto">
+              {isLoading ? (
+                <div className="p-4 space-y-4">
+                  {[1, 2, 3].map(i => <LoadingSkeleton key={i} />)}
+                </div>
+              ) : (
+                <table className="w-full text-sm text-right">
+                  <thead className="bg-surface-50 text-surface-600 border-b border-surface-200 sticky top-0">
+                    <tr>
+                      <th className="px-4 py-3 font-semibold">التاريخ والوقت</th>
+                      <th className="px-4 py-3 font-semibold">العميل</th>
+                      <th className="px-4 py-3 font-semibold">الخدمة</th>
+                      <th className="px-4 py-3 font-semibold">الطبيب</th>
+                      <th className="px-4 py-3 font-semibold">الحالة</th>
+                      <th className="px-4 py-3 font-semibold text-center">إجراءات</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-surface-200">
+                    {appointments?.data?.map((apt: any) => (
+                      <tr key={apt.id} className="hover:bg-surface-50 transition-colors">
+                        <td className="px-4 py-3">
+                          <div className="font-medium text-surface-900">{new Date(apt.scheduledDate).toLocaleDateString('ar-EG')}</div>
+                          <div className="text-xs text-surface-500">{apt.startTime} {apt.endTime ? `- ${apt.endTime}` : ''}</div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="font-medium text-surface-900">{apt.client.fullName}</div>
+                          <div className="text-xs text-surface-500">{apt.client.phone}</div>
+                        </td>
+                        <td className="px-4 py-3 text-surface-700">{apt.service.nameAr || apt.service.name}</td>
+                        <td className="px-4 py-3 text-surface-700">د. {apt.staff.fullName}</td>
+                        <td className="px-4 py-3">
+                          <Badge variant={
+                            apt.status === 'CONFIRMED' ? 'success' :
+                            apt.status === 'PENDING' ? 'warning' :
+                            apt.status === 'IN_PROGRESS' ? 'info' :
+                            apt.status === 'COMPLETED' ? 'success' : 'danger'
+                          }>{apt.status}</Badge>
+                          {apt.isWalkIn && <span className="mr-2 text-[10px] bg-purple-100 text-purple-700 px-1 py-0.5 rounded uppercase font-bold tracking-wider">زيارة مباشرة (Walk-in)</span>}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {!apt.isWalkIn && apt.status !== 'CANCELLED' && apt.status !== 'COMPLETED' && apt.status !== 'NO_SHOW' && (
+                            <button 
+                              onClick={() => remindMutation.mutate(apt.id)}
+                              disabled={remindMutation.isPending || apt.reminderSent}
+                              className={`p-1.5 rounded text-xs flex items-center justify-center w-full gap-1 ${
+                                apt.reminderSent 
+                                  ? 'bg-emerald-100 text-emerald-700 cursor-not-allowed' 
+                                  : 'bg-primary-100 text-primary-700 hover:bg-primary-200'
+                              }`}
+                              title="إرسال تذكير عبر الواتساب"
+                            >
+                              {apt.reminderSent ? <><Check className="w-3 h-3" /> تم التذكير</> : <><Bell className="w-3 h-3" /> إرسال تذكير</>}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </Card>
+        ) : (
+          <CalendarView 
+            appointments={appointments?.data || []} 
+            currentDate={currentDate}
+            onDateChange={setCurrentDate}
+            onAppointmentClick={handleEdit}
+            onEmptyCellClick={(date, time) => {
+              if (date >= new Date(new Date().setHours(0,0,0,0))) {
+                handleAddNew(date, time);
+              }
+            }}
+            timeframe={timeframe}
+            maxSlotsPerDay={systemSettings.maxSlotsPerDay}
+            appointmentInterval={systemSettings.appointmentInterval}
+          />
+        )}
+      </div>
 
       {/* New Appointment Modal */}
       <Modal
@@ -311,7 +482,7 @@ export default function Appointments() {
 
           <div className="flex justify-end gap-3 pt-4 border-t border-surface-200">
             <button type="button" onClick={() => setShowModal(false)} className="btn-secondary">
-              Cancel
+              إلغاء
             </button>
             <button type="submit" disabled={createMutation.isPending || !formData.clientId} className="btn-primary">
               {createMutation.isPending ? 'جاري الحفظ...' : (isWalkIn ? 'إضافة زيارة مباشرة (Walk-in)' : 'حجز الموعد')}
