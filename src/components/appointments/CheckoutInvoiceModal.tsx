@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Printer, CheckCircle, CreditCard, Banknote } from 'lucide-react';
+import { CheckCircle, CreditCard, Banknote } from 'lucide-react';
 import Modal from '../Modal';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';
@@ -25,7 +25,7 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
           setSettlement(res.data);
           setLoading(false);
         })
-        .catch(err => {
+        .catch(() => {
           toast.error('حدث خطأ أثناء جلب بيانات التسوية');
           setLoading(false);
         });
@@ -56,7 +56,7 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
   const finalTotal = netTotalAfterDiscount < 0 ? 0 : netTotalAfterDiscount;
 
   return (
-    <Modal isOpen={!!queueItem} onClose={onClose} title="تسوية فاتورة العميل" size="lg">
+    <Modal isOpen={!!queueItem} onClose={onClose} title="تسوية فاتورة العميل" maxWidth="max-w-3xl">
       {loading ? (
         <div className="flex justify-center p-8">جاري التحميل...</div>
       ) : (
@@ -65,11 +65,11 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
           <div className="flex justify-between bg-surface-50 p-4 rounded-xl border border-surface-200">
             <div>
               <p className="text-sm text-surface-500">العميل</p>
-              <p className="font-bold text-surface-900 text-lg">{queueItem.client.fullName}</p>
+              <p className="font-bold text-surface-900 text-lg">{queueItem.client?.fullName || 'عميل غير محدد'}</p>
             </div>
             <div className="text-left">
               <p className="text-sm text-surface-500">الطبيب</p>
-              <p className="font-bold text-surface-900 text-lg">د. {queueItem.appointment.staff.fullName}</p>
+              <p className="font-bold text-surface-900 text-lg">د. {queueItem.staff?.fullName || queueItem.appointment?.staff?.fullName || 'طبيب غير محدد'}</p>
             </div>
           </div>
 

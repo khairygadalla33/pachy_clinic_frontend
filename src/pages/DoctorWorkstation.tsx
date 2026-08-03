@@ -140,9 +140,9 @@ export default function DoctorWorkstation() {
               ) : (
                 historyItems?.map((item: any) => (
                   <tr key={item.id} className="hover:bg-surface-50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-surface-900">{item.client.fullName}</td>
+                    <td className="px-6 py-4 font-medium text-surface-900">{item.client?.fullName || 'عميل غير محدد'}</td>
                     <td className="px-6 py-4 text-surface-600">{item.appointment?.service?.nameAr || item.appointment?.service?.name}</td>
-                    <td className="px-6 py-4 text-surface-600 font-mono">{item.client.phone}</td>
+                    <td className="px-6 py-4 text-surface-600 font-mono">{item.client?.phone || '-'}</td>
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.stage === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}`}>
                         {item.stage === 'COMPLETED' ? 'مكتمل (دفع)' : 'بانتظار الدفع'}

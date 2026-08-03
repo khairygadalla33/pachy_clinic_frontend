@@ -76,7 +76,7 @@ export default function WorkflowCardsPanel({ items, isLoading, onCardClick, acti
                 {/* Patient Name + Status */}
                 <div className="flex items-start justify-between gap-1 mb-3">
                   <span className="font-bold text-sm text-surface-900 leading-tight">
-                    {item.client?.fullName}
+                    {item.client?.fullName || 'عميل غير محدد'}
                   </span>
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${item.stage === 'IN_SESSION' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
                     {item.stage === 'IN_SESSION' ? 'في الجلسة' : 'في الانتظار'}

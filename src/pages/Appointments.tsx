@@ -384,13 +384,13 @@ export default function Appointments() {
                           <div className="text-xs text-surface-500">{apt.startTime} {apt.endTime ? `- ${apt.endTime}` : ''}</div>
                         </td>
                         <td className="px-4 py-3">
-                          <div className="font-medium text-surface-900">{apt.client.fullName}</div>
-                          <div className="text-xs text-surface-500">{apt.client.phone}</div>
+                          <div className="font-medium text-surface-900">{apt.client?.fullName || 'عميل غير محدد'}</div>
+                          <div className="text-xs text-surface-500">{apt.client?.phone || ''}</div>
                         </td>
                         <td className="px-4 py-3 text-surface-700">
-                          {apt.appointmentServices?.map((as: any) => as.service.nameAr || as.service.name).join(' + ') || 'بدون خدمة'}
+                          {apt.appointmentServices?.map((as: any) => as.service?.nameAr || as.service?.name).filter(Boolean).join(' + ') || apt.service?.nameAr || apt.service?.name || 'بدون خدمة'}
                         </td>
-                        <td className="px-4 py-3 text-surface-700">د. {apt.staff.fullName}</td>
+                        <td className="px-4 py-3 text-surface-700">{apt.staff?.fullName ? `د. ${apt.staff.fullName}` : 'غير محدد'}</td>
                         <td className="px-4 py-3">
                           <Badge variant={
                             apt.status === 'CONFIRMED' ? 'success' :

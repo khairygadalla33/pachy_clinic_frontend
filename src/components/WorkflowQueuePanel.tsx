@@ -73,16 +73,18 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
 
   return (
     <div className="space-y-4">
-      {doctorGroups.map((group) => {
-        const isOpen = openSections[group.doctor.id] !== false; // default true
+      {doctorGroups.map((group, idx) => {
+        const docId = group.doctor?.id || `unassigned-${idx}`;
+        const docName = group.doctor?.fullName ? `د. ${group.doctor.fullName}` : 'طبيب غير محدد';
+        const isOpen = openSections[docId] !== false; // default true
         return (
-          <div key={group.doctor.id} className="bg-white border border-surface-200 rounded-xl overflow-hidden shadow-sm">
+          <div key={docId} className="bg-white border border-surface-200 rounded-xl overflow-hidden shadow-sm">
             <button 
-              onClick={() => toggleSection(group.doctor.id)}
+              onClick={() => toggleSection(docId)}
               className="w-full flex items-center justify-between px-4 py-3 bg-surface-50 hover:bg-surface-100 transition-colors"
             >
               <div className="flex items-center gap-2">
-                <span className="font-bold text-lg text-surface-900">د. {group.doctor.fullName}</span>
+                <span className="font-bold text-lg text-surface-900">{docName}</span>
                 <Badge variant="info">{group.items.length} مرضى</Badge>
               </div>
               {isOpen ? <ChevronUp className="w-5 h-5 text-surface-500" /> : <ChevronDown className="w-5 h-5 text-surface-500" />}

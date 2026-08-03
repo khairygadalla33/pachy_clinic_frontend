@@ -130,13 +130,13 @@ export default function ReceptionDashboard() {
                   <tr key={apt.id} className="hover:bg-surface-50 transition-colors">
                     <td className="px-4 py-3 font-medium text-surface-900">{apt.startTime}</td>
                     <td className="px-4 py-3">
-                      <div className="font-medium text-surface-900">{apt.client.fullName}</div>
-                      <div className="text-xs text-surface-500">{apt.client.phone}</div>
+                      <div className="font-medium text-surface-900">{apt.client?.fullName || 'عميل غير محدد'}</div>
+                      <div className="text-xs text-surface-500">{apt.client?.phone || ''}</div>
                     </td>
                     <td className="px-4 py-3 text-surface-700">
                       {apt.appointmentServices?.map((as: any) => as.service?.nameAr || as.service?.name).join(' + ') || apt.service?.nameAr || apt.service?.name || 'بدون خدمة'}
                     </td>
-                    <td className="px-4 py-3 text-surface-700">د. {apt.staff.fullName}</td>
+                    <td className="px-4 py-3 text-surface-700">{apt.staff?.fullName ? `د. ${apt.staff.fullName}` : 'غير محدد'}</td>
                     <td className="px-4 py-3">
                       <Badge variant={apt.status === 'CONFIRMED' ? 'success' : 'warning'}>{translateStatus(apt.status)}</Badge>
                     </td>

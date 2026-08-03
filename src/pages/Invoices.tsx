@@ -67,9 +67,6 @@ const Invoices = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-start items-center">
-        <h1 className="text-3xl font-bold tracking-tight">الفواتير</h1>
-      </div>
 
       <Card>
         <CardContent className="p-0">

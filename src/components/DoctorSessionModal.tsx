@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { X, Activity, FileText, CheckCircle } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { X, Activity, FileText, CheckCircle, Plus, DollarSign, Zap, Syringe, Sparkles, Scissors } from 'lucide-react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
 import SessionForm from './SessionForm';
@@ -12,10 +13,28 @@ interface DoctorSessionModalProps {
   onSessionComplete: () => void;
 }
 
+// Resolve service category type to an icon and color
+function getServiceMeta(categoryType?: string, categoryName?: string) {
+  const ct = (categoryType || categoryName || '').toUpperCase();
+  if (ct.includes('LASER') || ct.includes('CRYO') || ct.includes('CAVITATION'))
+    return { icon: <Zap className="w-4 h-4" />, color: 'text-red-600 bg-red-50 border-red-200', label: 'جلسة ليزر' };
+  if (ct.includes('INJECT') || ct.includes('FILLER') || ct.includes('BOTOX'))
+    return { icon: <Syringe className="w-4 h-4" />, color: 'text-teal-600 bg-teal-50 border-teal-200', label: 'حقن وتجميل' };
+  if (ct.includes('SKIN'))
+    return { icon: <Sparkles className="w-4 h-4" />, color: 'text-purple-600 bg-purple-50 border-purple-200', label: 'عناية بالبشرة' };
+  if (ct.includes('HAIR'))
+    return { icon: <Scissors className="w-4 h-4" />, color: 'text-amber-600 bg-amber-50 border-amber-200', label: 'عناية بالشعر' };
+  return { icon: <Activity className="w-4 h-4" />, color: 'text-primary-600 bg-primary-50 border-primary-200', label: 'خدمة' };
+}
+
 export default function DoctorSessionModal({ queueItem, onClose, onSessionComplete }: DoctorSessionModalProps) {
-  const [activeTab, setActiveTab] = useState<'details' | 'prescription' | 'add_service'>('details');
+  const [activeTab, setActiveTab] = useState<'details' | 'prescription'>('details');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAddingService, setIsAddingService] = useState(false);
   const [selectedNewService, setSelectedNewService] = useState('');
+  
+  // Track which booked service is currently selected for editing
+  const [selectedServiceIdx, setSelectedServiceIdx] = useState(0);
   
   // Fetch services for the add service tab
   const { data: servicesData } = useQuery({
@@ -27,15 +46,26 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
 
   const patient = queueItem.client;
   const appointment = queueItem.appointment;
-  const services = appointment?.appointmentServices?.map((as: any) => as.service) || [];
-  const primaryService = services[0];
+  
+  // All booked services for this appointment
+  const appointmentServices: any[] = appointment?.appointmentServices || [];
+  const bookedServices = appointmentServices.map((as: any) => ({
+    id: as.service?.id,
+    name: as.service?.nameAr || as.service?.name || 'خدمة',
+    categoryType: as.service?.category?.type || as.service?.category?.name || '',
+    categoryName: as.service?.category?.nameAr || as.service?.category?.name || '',
+    unitPrice: as.unitPrice,
+    pricingId: as.pricingId,
+  }));
 
-  let sessionType: 'LASER' | 'INJECTION' | 'SKIN_CARE' = 'SKIN_CARE';
-  if (primaryService?.category?.name) {
-    const cat = primaryService.category.name.toUpperCase();
-    if (cat.includes('LASER')) sessionType = 'LASER';
-    else if (cat.includes('INJECT') || cat.includes('FILLER') || cat.includes('BOTOX')) sessionType = 'INJECTION';
-  }
+  // Currently selected service
+  const currentService = bookedServices[selectedServiceIdx] || bookedServices[0];
+
+  // Calculate total estimated cost
+  const totalCost = appointmentServices.reduce((sum: number, as: any) => {
+    const price = Number(as.unitPrice || as.service?.pricings?.[0]?.price || 0);
+    return sum + price;
+  }, 0);
 
   const handleAddService = async () => {
     if (!selectedNewService) return;
@@ -44,8 +74,8 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
       await api.post(`/appointments/${appointment.id}/services`, { serviceId: selectedNewService });
       toast.success('تم إضافة الخدمة بنجاح');
       setSelectedNewService('');
-      // Force refresh of the queue so the modal gets the new data
-      onSessionComplete(); // This usually refetches the queue
+      setIsAddingService(false);
+      onSessionComplete();
     } catch (error: any) {
       toast.error('حدث خطأ أثناء إضافة الخدمة: ' + (error.response?.data?.message || ''));
     } finally {
@@ -57,13 +87,10 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
     try {
       setIsSubmitting(true);
 
-      // If it wasn't in session yet, mark it as in session first?
-      // Typically the modal might just finish it. But let's assume clicking it means starting/resuming it.
       if (queueItem.stage !== 'IN_SESSION') {
         await api.put(`/workflow/${queueItem.id}/start-session`);
       }
 
-      // Finish session and move to pending checkout
       await api.put(`/workflow/${queueItem.id}/end-session`);
       
       toast.success('تم إنهاء الجلسة وتحويل المريض للاستقبال');
@@ -79,154 +106,228 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-surface-900/40 backdrop-blur-sm p-4 sm:p-6">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-7xl h-[90vh] flex overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-7xl h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         
-        {/* Left Sidebar - Patient History */}
-        <PatientHistorySidebar clientId={patient.id} excludeAppointmentId={appointment.id} />
-
-        {/* Right Side - Main Content */}
-        <div className="flex-1 flex flex-col min-w-0">
-          {/* Header */}
-        <div className="px-6 py-4 border-b border-surface-200 flex items-center justify-between bg-surface-50/50">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-lg">
-              {patient?.fullName?.substring(0, 2) || 'م'}
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-surface-900">{patient?.fullName}</h2>
-              <div className="flex items-center gap-2 text-sm text-surface-500">
-                <span>{patient?.phone}</span>
-                <span className="w-1 h-1 rounded-full bg-surface-300"></span>
-                <span className="font-medium text-primary-600">
-                  {services.map((s: any) => s.nameAr || s.name).join(' + ') || 'بدون خدمة'}
-                </span>
+        {/* ═══════════ HEADER ═══════════ */}
+        <div className="px-6 py-3.5 border-b border-surface-200 bg-surface-50/50 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              {/* Patient Avatar */}
+              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold text-base shadow-sm">
+                {patient?.fullName?.substring(0, 2) || 'م'}
               </div>
+              <div>
+                <h2 className="text-base font-bold text-surface-900">{patient?.fullName}</h2>
+                <div className="flex items-center gap-2 text-xs text-surface-500 mt-0.5">
+                  <span className="font-mono">{patient?.phone}</span>
+                  {totalCost > 0 && (
+                    <>
+                      <span className="w-1 h-1 rounded-full bg-surface-300"></span>
+                      <span className="flex items-center gap-1 font-bold text-primary-600">
+                        <DollarSign className="w-3 h-3" />
+                        {totalCost.toFixed(0)} ج.م
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Booked Services Summary in Header */}
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1.5 flex-wrap justify-end max-w-md">
+                {bookedServices.map((svc: any, idx: number) => {
+                  const meta = getServiceMeta(svc.categoryType, svc.categoryName);
+                  return (
+                    <span
+                      key={idx}
+                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-md border text-[11px] font-bold ${meta.color}`}
+                    >
+                      {meta.icon}
+                      {svc.name}
+                    </span>
+                  );
+                })}
+                {bookedServices.length === 0 && (
+                  <span className="text-xs text-surface-400">لا توجد خدمات محجوزة</span>
+                )}
+              </div>
+              
+              <button 
+                onClick={onClose}
+                className="p-2 text-surface-400 hover:text-surface-600 hover:bg-surface-100 rounded-lg transition-colors mr-2"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
           </div>
-          <button 
-            onClick={onClose}
-            className="p-2 text-surface-400 hover:text-surface-600 hover:bg-surface-100 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex border-b border-surface-200 px-6">
-          <button
-            onClick={() => setActiveTab('details')}
-            className={`flex items-center gap-2 py-4 px-4 font-bold text-sm border-b-2 transition-colors ${
-              activeTab === 'details' 
-                ? 'border-primary-500 text-primary-700' 
-                : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'
-            }`}
-          >
-            <Activity className="w-4 h-4" />
-            تفاصيل الجلسة
-          </button>
-          <button
-            onClick={() => setActiveTab('prescription')}
-            className={`flex items-center gap-2 py-4 px-4 font-bold text-sm border-b-2 transition-colors ${
-              activeTab === 'prescription' 
-                ? 'border-primary-500 text-primary-700' 
-                : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'
-            }`}
-          >
-            <FileText className="w-4 h-4" />
-            الروشتة والأدوية
-          </button>
-          <button
-            onClick={() => setActiveTab('add_service')}
-            className={`flex items-center gap-2 py-4 px-4 font-bold text-sm border-b-2 transition-colors ${
-              activeTab === 'add_service' 
-                ? 'border-primary-500 text-primary-700' 
-                : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'
-            }`}
-          >
-            <Plus className="w-4 h-4" />
-            إضافة خدمات
-          </button>
-        </div>
+        {/* ═══════════ MAIN BODY: 1/3 Right + 2/3 Left ═══════════ */}
+        <div className="flex-1 flex min-h-0 overflow-hidden">
+          
+          {/* ──── RIGHT SIDE: Patient History (1/3) - Placed first to appear on the right in RTL ──── */}
+          <PatientHistorySidebar clientId={patient.id} excludeAppointmentId={appointment.id} />
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 bg-surface-50/30">
-          {activeTab === 'details' && (
-             <SessionForm 
-               type={sessionType}
-               appointmentId={appointment.id}
-               clientId={patient.id}
-               serviceId={service.id}
-               onSuccess={() => toast.success('تم حفظ تفاصيل الجلسة')}
-               onCancel={onClose}
-             />
-          )}
-
-          {activeTab === 'prescription' && (
-             <PrescriptionForm 
-               clientId={patient.id}
-               appointmentId={appointment.id}
-               onSuccess={() => toast.success('تم حفظ الروشتة')}
-               onCancel={onClose}
-             />
-          )}
-
-          {activeTab === 'add_service' && (
-            <div className="bg-white p-6 rounded-xl border border-surface-200 shadow-sm space-y-4">
-              <h3 className="text-lg font-bold text-surface-900">إضافة خدمة جديدة للجلسة الحالية</h3>
-              <p className="text-sm text-surface-500">سيتم إضافة الخدمة إلى فاتورة المريض النهائية.</p>
-              
-              <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1">اختر الخدمة</label>
-                <select 
-                  className="input-field"
-                  value={selectedNewService}
-                  onChange={e => setSelectedNewService(e.target.value)}
+          {/* ──── LEFT SIDE: Session Content (2/3) ──── */}
+          <div className="flex-1 flex flex-col min-w-0">
+            
+            {/* Tabs */}
+            <div className="flex border-b border-surface-200 px-6 flex-shrink-0 bg-white items-center">
+              <div className="flex">
+                <button
+                  onClick={() => setActiveTab('details')}
+                  className={`flex items-center gap-2 py-3.5 px-4 font-bold text-sm border-b-2 transition-colors ${
+                    activeTab === 'details' 
+                      ? 'border-primary-500 text-primary-700' 
+                      : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'
+                  }`}
                 >
-                  <option value="">اختر الخدمة...</option>
-                  {servicesData?.data?.map((s: any) => (
-                    <option key={s.id} value={s.id}>{s.name} ({s.nameAr})</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex justify-end pt-4">
-                <button 
-                  className="btn-primary" 
-                  onClick={handleAddService}
-                  disabled={!selectedNewService || isSubmitting}
+                  <Activity className="w-4 h-4" />
+                  تفاصيل الجلسة
+                </button>
+                <button
+                  onClick={() => setActiveTab('prescription')}
+                  className={`flex items-center gap-2 py-3.5 px-4 font-bold text-sm border-b-2 transition-colors ${
+                    activeTab === 'prescription' 
+                      ? 'border-primary-500 text-primary-700' 
+                      : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'
+                  }`}
                 >
-                  <Plus className="w-4 h-4 ml-2" />
-                  إضافة للعميل
+                  <FileText className="w-4 h-4" />
+                  الروشتة والأدوية
                 </button>
               </div>
             </div>
-          )}
-        </div>
 
-          {/* Footer */}
-          <div className="p-4 border-t border-surface-200 bg-white flex justify-end gap-3">
-            <button 
-              className="btn-ghost" 
-              onClick={onClose}
-              disabled={isSubmitting}
-            >
-              إغلاق
-            </button>
-            <button 
-              className="btn-primary flex items-center gap-2"
-              onClick={handleFinish}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
-              ) : (
-                <CheckCircle className="w-4 h-4" />
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-5 bg-surface-50/30">
+              
+              {/* Inline Add Service UI */}
+              {isAddingService && (
+                <div className="bg-white p-4 rounded-xl border border-primary-200 shadow-sm mb-4 animate-in slide-in-from-top-2">
+                  <div className="flex items-end gap-3">
+                    <div className="flex-1">
+                      <label className="block text-xs font-bold text-surface-700 mb-1">اختر خدمة لإضافتها للزيارة</label>
+                      <select 
+                        className="input-field text-sm py-2"
+                        value={selectedNewService}
+                        onChange={e => setSelectedNewService(e.target.value)}
+                      >
+                        <option value="">اختر الخدمة...</option>
+                        {servicesData?.data?.map((s: any) => (
+                          <option key={s.id} value={s.id}>{s.name} ({s.nameAr})</option>
+                        ))}
+                      </select>
+                    </div>
+                    <button 
+                      className="btn-primary py-2 px-5 flex items-center gap-1" 
+                      onClick={handleAddService}
+                      disabled={!selectedNewService || isSubmitting}
+                    >
+                      <Plus className="w-4 h-4" /> إضافة للعميل
+                    </button>
+                  </div>
+                </div>
               )}
-              إنهاء الجلسة وتحويل للاستقبال
-            </button>
-          </div>
-        </div>
 
+              {activeTab === 'details' && (
+                <div className="space-y-4">
+                  {/* ─── Service Chips Row ─── */}
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {bookedServices.map((svc: any, idx: number) => {
+                        const meta = getServiceMeta(svc.categoryType, svc.categoryName);
+                        const isActive = idx === selectedServiceIdx;
+                        return (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setSelectedServiceIdx(idx)}
+                            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${
+                              isActive 
+                                ? meta.color 
+                                : `bg-white text-surface-400 border-surface-200 hover:bg-surface-50 hover:text-surface-600`
+                            }`}
+                          >
+                            {meta.icon}
+                            {meta.label}
+                            {svc.name && <span className={isActive ? "text-surface-500 font-medium" : "font-medium"}>— {svc.name}</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    
+                    <button
+                      onClick={() => setIsAddingService(!isAddingService)}
+                      className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border text-xs font-bold transition-colors ${
+                        isAddingService 
+                          ? 'bg-primary-50 text-primary-700 border-primary-200' 
+                          : 'bg-white text-primary-600 border-surface-200 hover:bg-primary-50 hover:border-primary-200'
+                      }`}
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      إضافة خدمة أخرى
+                    </button>
+                  </div>
+
+                  {/* ─── Dynamic Session Form based on selected service ─── */}
+                  {currentService ? (
+                    <SessionForm 
+                      categoryType={currentService.categoryType}
+                      appointmentId={appointment.id}
+                      clientId={patient.id}
+                      serviceId={currentService.id}
+                      serviceName={currentService.name}
+                      onSuccess={() => toast.success('تم حفظ تفاصيل الجلسة')}
+                      onCancel={onClose}
+                    />
+                  ) : (
+                    <div className="bg-white p-8 rounded-xl border border-surface-200 text-center text-surface-400">
+                      <Activity className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                      <p className="text-sm font-medium">لا توجد خدمات محجوزة لهذا الموعد</p>
+                      <p className="text-xs mt-1">يمكنك إضافة خدمة من تبويب "إضافة خدمات"</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'prescription' && (
+                 <PrescriptionForm 
+                   clientId={patient.id}
+                   appointmentId={appointment.id}
+                   onSuccess={() => toast.success('تم حفظ الروشتة')}
+                   onCancel={onClose}
+                 />
+              )}
+
+            </div>
+            
+            {/* Footer */}
+            <div className="p-4 border-t border-surface-200 bg-white flex justify-end gap-3 flex-shrink-0">
+              <button 
+                className="btn-ghost" 
+                onClick={onClose}
+                disabled={isSubmitting}
+              >
+                إغلاق
+              </button>
+              <button 
+                className="btn-primary flex items-center gap-2"
+                onClick={handleFinish}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+                ) : (
+                  <CheckCircle className="w-4 h-4" />
+                )}
+                إنهاء الجلسة وتحويل للاستقبال
+              </button>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   );

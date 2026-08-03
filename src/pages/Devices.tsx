@@ -24,9 +24,7 @@ const Devices = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-start items-center">
-        <h1 className="text-3xl font-bold tracking-tight">إدارة الأجهزة</h1>
-      </div>
+
 
       {alerts && alerts.length > 0 && (
         <Card className="border-red-200 bg-red-50">
