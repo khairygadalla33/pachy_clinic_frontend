@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Activity, Clock, Users, LogIn, CheckSquare, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -6,11 +7,13 @@ import { useAuth } from '../lib/auth';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
 import WorkflowQueuePanel from '../components/WorkflowQueuePanel';
+import CheckoutInvoiceModal from '../components/appointments/CheckoutInvoiceModal';
 import { translateStatus } from '../lib/utils';
 
 export default function ReceptionDashboard() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [checkoutItem, setCheckoutItem] = useState<any>(null);
   const { user } = useAuth();
   const branchId = user?.branchId;
 
@@ -89,6 +92,16 @@ export default function ReceptionDashboard() {
         doctorGroups={doctorGroups || []} 
         onAction={handleAction} 
         onViewClient={handleViewClient} 
+        onCheckout={(item) => setCheckoutItem(item)}
+      />
+
+      <CheckoutInvoiceModal 
+        queueItem={checkoutItem}
+        onClose={() => setCheckoutItem(null)}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['workflow-queue'] });
+          queryClient.invalidateQueries({ queryKey: ['workflow-stats'] });
+        }}
       />
 
       {/* Upcoming Appointments Table */}

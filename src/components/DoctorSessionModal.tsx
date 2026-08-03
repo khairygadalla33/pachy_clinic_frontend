@@ -13,21 +13,45 @@ interface DoctorSessionModalProps {
 }
 
 export default function DoctorSessionModal({ queueItem, onClose, onSessionComplete }: DoctorSessionModalProps) {
-  const [activeTab, setActiveTab] = useState<'details' | 'prescription'>('details');
+  const [activeTab, setActiveTab] = useState<'details' | 'prescription' | 'add_service'>('details');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedNewService, setSelectedNewService] = useState('');
+  
+  // Fetch services for the add service tab
+  const { data: servicesData } = useQuery({
+    queryKey: ['services'],
+    queryFn: () => api.get('/services').then(res => res.data)
+  });
 
   if (!queueItem) return null;
 
   const patient = queueItem.client;
   const appointment = queueItem.appointment;
-  const service = appointment?.service;
+  const services = appointment?.appointmentServices?.map((as: any) => as.service) || [];
+  const primaryService = services[0];
 
   let sessionType: 'LASER' | 'INJECTION' | 'SKIN_CARE' = 'SKIN_CARE';
-  if (service?.category?.name) {
-    const cat = service.category.name.toUpperCase();
+  if (primaryService?.category?.name) {
+    const cat = primaryService.category.name.toUpperCase();
     if (cat.includes('LASER')) sessionType = 'LASER';
     else if (cat.includes('INJECT') || cat.includes('FILLER') || cat.includes('BOTOX')) sessionType = 'INJECTION';
   }
+
+  const handleAddService = async () => {
+    if (!selectedNewService) return;
+    try {
+      setIsSubmitting(true);
+      await api.post(`/appointments/${appointment.id}/services`, { serviceId: selectedNewService });
+      toast.success('تم إضافة الخدمة بنجاح');
+      setSelectedNewService('');
+      // Force refresh of the queue so the modal gets the new data
+      onSessionComplete(); // This usually refetches the queue
+    } catch (error: any) {
+      toast.error('حدث خطأ أثناء إضافة الخدمة: ' + (error.response?.data?.message || ''));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleFinish = async () => {
     try {
@@ -73,7 +97,9 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
               <div className="flex items-center gap-2 text-sm text-surface-500">
                 <span>{patient?.phone}</span>
                 <span className="w-1 h-1 rounded-full bg-surface-300"></span>
-                <span className="font-medium text-primary-600">{service?.nameAr || service?.name}</span>
+                <span className="font-medium text-primary-600">
+                  {services.map((s: any) => s.nameAr || s.name).join(' + ') || 'بدون خدمة'}
+                </span>
               </div>
             </div>
           </div>
@@ -109,6 +135,17 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
             <FileText className="w-4 h-4" />
             الروشتة والأدوية
           </button>
+          <button
+            onClick={() => setActiveTab('add_service')}
+            className={`flex items-center gap-2 py-4 px-4 font-bold text-sm border-b-2 transition-colors ${
+              activeTab === 'add_service' 
+                ? 'border-primary-500 text-primary-700' 
+                : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'
+            }`}
+          >
+            <Plus className="w-4 h-4" />
+            إضافة خدمات
+          </button>
         </div>
 
         {/* Content */}
@@ -131,6 +168,38 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
                onSuccess={() => toast.success('تم حفظ الروشتة')}
                onCancel={onClose}
              />
+          )}
+
+          {activeTab === 'add_service' && (
+            <div className="bg-white p-6 rounded-xl border border-surface-200 shadow-sm space-y-4">
+              <h3 className="text-lg font-bold text-surface-900">إضافة خدمة جديدة للجلسة الحالية</h3>
+              <p className="text-sm text-surface-500">سيتم إضافة الخدمة إلى فاتورة المريض النهائية.</p>
+              
+              <div>
+                <label className="block text-sm font-medium text-surface-700 mb-1">اختر الخدمة</label>
+                <select 
+                  className="input-field"
+                  value={selectedNewService}
+                  onChange={e => setSelectedNewService(e.target.value)}
+                >
+                  <option value="">اختر الخدمة...</option>
+                  {servicesData?.data?.map((s: any) => (
+                    <option key={s.id} value={s.id}>{s.name} ({s.nameAr})</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex justify-end pt-4">
+                <button 
+                  className="btn-primary" 
+                  onClick={handleAddService}
+                  disabled={!selectedNewService || isSubmitting}
+                >
+                  <Plus className="w-4 h-4 ml-2" />
+                  إضافة للعميل
+                </button>
+              </div>
+            </div>
           )}
         </div>
 

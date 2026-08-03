@@ -9,6 +9,7 @@ interface WorkflowQueuePanelProps {
   }>;
   onAction: (itemId: string, action: string) => void;
   onViewClient: (clientId: string) => void;
+  onCheckout?: (item: any) => void;
 }
 
 const stageColors: Record<string, string> = {
@@ -55,7 +56,7 @@ function WaitingTime({ startTime }: { startTime: string | null }) {
   return <span className="font-bold">{mins} دقيقة</span>;
 }
 
-export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClient }: WorkflowQueuePanelProps) {
+export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClient, onCheckout }: WorkflowQueuePanelProps) {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
   const toggleSection = (docId: string) => {
@@ -114,7 +115,9 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
                           </div>
                           <div className="flex items-center gap-1.5 text-xs text-surface-600">
                             <Stethoscope className="w-3.5 h-3.5" />
-                            <span className="truncate font-medium">{item.appointment?.service?.name}</span>
+                            <span className="truncate font-medium">
+                              {item.appointment?.appointmentServices?.map((as: any) => as.service?.name).join(' + ') || 'بدون خدمة'}
+                            </span>
                           </div>
                           {(item.stage === 'WAITING' || item.stage === 'IN_SESSION') && (
                             <div className="flex items-center gap-1.5 text-xs text-surface-600 font-medium">
@@ -146,8 +149,8 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
                           {item.stage === 'IN_SESSION' && (
                             <button onClick={() => onAction(item.id, 'end-session')} className="px-2 py-1 text-xs font-medium bg-blue-500 text-white rounded hover:bg-blue-600">إنهاء الجلسة</button>
                           )}
-                          {item.stage === 'PENDING_CHECKOUT' && (
-                            <button onClick={() => onAction(item.id, 'checkout')} className="px-2 py-1 text-xs font-medium bg-surface-900 text-white rounded hover:bg-black">الدفع</button>
+                          {item.stage === 'PENDING_CHECKOUT' && onCheckout && (
+                            <button onClick={() => onCheckout(item)} className="px-2 py-1 text-xs font-medium bg-surface-900 text-white rounded hover:bg-black">الدفع</button>
                           )}
 
                           <button onClick={() => onViewClient(item.clientId)} className="px-2 py-1 text-xs font-medium bg-white border border-surface-200 rounded hover:bg-surface-50 flex items-center">

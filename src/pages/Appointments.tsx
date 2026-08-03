@@ -28,7 +28,7 @@ export default function Appointments() {
 
   const [formData, setFormData] = useState({
     clientId: '',
-    serviceId: '',
+    serviceIds: [] as string[],
     staffId: '',
     scheduledDate: new Date().toISOString().split('T')[0],
     startTime: '10:00',
@@ -149,7 +149,7 @@ export default function Appointments() {
       queryClient.invalidateQueries({ queryKey: ['workflow-stats'] });
       queryClient.invalidateQueries({ queryKey: ['workflow-queue'] });
       setShowModal(false);
-      setFormData({ clientId: '', serviceId: '', staffId: '', scheduledDate: new Date().toISOString().split('T')[0], startTime: '10:00', depositAmount: '', depositMethod: 'CASH', notes: '', source: 'phone' });
+      setFormData({ clientId: '', serviceIds: [], staffId: '', scheduledDate: new Date().toISOString().split('T')[0], startTime: '10:00', depositAmount: '', depositMethod: 'CASH', notes: '', source: 'phone' });
       if (searchParams.has('newWalkIn')) {
         searchParams.delete('newWalkIn');
         setSearchParams(searchParams);
@@ -199,7 +199,7 @@ export default function Appointments() {
     e.preventDefault();
     const payload: any = {
       clientId: formData.clientId,
-      serviceId: formData.serviceId,
+      serviceIds: formData.serviceIds,
       staffId: formData.staffId,
       branchId,
       notes: formData.notes,
@@ -387,7 +387,9 @@ export default function Appointments() {
                           <div className="font-medium text-surface-900">{apt.client.fullName}</div>
                           <div className="text-xs text-surface-500">{apt.client.phone}</div>
                         </td>
-                        <td className="px-4 py-3 text-surface-700">{apt.service.nameAr || apt.service.name}</td>
+                        <td className="px-4 py-3 text-surface-700">
+                          {apt.appointmentServices?.map((as: any) => as.service.nameAr || as.service.name).join(' + ') || 'بدون خدمة'}
+                        </td>
                         <td className="px-4 py-3 text-surface-700">د. {apt.staff.fullName}</td>
                         <td className="px-4 py-3">
                           <Badge variant={
@@ -456,19 +458,29 @@ export default function Appointments() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1">الخدمة</label>
-              <select 
-                className="input-field"
-                required
-                value={formData.serviceId}
-                onChange={e => setFormData({ ...formData, serviceId: e.target.value })}
-              >
-                <option value="">اختر الخدمة...</option>
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-surface-700 mb-2">الخدمات (يمكن اختيار أكثر من خدمة)</label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-40 overflow-y-auto p-2 border border-surface-200 rounded-md">
                 {services?.map((s: any) => (
-                  <option key={s.id} value={s.id}>{s.name} ({s.nameAr})</option>
+                  <label key={s.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-surface-50 p-1 rounded">
+                    <input 
+                      type="checkbox"
+                      checked={formData.serviceIds.includes(s.id)}
+                      onChange={(e) => {
+                        const newIds = e.target.checked 
+                          ? [...formData.serviceIds, s.id] 
+                          : formData.serviceIds.filter(id => id !== s.id);
+                        setFormData({ ...formData, serviceIds: newIds });
+                      }}
+                      className="rounded text-primary-600 focus:ring-primary-500"
+                    />
+                    <span>{s.name} ({s.nameAr})</span>
+                  </label>
                 ))}
-              </select>
+              </div>
+              {formData.serviceIds.length === 0 && (
+                <p className="text-xs text-red-500 mt-1">يجب اختيار خدمة واحدة على الأقل</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-surface-700 mb-1">الطبيب</label>
