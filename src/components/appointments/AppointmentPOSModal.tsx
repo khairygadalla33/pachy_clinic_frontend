@@ -477,14 +477,6 @@ export default function AppointmentPOSModal({
               <div className="flex items-center justify-between text-surface-600">
                 <span>الخصم (Discount):</span>
                 <div className="flex items-center gap-1">
-                  <input 
-                    type="number" 
-                    min="0"
-                    placeholder="0"
-                    className="input-field py-1 px-2 w-20 text-center h-8 text-sm"
-                    value={formData.discountValue}
-                    onChange={(e) => setFormData({ ...formData, discountValue: e.target.value })}
-                  />
                   <select 
                     className="input-field py-1 pl-6 pr-2 w-20 h-8 text-sm"
                     value={formData.discountType}
@@ -493,6 +485,14 @@ export default function AppointmentPOSModal({
                     <option value="value">قيمة</option>
                     <option value="percentage">% نسبة</option>
                   </select>
+                  <input 
+                    type="number" 
+                    min="0"
+                    placeholder="0"
+                    className="input-field py-1 px-2 w-20 text-center h-8 text-sm"
+                    value={formData.discountValue}
+                    onChange={(e) => setFormData({ ...formData, discountValue: e.target.value })}
+                  />
                 </div>
               </div>
               
@@ -506,14 +506,6 @@ export default function AppointmentPOSModal({
               <div className="flex items-center justify-between text-emerald-600 pb-2 border-b border-surface-100">
                 <span>المدفوع (Paid):</span>
                 <div className="flex items-center gap-1">
-                  <input 
-                    type="number" 
-                    min="0"
-                    placeholder="0"
-                    className="input-field py-1 px-2 w-20 text-center h-8 text-sm font-bold text-emerald-700"
-                    value={formData.depositAmount}
-                    onChange={(e) => setFormData({ ...formData, depositAmount: e.target.value })}
-                  />
                   <select 
                     className="input-field py-1 pl-6 pr-2 w-20 h-8 text-sm"
                     value={formData.depositMethod}
@@ -524,6 +516,14 @@ export default function AppointmentPOSModal({
                     <option value="INSTAPAY">إنستاباي</option>
                     <option value="E_WALLET">محفظة</option>
                   </select>
+                  <input 
+                    type="number" 
+                    min="0"
+                    placeholder="0"
+                    className="input-field py-1 px-2 w-20 text-center h-8 text-sm font-bold text-emerald-700"
+                    value={formData.depositAmount}
+                    onChange={(e) => setFormData({ ...formData, depositAmount: e.target.value })}
+                  />
                 </div>
               </div>
 
@@ -537,7 +537,7 @@ export default function AppointmentPOSModal({
             <button 
               onClick={handleSubmit} 
               disabled={createMutation.isPending || !formData.clientId || !formData.staffId || basket.length === 0}
-              className={`w-full py-3.5 text-base font-bold shadow-lg transition-all rounded-xl text-white ${isWalkIn ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20' : 'bg-primary-600 hover:bg-primary-700 shadow-primary-500/20'} disabled:opacity-50 disabled:cursor-not-allowed`}
+              className="w-full btn-primary py-2.5 text-base font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {createMutation.isPending ? 'جاري التنفيذ...' : (isWalkIn ? 'تسجيل كزيارة مباشرة' : 'تأكيد وحجز الموعد')}
             </button>
