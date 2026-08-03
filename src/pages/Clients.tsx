@@ -109,7 +109,7 @@ export default function Clients() {
             setFormData({ fullName: '', phone: '', email: '', gender: 'FEMALE', skinType: '', dateOfBirth: '', age: '', region: '', address: '' });
             setShowModal(true);
           }}
-          className="btn-primary flex items-center gap-2"
+          className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm text-white bg-[#c0389f] hover:opacity-90 transition-opacity gap-2"
         >
           <UserPlus className="w-5 h-5" />
           إضافة عميل جديد
