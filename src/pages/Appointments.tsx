@@ -129,7 +129,7 @@ export default function Appointments() {
 
   const { data: staff } = useQuery({
     queryKey: ['staff', 'doctors'],
-    queryFn: () => api.get('/users', { params: { role: 'DOCTOR' } }).then(r => r.data),
+    queryFn: () => api.get('/users/doctors').then(r => r.data),
   });
 
   const { data: doctorSchedule } = useQuery({
