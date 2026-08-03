@@ -235,7 +235,12 @@ export default function AppointmentPOSModal({
           
           {/* Header & Search */}
           <div className="p-5 border-b border-surface-200 bg-white shrink-0">
-            <h1 className="text-xl font-black text-surface-900 mb-4">قائمة الخدمات</h1>
+            <h1 className="text-xl font-black text-surface-900 mb-4 flex items-center gap-2">
+              <span className="w-8 h-8 rounded-lg bg-primary-100 text-primary-600 flex items-center justify-center">
+                <CheckCircle className="w-5 h-5" />
+              </span>
+              {isWalkIn ? 'زيارة مباشرة (Walk-in)' : 'تفاصيل الحجز'}
+            </h1>
             
             <div className="relative">
               <input 
@@ -341,16 +346,7 @@ export default function AppointmentPOSModal({
 
         {/* ======================= LEFT PANE: BASKET & DETAILS (35%) ======================= */}
         <div className="w-full md:w-[35%] bg-white flex flex-col h-full min-h-0 z-10 shadow-xl order-2">
-          
-          {/* Header */}
-          <div className="p-4 border-b border-surface-100 bg-surface-50 flex items-center justify-between shrink-0">
-            <h2 className="text-lg font-bold text-surface-900 flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-primary-100 text-primary-600 flex items-center justify-center">
-                <CheckCircle className="w-5 h-5" />
-              </span>
-              {isWalkIn ? 'زيارة مباشرة (Walk-in)' : 'تفاصيل الحجز'}
-            </h2>
-          </div>
+
 
           {/* Fixed Meta: Client & Doctor */}
           <div className="p-4 border-b border-surface-200 bg-white grid grid-cols-2 gap-3 shrink-0">
