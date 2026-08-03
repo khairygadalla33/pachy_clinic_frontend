@@ -228,7 +228,7 @@ export default function AppointmentPOSModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-900/60 backdrop-blur-sm p-4">
-      <div className="bg-surface-50 w-full max-w-[1200px] max-h-[88vh] rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-surface-200">
+      <div className="bg-surface-50 w-full max-w-[1200px] h-[88vh] rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-surface-200">
         
         {/* ======================= RIGHT PANE: SERVICES MENU (65%) ======================= */}
         <div className="w-full md:w-[65%] bg-surface-50 flex flex-col h-full min-h-0 border-l border-surface-200 order-1">

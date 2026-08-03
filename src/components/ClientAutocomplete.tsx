@@ -35,7 +35,18 @@ export default function ClientAutocomplete({ onSelect, placeholder = 'البحث
 
   useEffect(() => {
     if (query.trim().length < 2) {
-      setResults([]);
+      if (isOpen) {
+        setIsLoading(true);
+        // Fetch recent/default clients
+        api.get('/clients?limit=15')
+          .then((res) => {
+            setResults(res.data.data || res.data || []);
+          })
+          .catch(console.error)
+          .finally(() => setIsLoading(false));
+      } else {
+        setResults([]);
+      }
       return;
     }
 
@@ -44,14 +55,14 @@ export default function ClientAutocomplete({ onSelect, placeholder = 'البحث
       api.get(`/clients/search?q=${encodeURIComponent(query)}`)
         .then((res) => {
           setResults(res.data);
-          setIsOpen(true);
+          if (res.data.length > 0) setIsOpen(true);
         })
         .catch(console.error)
         .finally(() => setIsLoading(false));
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [query]);
+  }, [query, isOpen]);
 
   return (
     <div className={`relative ${className}`} ref={wrapperRef}>
@@ -62,8 +73,12 @@ export default function ClientAutocomplete({ onSelect, placeholder = 'البحث
           className="w-full pl-4 pr-10 py-2 rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800 text-surface-900 dark:text-surface-100 focus:ring-2 focus:ring-primary-500 transition-shadow"
           placeholder={placeholder}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => { if (results.length > 0) setIsOpen(true); }}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setIsOpen(true);
+          }}
+          onClick={() => setIsOpen(true)}
+          onFocus={() => setIsOpen(true)}
         />
         {isLoading && (
           <div className="absolute left-3 top-1/2 -translate-y-1/2">
