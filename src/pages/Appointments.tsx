@@ -64,10 +64,7 @@ export default function Appointments() {
     end.setHours(23, 59, 59, 999);
 
     if (timeframe === 'week') {
-      const day = start.getDay();
-      const diff = start.getDate() - day + (day === 0 ? -6 : 1);
-      start.setDate(diff);
-      end.setDate(diff + 5);
+      end.setDate(start.getDate() + 6);
     } else if (timeframe === 'month') {
       start.setDate(1);
       end.setMonth(end.getMonth() + 1, 0);
@@ -96,8 +93,8 @@ export default function Appointments() {
   const formatWeekRange = () => {
     const s = dateRange.start;
     const e = dateRange.end;
-    const opts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
-    return `${s.toLocaleDateString('en-US', opts)} – ${e.toLocaleDateString('en-US', opts)}, ${e.getFullYear()}`;
+    const opts: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric' };
+    return `${s.toLocaleDateString('ar-EG', opts)} – ${e.toLocaleDateString('ar-EG', opts)}, ${e.getFullYear()}`;
   };
 
   // Data fetching
@@ -281,7 +278,7 @@ export default function Appointments() {
                   className="text-sm font-semibold text-surface-900 dark:text-surface-100 px-2 hover:bg-surface-100 dark:hover:bg-surface-800 rounded transition-colors cursor-pointer text-center"
                   title="الذهاب لليوم"
                 >
-                  {timeframe === 'week' ? formatWeekRange() : timeframe === 'month' ? `${dateRange.start.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : timeframe === 'year' ? currentDate.getFullYear() : 'Select Range'}
+                  {timeframe === 'week' ? formatWeekRange() : timeframe === 'month' ? `${dateRange.start.toLocaleDateString('ar-EG', { month: 'long', year: 'numeric' })}` : timeframe === 'year' ? currentDate.getFullYear() : 'Select Range'}
                 </button>
 
                 <button 

@@ -29,14 +29,11 @@ export default function CalendarView({
     const days = [];
 
     if (isWeekly) {
-      // Weekly view (Mon-Sat)
+      // Weekly view (7 days starting from current date)
       const start = new Date(currentDate);
       start.setHours(0, 0, 0, 0);
-      const day = start.getDay();
-      const diff = start.getDate() - day + (day === 0 ? -6 : 1);
-      start.setDate(diff); // Monday
       
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 7; i++) {
         const d = new Date(start);
         d.setDate(start.getDate() + i);
         const dayApts = appointments.filter(a => {
@@ -81,7 +78,7 @@ export default function CalendarView({
 
     return {
       days,
-      monthName: currentDate.toLocaleString('default', { month: 'long' }),
+      monthName: currentDate.toLocaleString('ar-EG', { month: 'long' }),
       year,
       isWeekly
     };
@@ -89,24 +86,15 @@ export default function CalendarView({
 
 
 
-  const weekDaysWeekly = [
-    { en: 'Mon' },
-    { en: 'Tue' },
-    { en: 'Wed' },
-    { en: 'Thu' },
-    { en: 'Fri' },
-    { en: 'Sat' }
-  ];
   const weekDaysMonthly = [
-    { en: 'Sun' },
-    { en: 'Mon' },
-    { en: 'Tue' },
-    { en: 'Wed' },
-    { en: 'Thu' },
-    { en: 'Fri' },
-    { en: 'Sat' }
+    { ar: 'الأحد' },
+    { ar: 'الإثنين' },
+    { ar: 'الثلاثاء' },
+    { ar: 'الأربعاء' },
+    { ar: 'الخميس' },
+    { ar: 'الجمعة' },
+    { ar: 'السبت' }
   ];
-  const displayWeekDays = isWeekly ? weekDaysWeekly : weekDaysMonthly;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -123,41 +111,48 @@ export default function CalendarView({
   return (
     <div className="bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800 rounded-xl overflow-hidden flex flex-col h-full">
       {/* Calendar Grid Header (Days of week) */}
-      <div className={cn(
-        "grid border-b border-surface-200 dark:border-surface-800 bg-surface-200 dark:bg-surface-700/50",
-        isWeekly ? 'grid-cols-6' : 'grid-cols-7'
-      )}>
-        {displayWeekDays.map((day, idx) => {
-          const date = isWeekly ? days[idx]?.date : null;
-          const isSelected = selectedDate && date && selectedDate.toDateString() === date.toDateString();
-          const isToday = date && date.toDateString() === new Date().toDateString();
+      <div className="grid border-b border-surface-200 dark:border-surface-800 bg-surface-200 dark:bg-surface-700/50 grid-cols-7">
+        {isWeekly ? days.map((dayColumn, idx) => {
+          const date = dayColumn.date;
+          if (!date) return null;
+          const isSelected = selectedDate && selectedDate.toDateString() === date.toDateString();
+          const isToday = date.toDateString() === new Date().toDateString();
 
           return (
             <div 
               key={idx} 
-              onClick={() => date && onDateChange(date)}
+              onClick={() => onDateChange(date)}
               className={cn(
                 "py-2 px-2 text-center border-r border-surface-200 dark:border-surface-800 last:border-r-0 cursor-pointer transition-all duration-200 min-h-[62px] flex flex-col justify-center",
                 isToday ? "bg-primary-600 text-white shadow-lg z-10" : "hover:bg-surface-300 dark:hover:bg-surface-600"
               )}
             >
               <p className={cn(
-                "text-[12px] font-black uppercase tracking-[0.2em]",
+                "text-[12px] font-black uppercase",
                 isToday ? "text-white/90" : "text-primary-600 dark:text-primary-400"
               )}>
-                {day.en}
+                {date.toLocaleDateString('ar-EG', { weekday: 'short' })}
               </p>
-              {date && (
-                <p className={cn(
-                  "text-sm font-normal tracking-tight",
-                  isToday ? "text-white" : "text-surface-900 dark:text-surface-100"
-                )}>
-                  {date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}
-                </p>
-              )}
+              <p className={cn(
+                "text-sm font-normal tracking-tight",
+                isToday ? "text-white" : "text-surface-900 dark:text-surface-100"
+              )}>
+                {date.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' })}
+              </p>
               {isSelected && !isToday && (
                 <div className="mx-auto mt-0.5 w-1 h-1 rounded-full bg-primary-600 animate-pulse" />
               )}
+            </div>
+          );
+        }) : weekDaysMonthly.map((day, idx) => {
+          return (
+            <div 
+              key={idx} 
+              className="py-2 px-2 text-center border-r border-surface-200 dark:border-surface-800 last:border-r-0 min-h-[62px] flex flex-col justify-center bg-surface-200 dark:bg-surface-700/50"
+            >
+              <p className="text-[12px] font-black uppercase text-primary-600 dark:text-primary-400">
+                {day.ar}
+              </p>
             </div>
           );
         })}
@@ -166,7 +161,7 @@ export default function CalendarView({
       {/* Calendar Grid Body */}
       <div className="flex-1 overflow-y-auto">
         {isWeekly ? (
-          <div className="grid grid-cols-6 relative">
+          <div className="grid grid-cols-7 relative">
             {/* Daily Columns */}
             {days.map((dayColumn, dayIdx) => {
               const dayOfWeek = dayColumn.date?.getDay();
