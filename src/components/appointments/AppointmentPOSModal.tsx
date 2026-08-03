@@ -45,6 +45,17 @@ export default function AppointmentPOSModal({
   // Basket State: Array of objects { service, quantity, unitPrice, total }
   const [basket, setBasket] = useState<any[]>([]);
 
+  // Handle Escape Key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   // Update formData when props change
   useEffect(() => {
     if (isOpen) {
@@ -217,10 +228,10 @@ export default function AppointmentPOSModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-900/60 backdrop-blur-sm p-4">
-      <div className="bg-surface-50 w-full max-w-[1400px] h-[96vh] rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-surface-200">
+      <div className="bg-surface-50 w-full max-w-[1200px] max-h-[88vh] rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-surface-200">
         
-        {/* ======================= RIGHT PANE: SERVICES MENU (60%) ======================= */}
-        <div className="w-full md:w-[60%] bg-surface-50 flex flex-col h-full border-l border-surface-200 order-1">
+        {/* ======================= RIGHT PANE: SERVICES MENU (65%) ======================= */}
+        <div className="w-full md:w-[65%] bg-surface-50 flex flex-col h-full border-l border-surface-200 order-1">
           
           {/* Header & Search */}
           <div className="p-5 border-b border-surface-200 bg-white shrink-0">
@@ -328,8 +339,8 @@ export default function AppointmentPOSModal({
           </div>
         </div>
 
-        {/* ======================= LEFT PANE: BASKET & DETAILS (40%) ======================= */}
-        <div className="w-full md:w-[40%] bg-white flex flex-col h-full z-10 shadow-xl order-2">
+        {/* ======================= LEFT PANE: BASKET & DETAILS (35%) ======================= */}
+        <div className="w-full md:w-[35%] bg-white flex flex-col h-full z-10 shadow-xl order-2">
           
           {/* Header */}
           <div className="p-4 border-b border-surface-100 bg-surface-50 flex items-center justify-between shrink-0">
@@ -454,38 +465,6 @@ export default function AppointmentPOSModal({
 
             {/* --- Deposit & Notes --- */}
             <div className="space-y-4 pt-2">
-              <div className="bg-surface-50 p-4 rounded-xl border border-surface-200">
-                <label className="block text-sm font-bold text-surface-800 mb-3 flex items-center gap-1.5">
-                  <Wallet className="w-4 h-4 text-emerald-600" /> الدفعة المقدمة (عربون)
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <div className="relative">
-                      <input 
-                        type="number"
-                        className="input-field font-bold text-lg text-emerald-700 py-2"
-                        placeholder="0.00"
-                        value={formData.depositAmount}
-                        onChange={e => setFormData({ ...formData, depositAmount: e.target.value })}
-                      />
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-surface-400 font-medium">ج.م</span>
-                    </div>
-                  </div>
-                  <div>
-                    <select 
-                      className="input-field py-2 text-sm font-medium"
-                      value={formData.depositMethod}
-                      onChange={e => setFormData({ ...formData, depositMethod: e.target.value })}
-                    >
-                      <option value="CASH">نقدي</option>
-                      <option value="CARD">بطاقة بنكية</option>
-                      <option value="INSTAPAY">إنستاباي</option>
-                      <option value="E_WALLET">محفظة إلكترونية</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
               <div>
                 <label className="block text-xs font-bold text-surface-700 mb-1.5">ملاحظات إضافية</label>
                 <textarea 
@@ -502,7 +481,7 @@ export default function AppointmentPOSModal({
 
           {/* Footer (Totals & Submit) */}
           <div className="p-4 border-t border-surface-200 bg-white shrink-0">
-            <div className="space-y-2 mb-4 text-sm font-medium text-surface-600">
+            <div className="space-y-3 mb-4 text-sm font-medium text-surface-600">
               {/* 1. Subtotal */}
               <div className="flex justify-between items-center text-surface-600">
                 <span>الإجمالي (Total):</span>
@@ -538,10 +517,29 @@ export default function AppointmentPOSModal({
                 <span>{netAccount.toLocaleString()} ج.م</span>
               </div>
 
-              {/* 4. Paid / Deposit */}
-              <div className="flex justify-between items-center text-emerald-600 pb-2 border-b border-surface-100">
+              {/* 4. Paid / Deposit (Merged) */}
+              <div className="flex items-center justify-between text-emerald-600 pb-2 border-b border-surface-100">
                 <span>المدفوع (Paid):</span>
-                <span className="font-bold">{deposit > 0 ? `- ${deposit.toLocaleString()}` : '0'} ج.م</span>
+                <div className="flex items-center gap-1">
+                  <input 
+                    type="number" 
+                    min="0"
+                    placeholder="0"
+                    className="input-field py-1 px-2 w-20 text-center h-8 text-sm font-bold text-emerald-700"
+                    value={formData.depositAmount}
+                    onChange={(e) => setFormData({ ...formData, depositAmount: e.target.value })}
+                  />
+                  <select 
+                    className="input-field py-1 pl-6 pr-2 w-20 h-8 text-sm"
+                    value={formData.depositMethod}
+                    onChange={(e: any) => setFormData({ ...formData, depositMethod: e.target.value })}
+                  >
+                    <option value="CASH">نقدي</option>
+                    <option value="CARD">بطاقة</option>
+                    <option value="INSTAPAY">إنستاباي</option>
+                    <option value="E_WALLET">محفظة</option>
+                  </select>
+                </div>
               </div>
 
               {/* 5. Remaining */}
@@ -554,7 +552,7 @@ export default function AppointmentPOSModal({
             <button 
               onClick={handleSubmit} 
               disabled={createMutation.isPending || !formData.clientId || !formData.staffId || basket.length === 0}
-              className="w-full btn-primary py-3.5 text-base font-bold shadow-lg shadow-primary-500/20"
+              className={`w-full py-3.5 text-base font-bold shadow-lg transition-all rounded-xl text-white ${isWalkIn ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20' : 'bg-primary-600 hover:bg-primary-700 shadow-primary-500/20'} disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {createMutation.isPending ? 'جاري التنفيذ...' : (isWalkIn ? 'تسجيل كزيارة مباشرة' : 'تأكيد وحجز الموعد')}
             </button>
