@@ -16,15 +16,18 @@ interface DoctorSessionModalProps {
 // Resolve service category type to an icon and color
 function getServiceMeta(categoryType?: string, categoryName?: string) {
   const ct = (categoryType || categoryName || '').toUpperCase();
+  const activeClass = 'bg-primary-600 text-white border-primary-600 shadow-md';
+  const inactiveClass = 'bg-primary-50 text-primary-700 border-primary-200 hover:bg-primary-100';
+
   if (ct.includes('LASER') || ct.includes('CRYO') || ct.includes('CAVITATION'))
-    return { icon: <Zap className="w-4 h-4" />, activeClass: 'bg-red-600 text-white border-red-600 shadow-md', inactiveClass: 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100', label: 'جلسة ليزر' };
+    return { icon: <Zap className="w-4 h-4" />, activeClass, inactiveClass, label: 'جلسة ليزر' };
   if (ct.includes('INJECT') || ct.includes('FILLER') || ct.includes('BOTOX'))
-    return { icon: <Syringe className="w-4 h-4" />, activeClass: 'bg-teal-600 text-white border-teal-600 shadow-md', inactiveClass: 'bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100', label: 'حقن وتجميل' };
+    return { icon: <Syringe className="w-4 h-4" />, activeClass, inactiveClass, label: 'حقن وتجميل' };
   if (ct.includes('SKIN'))
-    return { icon: <Sparkles className="w-4 h-4" />, activeClass: 'bg-purple-600 text-white border-purple-600 shadow-md', inactiveClass: 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100', label: 'عناية بالبشرة' };
+    return { icon: <Sparkles className="w-4 h-4" />, activeClass, inactiveClass, label: 'عناية بالبشرة' };
   if (ct.includes('HAIR'))
-    return { icon: <Scissors className="w-4 h-4" />, activeClass: 'bg-amber-500 text-white border-amber-500 shadow-md', inactiveClass: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100', label: 'عناية بالشعر' };
-  return { icon: <Activity className="w-4 h-4" />, activeClass: 'bg-primary-600 text-white border-primary-600 shadow-md', inactiveClass: 'bg-primary-50 text-primary-700 border-primary-200 hover:bg-primary-100', label: 'خدمة' };
+    return { icon: <Scissors className="w-4 h-4" />, activeClass, inactiveClass, label: 'عناية بالشعر' };
+  return { icon: <Activity className="w-4 h-4" />, activeClass, inactiveClass, label: 'خدمة' };
 }
 
 export default function DoctorSessionModal({ queueItem, onClose, onSessionComplete }: DoctorSessionModalProps) {
