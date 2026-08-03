@@ -21,6 +21,7 @@ export default function ClientAutocomplete({ onSelect, placeholder = 'البحث
   const [results, setResults] = useState<ClientOption[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedClientName, setSelectedClientName] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,6 +35,8 @@ export default function ClientAutocomplete({ onSelect, placeholder = 'البحث
   }, []);
 
   useEffect(() => {
+    if (query === selectedClientName && query.length > 0) return; // Prevent searching if just selected
+
     if (query.trim().length < 2) {
       if (isOpen) {
         setIsLoading(true);
@@ -94,18 +97,12 @@ export default function ClientAutocomplete({ onSelect, placeholder = 'البحث
               key={client.id}
               onClick={() => {
                 onSelect(client);
-                setIsOpen(false);
+                setSelectedClientName(client.fullName);
                 setQuery(client.fullName);
+                setIsOpen(false);
               }}
               className="w-full text-right px-4 py-3 hover:bg-surface-50 dark:hover:bg-surface-700/50 flex items-center gap-3 transition-colors border-b border-surface-100 dark:border-surface-700/50 last:border-0"
             >
-              <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 flex items-center justify-center font-bold overflow-hidden shrink-0">
-                {client.photoUrl ? (
-                  <img src={client.photoUrl} alt={client.fullName} className="w-full h-full object-cover" />
-                ) : (
-                  getInitials(client.fullName)
-                )}
-              </div>
               <div className="flex-1">
                 <div className="font-medium text-surface-900 dark:text-surface-100">{client.fullName}</div>
                 <div className="text-sm text-surface-500" dir="ltr">{client.phone}</div>
