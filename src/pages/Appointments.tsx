@@ -163,11 +163,8 @@ export default function Appointments() {
 
   const handleAddNew = (date?: Date, time?: string) => {
     setIsWalkIn(false);
-    setFormData(prev => ({
-      ...prev,
-      scheduledDate: date ? date.toISOString().split('T')[0] : prev.scheduledDate,
-      startTime: time || prev.startTime
-    }));
+    if (date) setInitialDate(date);
+    if (time) setInitialTime(time);
     setShowModal(true);
   };
 
