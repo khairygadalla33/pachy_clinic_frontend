@@ -471,7 +471,7 @@ export default function AppointmentPOSModal({
                 <span>الخصم (Discount):</span>
                 <div className="flex items-center gap-1">
                   <select 
-                    className="input-field py-1 pl-6 pr-2 w-20 h-8 text-sm"
+                    className="input-field py-1 pl-6 pr-2 w-28 h-8 text-sm"
                     value={formData.discountType}
                     onChange={(e: any) => setFormData({ ...formData, discountType: e.target.value })}
                   >
@@ -500,7 +500,7 @@ export default function AppointmentPOSModal({
                 <span>المدفوع (Paid):</span>
                 <div className="flex items-center gap-1">
                   <select 
-                    className="input-field py-1 pl-6 pr-2 w-20 h-8 text-sm"
+                    className="input-field py-1 pl-6 pr-2 w-28 h-8 text-sm"
                     value={formData.depositMethod}
                     onChange={(e: any) => setFormData({ ...formData, depositMethod: e.target.value })}
                   >
