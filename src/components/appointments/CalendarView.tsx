@@ -128,16 +128,16 @@ export default function CalendarView({
               )}
             >
               <p className={cn(
-                "text-[12px] font-black uppercase",
+                "text-sm font-black uppercase",
                 isToday ? "text-white/90" : "text-primary-600 dark:text-primary-400"
               )}>
                 {date.toLocaleDateString('ar-EG', { weekday: 'short' })}
               </p>
               <p className={cn(
-                "text-sm font-normal tracking-tight",
+                "text-base font-semibold tracking-tight mt-0.5",
                 isToday ? "text-white" : "text-surface-900 dark:text-surface-100"
               )}>
-                {date.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' })}
+                {String(date.getDate()).padStart(2, '0')}/{String(date.getMonth() + 1).padStart(2, '0')}
               </p>
               {isSelected && !isToday && (
                 <div className="mx-auto mt-0.5 w-1 h-1 rounded-full bg-primary-600 animate-pulse" />
@@ -150,7 +150,7 @@ export default function CalendarView({
               key={idx} 
               className="py-2 px-2 text-center border-r border-surface-200 dark:border-surface-800 last:border-r-0 min-h-[62px] flex flex-col justify-center bg-surface-200 dark:bg-surface-700/50"
             >
-              <p className="text-[12px] font-black uppercase text-primary-600 dark:text-primary-400">
+              <p className="text-sm font-black uppercase text-primary-600 dark:text-primary-400">
                 {day.ar}
               </p>
             </div>
