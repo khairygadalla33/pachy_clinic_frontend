@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Activity, Clock, Users, LogIn, CheckSquare, Plus } from 'lucide-react';
+import { Activity, Clock, Users, LogIn, CheckSquare, Plus, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -59,8 +59,10 @@ export default function ReceptionDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-start">
-        
+      <div className="flex items-center justify-start gap-3">
+        <button onClick={() => navigate('/appointments?newBooking=true')} className="btn-secondary">
+          <Calendar className="w-4 h-4 mr-2" /> حجز موعد جديد
+        </button>
         <button onClick={() => navigate('/appointments?newWalkIn=true')} className="btn-primary">
           <Plus className="w-4 h-4 mr-2" /> مريض بدون موعد
         </button>

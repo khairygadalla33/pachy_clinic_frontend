@@ -21,7 +21,7 @@ export default function Appointments() {
   const [dateFilter, setDateFilter] = useState('');
   const [selectedDoctorId, setSelectedDoctorId] = useState('');
   
-  const [showModal, setShowModal] = useState(searchParams.get('newWalkIn') === 'true');
+  const [showModal, setShowModal] = useState(searchParams.get('newWalkIn') === 'true' || searchParams.get('newBooking') === 'true');
   const [isWalkIn, setIsWalkIn] = useState(searchParams.get('newWalkIn') === 'true');
 
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
@@ -389,8 +389,9 @@ export default function Appointments() {
         isOpen={showModal} 
         onClose={() => {
           setShowModal(false);
-          if (searchParams.has('newWalkIn')) {
+          if (searchParams.has('newWalkIn') || searchParams.has('newBooking')) {
             searchParams.delete('newWalkIn');
+            searchParams.delete('newBooking');
             setSearchParams(searchParams);
           }
         }} 
