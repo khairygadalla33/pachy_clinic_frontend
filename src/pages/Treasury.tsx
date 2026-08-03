@@ -142,7 +142,7 @@ export default function Treasury() {
               <h2 className="font-bold text-surface-900">المركز المالي</h2>
             </div>
             <div className="p-4 space-y-4">
-              <div className="bg-primary-600 rounded-lg p-4 text-white">
+              <div className="bg-gradient-to-r from-primary-600 to-secondary-600 rounded-lg p-4 text-white">
                 <div className="text-primary-100 text-sm mb-1">الرصيد المتاح (السيولة)</div>
                 <div className="text-2xl font-bold">{Number(stats?.totalAvailableBalance || 0).toLocaleString()} ج.م</div>
               </div>

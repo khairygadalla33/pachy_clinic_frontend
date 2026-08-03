@@ -34,7 +34,7 @@
   }
   
   .dark .input-field {
-    @apply border-surface-600 bg-surface-900 text-white placeholder-surface-400 focus:border-rose-500 focus:bg-surface-800 focus:ring-rose-500/20 disabled:bg-surface-950 disabled:text-surface-600;
+    @apply border-surface-600 bg-surface-900 text-white placeholder-surface-400 focus:border-primary-500 focus:bg-surface-800 focus:ring-primary-500/20 disabled:bg-surface-950 disabled:text-surface-600;
   }
 
   .sidebar-link {
@@ -42,7 +42,11 @@
   }
   
   .sidebar-link.active {
-    @apply bg-rose-500/20 text-rose-400 border-l-4 border-rose-400;
+    @apply bg-primary-500/20 text-primary-400 border-l-4 border-primary-400;
+  }
+
+  .btn-gradient {
+    @apply bg-gradient-to-r from-primary-600 to-secondary-600 text-white hover:opacity-90 shadow-sm transition-all duration-300;
   }
 }
 

@@ -172,7 +172,7 @@ export default function Services() {
             setFormData({ ...formData, categoryId: activeTab });
             setShowModal(true);
           }}
-          className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
+          className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium btn-gradient"
         >
           <Plus className="h-4 w-4 ml-2" />
           إضافة خدمة
@@ -451,7 +451,7 @@ export default function Services() {
             <button
               type="submit"
               disabled={createMutation.isPending || updateMutation.isPending}
-              className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium disabled:opacity-50"
+              className="px-4 py-2 btn-gradient rounded-md font-medium disabled:opacity-50"
             >
               {createMutation.isPending || updateMutation.isPending ? 'جاري الحفظ...' : 'حفظ الخدمة'}
             </button>

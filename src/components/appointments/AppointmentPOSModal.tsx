@@ -584,7 +584,7 @@ export default function AppointmentPOSModal({
               <button 
                 onClick={handleSubmit} 
                 disabled={createMutation.isPending || !formData.clientId || !formData.staffId || basket.length === 0}
-                className="flex-1 bg-primary-600 hover:bg-primary-700 text-white py-2.5 text-base font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors"
+                className="flex-1 btn-gradient py-2.5 text-base font-bold disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
               >
                 {createMutation.isPending ? 'جاري التنفيذ...' : (isWalkIn ? 'تسجيل كزيارة مباشرة' : 'تأكيد وحجز الموعد')}
               </button>
