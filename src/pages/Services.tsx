@@ -257,30 +257,55 @@ export default function Services() {
           ) : (
             filteredServices.map((service: any) => (
               <Card key={service.id} className="flex flex-col relative overflow-hidden group">
-                <div className="flex justify-start items-start mb-4">
+                <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-lg font-bold text-surface-900 dark:text-white mb-1">
                       {service.nameAr || service.name}
                     </h3>
                     <p className="text-sm text-surface-500">{service.duration} دقيقة</p>
                   </div>
-                  <div className="flex items-center space-x-2 space-x-reverse opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => handleEdit(service)}
-                      className="p-1.5 text-surface-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (confirm('هل أنت متأكد من حذف هذه الخدمة؟')) {
-                          deleteMutation.mutate(service.id);
-                        }
-                      }}
-                      className="p-1.5 text-surface-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-colors"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                  
+                  <div className="flex flex-col items-end gap-3">
+                    {/* Toggle Switch */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-surface-500">
+                        {service.isActive ? 'مفعل ✅' : 'غير مفعل ❌'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => updateMutation.mutate({ id: service.id, data: { isActive: !service.isActive } })}
+                        className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none shadow-sm ${
+                          service.isActive ? 'bg-green-500' : 'bg-surface-300 dark:bg-surface-600'
+                        }`}
+                      >
+                        <span
+                          className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                            service.isActive ? '-translate-x-4' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    <div className="flex items-center space-x-2 space-x-reverse opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => handleEdit(service)}
+                        className="p-1.5 text-surface-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors shadow-sm bg-white"
+                        title="تعديل"
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (confirm('هل أنت متأكد من حذف هذه الخدمة؟')) {
+                            deleteMutation.mutate(service.id);
+                          }
+                        }}
+                        className="p-1.5 text-surface-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-colors shadow-sm bg-white"
+                        title="حذف"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
 
