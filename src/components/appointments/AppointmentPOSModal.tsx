@@ -350,9 +350,6 @@ export default function AppointmentPOSModal({
               </span>
               {isWalkIn ? 'زيارة مباشرة (Walk-in)' : 'تفاصيل الحجز'}
             </h2>
-            <button onClick={onClose} className="p-2 text-surface-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-              <X className="w-5 h-5" />
-            </button>
           </div>
 
           {/* Fixed Meta: Client & Doctor */}
@@ -533,14 +530,22 @@ export default function AppointmentPOSModal({
                 <span className="text-red-600 font-black text-xl">{remaining.toLocaleString()} ج.م</span>
               </div>
             </div>
-            
-            <button 
-              onClick={handleSubmit} 
-              disabled={createMutation.isPending || !formData.clientId || !formData.staffId || basket.length === 0}
-              className="w-full btn-primary py-2.5 text-base font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {createMutation.isPending ? 'جاري التنفيذ...' : (isWalkIn ? 'تسجيل كزيارة مباشرة' : 'تأكيد وحجز الموعد')}
-            </button>
+            <div className="flex gap-2 mt-2">
+              <button 
+                type="button"
+                onClick={onClose}
+                className="px-5 py-2.5 bg-surface-100 hover:bg-surface-200 text-surface-700 rounded-xl font-bold transition-colors shrink-0"
+              >
+                إلغاء
+              </button>
+              <button 
+                onClick={handleSubmit} 
+                disabled={createMutation.isPending || !formData.clientId || !formData.staffId || basket.length === 0}
+                className="flex-1 bg-primary-600 hover:bg-primary-700 text-white py-2.5 text-base font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors"
+              >
+                {createMutation.isPending ? 'جاري التنفيذ...' : (isWalkIn ? 'تسجيل كزيارة مباشرة' : 'تأكيد وحجز الموعد')}
+              </button>
+            </div>
           </div>
         </div>
       </div>
