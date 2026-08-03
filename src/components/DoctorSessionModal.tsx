@@ -17,14 +17,14 @@ interface DoctorSessionModalProps {
 function getServiceMeta(categoryType?: string, categoryName?: string) {
   const ct = (categoryType || categoryName || '').toUpperCase();
   if (ct.includes('LASER') || ct.includes('CRYO') || ct.includes('CAVITATION'))
-    return { icon: <Zap className="w-4 h-4" />, color: 'text-red-600 bg-red-50 border-red-200', label: 'جلسة ليزر' };
+    return { icon: <Zap className="w-4 h-4" />, activeClass: 'bg-red-600 text-white border-red-600 shadow-md', inactiveClass: 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100', label: 'جلسة ليزر' };
   if (ct.includes('INJECT') || ct.includes('FILLER') || ct.includes('BOTOX'))
-    return { icon: <Syringe className="w-4 h-4" />, color: 'text-teal-600 bg-teal-50 border-teal-200', label: 'حقن وتجميل' };
+    return { icon: <Syringe className="w-4 h-4" />, activeClass: 'bg-teal-600 text-white border-teal-600 shadow-md', inactiveClass: 'bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100', label: 'حقن وتجميل' };
   if (ct.includes('SKIN'))
-    return { icon: <Sparkles className="w-4 h-4" />, color: 'text-purple-600 bg-purple-50 border-purple-200', label: 'عناية بالبشرة' };
+    return { icon: <Sparkles className="w-4 h-4" />, activeClass: 'bg-purple-600 text-white border-purple-600 shadow-md', inactiveClass: 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100', label: 'عناية بالبشرة' };
   if (ct.includes('HAIR'))
-    return { icon: <Scissors className="w-4 h-4" />, color: 'text-amber-600 bg-amber-50 border-amber-200', label: 'عناية بالشعر' };
-  return { icon: <Activity className="w-4 h-4" />, color: 'text-primary-600 bg-primary-50 border-primary-200', label: 'خدمة' };
+    return { icon: <Scissors className="w-4 h-4" />, activeClass: 'bg-amber-500 text-white border-amber-500 shadow-md', inactiveClass: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100', label: 'عناية بالشعر' };
+  return { icon: <Activity className="w-4 h-4" />, activeClass: 'bg-primary-600 text-white border-primary-600 shadow-md', inactiveClass: 'bg-primary-50 text-primary-700 border-primary-200 hover:bg-primary-100', label: 'خدمة' };
 }
 
 export default function DoctorSessionModal({ queueItem, onClose, onSessionComplete }: DoctorSessionModalProps) {
@@ -252,14 +252,12 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
                             type="button"
                             onClick={() => setSelectedServiceIdx(idx)}
                             className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${
-                              isActive 
-                                ? meta.color 
-                                : `bg-white text-surface-400 border-surface-200 hover:bg-surface-50 hover:text-surface-600`
+                              isActive ? meta.activeClass : meta.inactiveClass
                             }`}
                           >
                             {meta.icon}
                             {meta.label}
-                            {svc.name && <span className={isActive ? "text-surface-500 font-medium" : "font-medium"}>— {svc.name}</span>}
+                            {svc.name && <span className={isActive ? "text-white/90 font-medium" : "opacity-80 font-medium"}>— {svc.name}</span>}
                           </button>
                         );
                       })}
