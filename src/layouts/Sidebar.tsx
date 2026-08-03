@@ -25,14 +25,9 @@ const navGroups = [
       { path: '/reception', label: 'الاستقبال', icon: LayoutDashboard, roles: ['ADMIN', 'RECEPTIONIST'] },
       { path: '/clients', label: 'العملاء', icon: Users, roles: ['ADMIN', 'RECEPTIONIST', 'DOCTOR'] },
       { path: '/appointments', label: 'المواعيد', icon: Calendar, roles: ['ADMIN', 'RECEPTIONIST', 'DOCTOR', 'NURSE', 'TECHNICIAN'] },
+      { path: '/whatsapp', label: 'الواتساب', icon: MessageSquare, roles: ['ADMIN', 'RECEPTIONIST'] },
       { path: '/doctor-workstation', label: 'عيادة الطبيب', icon: Stethoscope, roles: ['ADMIN', 'DOCTOR'] },
       { path: '/services', label: 'الخدمات', icon: Sparkles, roles: ['ADMIN'] },
-    ]
-  },
-  {
-    title: 'التسويق',
-    items: [
-      { path: '/whatsapp', label: 'الواتساب', icon: MessageSquare, roles: ['ADMIN', 'RECEPTIONIST'] },
     ]
   },
   {
