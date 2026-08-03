@@ -161,7 +161,7 @@ export default function ClientProfile() {
               </div>
               <div className="flex gap-2">
                 <button className="btn-secondary text-sm">تعديل البيانات</button>
-                <button className="btn-primary text-sm whitespace-nowrap">+ حجز موعد</button>
+                <button onClick={() => navigate('/appointments?newBooking=true')} className="btn-primary text-sm whitespace-nowrap">+ حجز موعد</button>
               </div>
             </div>
             
