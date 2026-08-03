@@ -126,14 +126,14 @@ export default function CalendarView({
               onClick={() => onDateChange(date)}
               className={cn(
                 "py-2 px-2 text-center border-r border-surface-200 dark:border-surface-800 last:border-r-0 cursor-pointer transition-all duration-200 min-h-[62px] flex flex-col justify-center",
-                isToday ? "bg-primary-600 text-white shadow-lg z-10" : "hover:bg-surface-300 dark:hover:bg-surface-600"
+                isToday ? "bg-[#c0389f] text-white shadow-lg z-10" : "hover:bg-surface-300 dark:hover:bg-surface-600"
               )}
             >
               <p className={cn(
                 "text-sm font-black uppercase",
-                isToday ? "text-white/90" : "text-primary-600 dark:text-primary-400"
+                isToday ? "text-white/90" : "text-[#c0389f]"
               )}>
-                {date.toLocaleDateString('ar-EG', { weekday: 'short' })}
+                {['الأحـــد', 'الإثنيـــن', 'الثلاثـــاء', 'الأربعـــاء', 'الخميـــس', 'الجمعـــة', 'السبـــت'][date.getDay()]}
               </p>
               <p className={cn(
                 "text-base font-semibold tracking-tight mt-0.5",
@@ -142,7 +142,7 @@ export default function CalendarView({
                 {String(date.getDate()).padStart(2, '0')}/{String(date.getMonth() + 1).padStart(2, '0')}
               </p>
               {isSelected && !isToday && (
-                <div className="mx-auto mt-0.5 w-1 h-1 rounded-full bg-primary-600 animate-pulse" />
+                <div className="mx-auto mt-0.5 w-1 h-1 rounded-full bg-[#c0389f] animate-pulse" />
               )}
             </div>
           );
@@ -152,8 +152,8 @@ export default function CalendarView({
               key={idx} 
               className="py-2 px-2 text-center border-r border-surface-200 dark:border-surface-800 last:border-r-0 min-h-[62px] flex flex-col justify-center bg-surface-200 dark:bg-surface-700/50"
             >
-              <p className="text-sm font-black uppercase text-primary-600 dark:text-primary-400">
-                {day.ar}
+              <p className="text-sm font-black uppercase text-[#c0389f]">
+                {['الأحـــد', 'الإثنيـــن', 'الثلاثـــاء', 'الأربعـــاء', 'الخميـــس', 'الجمعـــة', 'السبـــت'][day.day]}
               </p>
             </div>
           );
