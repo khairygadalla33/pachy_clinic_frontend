@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Edit, Trash2, X, ShieldAlert } from 'lucide-react';
 import api from '../lib/api';
@@ -80,7 +80,24 @@ export default function Services() {
     }
   });
 
-  const filteredServices = services?.filter((s: any) => activeTab === 'all' || s.categoryId === activeTab) || [];
+  const uniqueCategories = useMemo(() => {
+    if (!categories) return [];
+    const map = new Map();
+    categories.forEach((c: any) => {
+      const name = c.nameAr || c.name;
+      if (!map.has(name)) {
+        map.set(name, c);
+      }
+    });
+    return Array.from(map.values());
+  }, [categories]);
+
+  const filteredServices = services?.filter((s: any) => {
+    if (activeTab === 'all') return true;
+    const cat = categories?.find((c: any) => c.id === s.categoryId);
+    const catName = cat?.nameAr || cat?.name;
+    return catName === activeTab;
+  }) || [];
 
   const handleEdit = (service: any) => {
     setEditingId(service.id);
@@ -102,7 +119,7 @@ export default function Services() {
   const closeModal = () => {
     setShowModal(false);
     setEditingId(null);
-    setFormData({ name: '', nameAr: '', categoryId: activeTab, duration: 30, isActive: true });
+    setFormData({ name: '', nameAr: '', categoryId: activeTab === 'all' ? '' : categories?.find((c: any) => (c.nameAr || c.name) === activeTab)?.id || '', duration: 30, isActive: true });
     setPricings([]);
     setConsumables([]);
   };
@@ -169,10 +186,10 @@ export default function Services() {
         
         <button
           onClick={() => {
-            setFormData({ ...formData, categoryId: activeTab });
+            setFormData({ ...formData, categoryId: activeTab === 'all' ? '' : categories?.find((c: any) => (c.nameAr || c.name) === activeTab)?.id || '' });
             setShowModal(true);
           }}
-          className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium btn-gradient"
+          className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
         >
           <Plus className="h-4 w-4 ml-2" />
           إضافة خدمة
@@ -194,19 +211,21 @@ export default function Services() {
             >
               الكل
             </button>
-            {categories?.map((category: any) => (
+            {uniqueCategories?.map((category: any) => {
+              const catName = category.nameAr || category.name;
+              return (
               <button
                 key={category.id}
-                onClick={() => setActiveTab(category.id)}
+                onClick={() => setActiveTab(catName)}
                 className={`${
-                  activeTab === category.id
+                  activeTab === catName
                     ? 'border-primary-500 text-primary-600 dark:text-primary-400'
                     : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'
                 } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
               >
-                {category.nameAr || category.name}
+                {catName}
               </button>
-            ))}
+            )})}
           </nav>
         </div>
       )}
@@ -451,7 +470,7 @@ export default function Services() {
             <button
               type="submit"
               disabled={createMutation.isPending || updateMutation.isPending}
-              className="px-4 py-2 btn-gradient rounded-md font-medium disabled:opacity-50"
+              className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium disabled:opacity-50"
             >
               {createMutation.isPending || updateMutation.isPending ? 'جاري الحفظ...' : 'حفظ الخدمة'}
             </button>
