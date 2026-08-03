@@ -44,6 +44,7 @@ export default function AppointmentPOSModal({
 
   // Basket State: Array of objects { service, quantity, unitPrice, total }
   const [basket, setBasket] = useState<any[]>([]);
+  const [pricingModalService, setPricingModalService] = useState<any | null>(null);
 
   // Handle Escape Key
   useEffect(() => {
@@ -68,6 +69,7 @@ export default function AppointmentPOSModal({
     } else {
       // Reset on close
       setBasket([]);
+      setPricingModalService(null);
       setFormData({
         clientId: '',
         staffId: '',
@@ -154,25 +156,37 @@ export default function AppointmentPOSModal({
   });
 
   // -- Handlers --
-  const handleAddToBasket = (service: any) => {
-    // Check if already exists
-    const exists = basket.find(item => item.service.id === service.id);
+  const handleAddToBasket = (service: any, pricing?: any) => {
+    const pricingId = pricing?.id;
+    // Check if already exists by serviceId + pricingId
+    const exists = basket.find(item => item.service.id === service.id && item.pricingId === pricingId);
     if (exists) {
       toast.error('الخدمة مضافة بالفعل');
       return;
     }
     
-    const price = Number(service.pricings?.[0]?.price || 0);
-    setBasket([...basket, { service, unitPrice: price, quantity: 1, total: price }]);
+    const price = Number(pricing?.price || service.pricings?.[0]?.price || 0);
+    setBasket([...basket, { 
+      service, 
+      pricingId,
+      pricingName: pricing?.nameAr || pricing?.name,
+      unitPrice: price, 
+      quantity: 1, 
+      total: price 
+    }]);
+
+    if (pricingModalService) {
+      setPricingModalService(null);
+    }
   };
 
-  const handleRemoveFromBasket = (serviceId: string) => {
-    setBasket(basket.filter(item => item.service.id !== serviceId));
+  const handleRemoveFromBasket = (index: number) => {
+    setBasket(basket.filter((_, i) => i !== index));
   };
 
-  const handleUpdatePrice = (serviceId: string, newPrice: number) => {
-    setBasket(basket.map(item => {
-      if (item.service.id === serviceId) {
+  const handleUpdatePrice = (index: number, newPrice: number) => {
+    setBasket(basket.map((item, i) => {
+      if (i === index) {
         return { ...item, unitPrice: newPrice, total: newPrice * item.quantity };
       }
       return item;
@@ -202,6 +216,7 @@ export default function AppointmentPOSModal({
       notes: formData.notes,
       source: formData.source,
       serviceIds: basket.map(item => item.service.id),
+      pricingIds: basket.map(item => item.pricingId).filter(Boolean),
       unitPrices: basket.map(item => {
         if (discountAmount > 0 && subTotal > 0) {
           const itemDiscount = discountAmount * (item.unitPrice / subTotal);
@@ -297,13 +312,20 @@ export default function AppointmentPOSModal({
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max">
                 {filteredServices.map((service: any) => {
+                  const hasMultiplePricings = service.pricings && service.pricings.length > 1;
                   const price = Number(service.pricings?.[0]?.price || 0);
-                  const inBasket = basket.some(b => b.service.id === service.id);
+                  const inBasket = !hasMultiplePricings && basket.some(b => b.service.id === service.id);
                   
                   return (
                     <div 
                       key={service.id} 
-                      onClick={() => !inBasket && handleAddToBasket(service)}
+                      onClick={() => {
+                        if (hasMultiplePricings) {
+                          setPricingModalService(service);
+                        } else if (!inBasket) {
+                          handleAddToBasket(service);
+                        }
+                      }}
                       className={`bg-white rounded-2xl p-4 border-2 transition-all cursor-pointer relative overflow-hidden group ${
                         inBasket 
                           ? 'border-primary-400 ring-4 ring-primary-50 shadow-md bg-primary-50/30' 
@@ -326,13 +348,25 @@ export default function AppointmentPOSModal({
                         </div>
                         <div className="flex items-end justify-between mt-auto pt-2 border-t border-surface-50">
                           <div className="flex items-baseline gap-1 text-primary-700">
-                            <span className="text-lg font-black">{price.toLocaleString()}</span>
-                            <span className="text-xs font-bold">ج.م</span>
+                            {hasMultiplePricings ? (
+                              <span className="text-xs font-bold text-surface-500">متعدد الأسعار</span>
+                            ) : (
+                              <>
+                                <span className="text-lg font-black">{price.toLocaleString()}</span>
+                                <span className="text-xs font-bold">ج.م</span>
+                              </>
+                            )}
                           </div>
                           {!inBasket && (
-                            <div className="w-8 h-8 rounded-full bg-surface-100 flex items-center justify-center text-surface-500 group-hover:bg-primary-500 group-hover:text-white transition-colors">
-                              <Plus className="w-5 h-5" />
-                            </div>
+                            hasMultiplePricings ? (
+                              <button className="text-[10px] font-bold text-white bg-primary-500 hover:bg-primary-600 px-3 py-1.5 rounded-lg transition-colors">
+                                حدد اختيارك
+                              </button>
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-surface-100 flex items-center justify-center text-surface-500 group-hover:bg-primary-500 group-hover:text-white transition-colors">
+                                <Plus className="w-5 h-5" />
+                              </div>
+                            )
                           )}
                         </div>
                       </div>
@@ -426,7 +460,10 @@ export default function AppointmentPOSModal({
                   {basket.map((item, idx) => (
                     <div key={idx} className="group flex items-center justify-between bg-white border border-surface-200 p-3 rounded-xl hover:border-primary-300 hover:shadow-sm transition-all">
                       <div className="flex-1 min-w-0 pr-3">
-                        <p className="text-sm font-bold text-surface-900 truncate">{item.service.nameAr || item.service.name}</p>
+                        <p className="text-sm font-bold text-surface-900 truncate">
+                          {item.service.nameAr || item.service.name}
+                          {item.pricingName && <span className="text-primary-600 mr-1 text-xs">({item.pricingName})</span>}
+                        </p>
                         <p className="text-xs text-surface-500">{item.service.category?.nameAr}</p>
                       </div>
                       
@@ -437,14 +474,14 @@ export default function AppointmentPOSModal({
                             type="number" 
                             className="w-24 text-sm font-bold text-center border-surface-200 rounded-lg focus:ring-primary-500 focus:border-primary-500 py-1.5"
                             value={item.unitPrice}
-                            onChange={(e) => handleUpdatePrice(item.service.id, Number(e.target.value))}
+                            onChange={(e) => handleUpdatePrice(idx, Number(e.target.value))}
                           />
                           <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-surface-400 font-medium">ج.م</span>
                         </div>
                         
                         <button 
                           type="button" 
-                          onClick={() => handleRemoveFromBasket(item.service.id)}
+                          onClick={() => handleRemoveFromBasket(idx)}
                           className="p-1.5 text-surface-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -545,6 +582,48 @@ export default function AppointmentPOSModal({
           </div>
         </div>
       </div>
+
+      {/* Pricing Selection Modal */}
+      {pricingModalService && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-surface-900/40 backdrop-blur-sm p-4">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-4 border-b border-surface-200 flex items-center justify-between bg-surface-50">
+              <h2 className="text-lg font-bold text-surface-900">
+                حدد اختيارك لـ {pricingModalService.nameAr || pricingModalService.name}
+              </h2>
+              <button onClick={() => setPricingModalService(null)} className="text-surface-400 hover:text-surface-600 p-1 rounded-lg transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-2 max-h-[60vh] overflow-y-auto custom-scrollbar">
+              {pricingModalService.pricings?.map((pricing: any) => {
+                const inBasket = basket.some(b => b.service.id === pricingModalService.id && b.pricingId === pricing.id);
+                return (
+                  <div 
+                    key={pricing.id}
+                    className={`flex items-center justify-between p-3 border-b border-surface-100 last:border-0 rounded-lg mb-1 ${inBasket ? 'bg-primary-50/50' : 'hover:bg-surface-50'}`}
+                  >
+                    <div>
+                      <p className="font-bold text-surface-900 text-sm">{pricing.nameAr || pricing.name}</p>
+                      <p className="text-primary-600 font-bold text-sm mt-0.5">{Number(pricing.price).toLocaleString()} ج.م</p>
+                    </div>
+                    {inBasket ? (
+                      <span className="text-xs font-bold text-primary-600 bg-primary-100 px-2 py-1 rounded-md">مضافة</span>
+                    ) : (
+                      <button 
+                        onClick={() => handleAddToBasket(pricingModalService, pricing)}
+                        className="w-8 h-8 rounded-full bg-surface-100 hover:bg-primary-500 hover:text-white flex items-center justify-center text-surface-600 transition-colors"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
