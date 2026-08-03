@@ -231,7 +231,7 @@ export default function AppointmentPOSModal({
       <div className="bg-surface-50 w-full max-w-[1200px] max-h-[88vh] rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-surface-200">
         
         {/* ======================= RIGHT PANE: SERVICES MENU (65%) ======================= */}
-        <div className="w-full md:w-[65%] bg-surface-50 flex flex-col h-full border-l border-surface-200 order-1">
+        <div className="w-full md:w-[65%] bg-surface-50 flex flex-col h-full min-h-0 border-l border-surface-200 order-1">
           
           {/* Header & Search */}
           <div className="p-5 border-b border-surface-200 bg-white shrink-0">
@@ -279,7 +279,7 @@ export default function AppointmentPOSModal({
           </div>
 
           {/* Services Grid */}
-          <div className="flex-1 overflow-y-auto p-5 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto min-h-0 p-5 custom-scrollbar">
             {isLoadingServices ? (
               <div className="flex justify-center items-center h-full">
                 <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
@@ -340,7 +340,7 @@ export default function AppointmentPOSModal({
         </div>
 
         {/* ======================= LEFT PANE: BASKET & DETAILS (35%) ======================= */}
-        <div className="w-full md:w-[35%] bg-white flex flex-col h-full z-10 shadow-xl order-2">
+        <div className="w-full md:w-[35%] bg-white flex flex-col h-full min-h-0 z-10 shadow-xl order-2">
           
           {/* Header */}
           <div className="p-4 border-b border-surface-100 bg-surface-50 flex items-center justify-between shrink-0">
@@ -385,7 +385,7 @@ export default function AppointmentPOSModal({
           </div>
 
           {/* Scrollable Basket Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar bg-surface-50/30">
+          <div className="flex-1 overflow-y-auto min-h-0 p-4 space-y-6 custom-scrollbar bg-surface-50/30">
             
             {/* --- Date & Time (Only for future bookings) --- */}
             {!isWalkIn && (
@@ -463,18 +463,6 @@ export default function AppointmentPOSModal({
               )}
             </div>
 
-            {/* --- Deposit & Notes --- */}
-            <div className="space-y-4 pt-2">
-              <div>
-                <label className="block text-xs font-bold text-surface-700 mb-1.5">ملاحظات إضافية</label>
-                <textarea 
-                  className="input-field text-sm"
-                  rows={2}
-                  placeholder="أي تفاصيل خاصة بالحجز..."
-                  value={formData.notes}
-                  onChange={e => setFormData({ ...formData, notes: e.target.value })}
-                />
-              </div>
             </div>
 
           </div>
