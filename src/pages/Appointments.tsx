@@ -178,6 +178,18 @@ export default function Appointments() {
     },
   });
 
+  const cancelMutation = useMutation({
+    mutationFn: (id: string) => api.put(`/appointments/${id}`, { status: 'CANCELLED' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['workflow-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['workflow-queue'] });
+      setShowEditModal(false);
+      setSelectedAppointment(null);
+      toast.success('تم إلغاء الموعد بنجاح');
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const payload: any = {
@@ -576,17 +588,35 @@ export default function Appointments() {
               </select>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-surface-200">
-              <button onClick={() => { setShowEditModal(false); setSelectedAppointment(null); }} className="btn-secondary">
-                إلغاء
-              </button>
-              <button 
-                onClick={() => updateMutation.mutate({ id: selectedAppointment.id, status: selectedAppointment.status })} 
-                disabled={updateMutation.isPending} 
-                className="btn-primary"
-              >
-                {updateMutation.isPending ? 'جاري الحفظ...' : 'حفظ التعديلات'}
-              </button>
+            <div className="flex justify-between items-center pt-4 border-t border-surface-200 mt-6">
+              {selectedAppointment.status !== 'CANCELLED' ? (
+                <button 
+                  onClick={() => {
+                    if (window.confirm('هل أنت متأكد من إلغاء هذا الموعد؟')) {
+                      cancelMutation.mutate(selectedAppointment.id);
+                    }
+                  }}
+                  disabled={cancelMutation.isPending}
+                  className="px-4 py-2 rounded-lg text-sm font-bold bg-red-100 text-red-700 hover:bg-red-200 transition-colors"
+                >
+                  {cancelMutation.isPending ? 'جاري الإلغاء...' : 'إلغاء الموعد'}
+                </button>
+              ) : (
+                <div />
+              )}
+              
+              <div className="flex gap-3">
+                <button onClick={() => { setShowEditModal(false); setSelectedAppointment(null); }} className="btn-secondary">
+                  إغلاق
+                </button>
+                <button 
+                  onClick={() => updateMutation.mutate({ id: selectedAppointment.id, status: selectedAppointment.status })} 
+                  disabled={updateMutation.isPending} 
+                  className="btn-primary"
+                >
+                  {updateMutation.isPending ? 'جاري الحفظ...' : 'حفظ التعديلات'}
+                </button>
+              </div>
             </div>
           </div>
         )}
