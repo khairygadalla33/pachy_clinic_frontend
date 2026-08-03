@@ -190,7 +190,7 @@ export default function CalendarView({
                 key={dayIdx} 
                 className={cn(
                   "relative border-r border-surface-200 dark:border-surface-800 last:border-r-0 transition-colors flex flex-col",
-                  dayColumn.date && dayColumn.date.toDateString() === new Date().toDateString() && "bg-[#c0389f]/5 dark:bg-[#c0389f]/10",
+                  dayColumn.date && dayColumn.date.toDateString() === new Date().toDateString() && "bg-primary-50/20 dark:bg-primary-900/10",
                   isDoctorOff && "bg-surface-100 dark:bg-surface-800 opacity-60"
                 )}
               >
@@ -219,12 +219,12 @@ export default function CalendarView({
                         if (canBook && dayColumn.date) onEmptyCellClick(dayColumn.date, calculatedTime);
                       }}
                       className={cn(
-                        "min-h-[4rem] border-b border-surface-100 dark:border-surface-800/50 p-1 group hover:bg-[#c0389f]/5 dark:hover:bg-[#c0389f]/10 transition-colors relative flex flex-col gap-1",
+                        "min-h-[4rem] border-b border-surface-100 dark:border-surface-800/50 p-1 group hover:bg-primary-50/30 dark:hover:bg-primary-900/10 transition-colors relative flex flex-col gap-1",
                         canBook ? "cursor-pointer" : "cursor-not-allowed",
                         disabled && "bg-surface-50 dark:bg-surface-900/50"
                       )}
                     >
-                      <div className="absolute top-1 left-1 opacity-40 text-[9px] font-bold text-surface-500 z-0">
+                      <div className="absolute top-1 left-1 opacity-80 text-[10px] font-black text-[#c0389f] z-0">
                         {calculatedTime}
                       </div>
 
@@ -245,7 +245,7 @@ export default function CalendarView({
 
                         {canBook && (
                           <div className={cn(
-                            "flex items-center justify-center rounded-md border border-dashed border-[#c0389f]/40 text-[#c0389f] hover:bg-[#c0389f]/10 hover:border-[#c0389f]/60 transition-colors py-1 text-[10px] font-bold mt-auto",
+                            "flex items-center justify-center rounded-md border border-dashed border-[#c0389f]/40 text-[#c0389f] hover:bg-[#c0389f]/10 hover:border-[#c0389f] transition-colors py-1 text-[10px] font-bold mt-auto",
                             aptsInSlot.length > 0 ? "opacity-0 group-hover:opacity-100 h-6" : "h-full opacity-0 group-hover:opacity-100"
                           )}>
                              + موعد
