@@ -96,16 +96,7 @@ export default function Services() {
   }, [categories, services]);
 
   const dropdownCategories = useMemo(() => {
-    if (!categories) return [];
-    const map = new Map();
-    categories.forEach((c: any) => {
-      // Group by category type to avoid duplicates like "عناية بالبشرة" and "العناية بالبشرة"
-      const key = c.type || c.nameAr || c.name;
-      if (!map.has(key)) {
-        map.set(key, c);
-      }
-    });
-    return Array.from(map.values());
+    return categories || [];
   }, [categories]);
 
   const filteredServices = services?.filter((s: any) => {
@@ -256,7 +247,10 @@ export default function Services() {
             </div>
           ) : (
             filteredServices.map((service: any) => (
-              <Card key={service.id} className="flex flex-col relative overflow-hidden group">
+              <Card 
+                key={service.id} 
+                className={`flex flex-col relative overflow-hidden group transition-all duration-300 ${!service.isActive ? 'opacity-60 grayscale-[0.2]' : ''}`}
+              >
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-lg font-bold text-surface-900 dark:text-white mb-1">
