@@ -159,7 +159,7 @@ export default function PatientHistorySidebar({ clientId, excludeAppointmentId }
   };
 
   return (
-    <div className="w-[450px] flex-shrink-0 flex flex-col h-full bg-blue-50/60 border-l border-blue-100 overflow-hidden">
+    <div className="w-[450px] flex-shrink-0 flex flex-col h-full bg-blue-50/60 border-l border-[#3a5061] overflow-hidden">
       {/* Header */}
       <div className="p-4 bg-blue-100/40 border-b border-blue-200 shadow-sm flex-shrink-0">
         <div className="flex items-center justify-between mb-2">
