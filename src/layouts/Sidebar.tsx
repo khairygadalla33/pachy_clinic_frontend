@@ -17,8 +17,6 @@ const navGroups = [
     title: 'نظرة عامة',
     items: [
       { path: '/dashboard', label: 'لوحة التحكم', icon: LayoutDashboard, roles: ['ADMIN', 'DOCTOR', 'NURSE', 'TECHNICIAN', 'RECEPTIONIST'] },
-      { path: '/reports', label: 'التقارير', icon: BarChart3, roles: ['ADMIN'] },
-      { path: '/audit-logs', label: 'سجل العمليات', icon: ShieldAlert, roles: ['ADMIN'] },
     ]
   },
   {
@@ -28,9 +26,6 @@ const navGroups = [
       { path: '/clients', label: 'العملاء', icon: Users, roles: ['ADMIN', 'RECEPTIONIST', 'DOCTOR'] },
       { path: '/appointments', label: 'المواعيد', icon: Calendar, roles: ['ADMIN', 'RECEPTIONIST', 'DOCTOR', 'NURSE', 'TECHNICIAN'] },
       { path: '/doctor-workstation', label: 'عيادة الطبيب', icon: Stethoscope, roles: ['ADMIN', 'DOCTOR'] },
-      { path: '/laser-sessions', label: 'جلسات الليزر', icon: Activity, roles: ['ADMIN', 'DOCTOR', 'TECHNICIAN'] },
-      { path: '/injection-sessions', label: 'جلسات الحقن', icon: Syringe, roles: ['ADMIN', 'DOCTOR'] },
-      { path: '/skincare-sessions', label: 'العناية بالبشرة', icon: Sparkles, roles: ['ADMIN', 'NURSE', 'TECHNICIAN'] },
     ]
   },
   {
@@ -59,6 +54,24 @@ const navGroups = [
     title: 'النظام',
     items: [
       { path: '/settings', label: 'الإعدادات', icon: SettingsIcon, roles: ['ADMIN'] },
+    ]
+  },
+  {
+    title: 'التقارير والسجلات',
+    items: [
+      { 
+        path: '/reports-group', 
+        label: 'التقارير', 
+        icon: BarChart3, 
+        roles: ['ADMIN', 'DOCTOR', 'NURSE', 'TECHNICIAN'],
+        subItems: [
+          { path: '/reports', label: 'التقارير المالية', roles: ['ADMIN'] },
+          { path: '/laser-sessions', label: 'جلسات الليزر', roles: ['ADMIN', 'DOCTOR', 'TECHNICIAN'] },
+          { path: '/injection-sessions', label: 'جلسات الحقن', roles: ['ADMIN', 'DOCTOR'] },
+          { path: '/skincare-sessions', label: 'العناية بالبشرة', roles: ['ADMIN', 'NURSE', 'TECHNICIAN'] },
+          { path: '/audit-logs', label: 'سجل العمليات', roles: ['ADMIN'] },
+        ]
+      }
     ]
   }
 ];
@@ -91,6 +104,7 @@ function cn(...classes: (string | undefined | false | null)[]) {
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>({});
   const { user, logout } = useAuth();
   const location = useLocation();
   const isTablet = useIsTablet();
@@ -164,8 +178,82 @@ export default function Sidebar() {
               )}
               
               <nav className="space-y-1">
-                {visibleItems.map((item) => {
-                  const isActive = location.pathname.startsWith(item.path);
+                {visibleItems.map((item: any) => {
+                  const isActive = item.subItems
+                    ? item.subItems.some((s: any) => location.pathname.startsWith(s.path))
+                    : location.pathname.startsWith(item.path);
+
+                  const isDropdownOpen = openDropdowns[item.path] || isActive;
+
+                  if (item.subItems) {
+                    const visibleSubItems = item.subItems.filter((sub: any) => 
+                      !user || !sub.roles || sub.roles.includes(user.role as string)
+                    );
+                    if (visibleSubItems.length === 0) return null;
+
+                    return (
+                      <div key={item.path} className="flex flex-col mb-1">
+                        <button
+                          onClick={() => setOpenDropdowns(prev => ({ ...prev, [item.path]: !prev[item.path] }))}
+                          title={(!isMobile && collapsed) ? item.label : undefined}
+                          className={cn(
+                            'sidebar-link w-full text-right flex items-center justify-between',
+                            isActive && 'active',
+                            (!isMobile && collapsed) && 'justify-center px-0'
+                          )}
+                        >
+                          <div className="flex items-center gap-3">
+                            <item.icon className={cn('w-5 h-5 flex-shrink-0', isActive && 'text-rose-400')} />
+                            <AnimatePresence>
+                              {(isMobile || !collapsed) && (
+                                <motion.span 
+                                  initial={{ opacity: 0, width: 0 }} 
+                                  animate={{ opacity: 1, width: 'auto' }} 
+                                  exit={{ opacity: 0, width: 0 }} 
+                                  className="overflow-hidden whitespace-nowrap"
+                                >
+                                  {item.label}
+                                </motion.span>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                          {(isMobile || !collapsed) && (
+                            <ChevronLeft className={cn("w-4 h-4 flex-shrink-0 transition-transform opacity-60", isDropdownOpen && "-rotate-90")} />
+                          )}
+                        </button>
+
+                        <AnimatePresence>
+                          {isDropdownOpen && (isMobile || !collapsed) && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="overflow-hidden pr-9 mt-1 space-y-1"
+                            >
+                              {visibleSubItems.map((sub: any) => {
+                                const isSubActive = location.pathname.startsWith(sub.path);
+                                return (
+                                  <NavLink
+                                    key={sub.path}
+                                    to={sub.path}
+                                    className={cn(
+                                      'block py-2 px-3 text-[13px] rounded-lg transition-colors font-medium',
+                                      isSubActive 
+                                        ? 'bg-rose-500/10 text-rose-500' 
+                                        : 'text-surface-400 hover:text-white hover:bg-white/5'
+                                    )}
+                                  >
+                                    {sub.label}
+                                  </NavLink>
+                                );
+                              })}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  }
+
                   return (
                     <NavLink
                       key={item.path}
