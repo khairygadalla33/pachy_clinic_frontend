@@ -462,9 +462,6 @@ export default function AppointmentPOSModal({
                 </div>
               )}
             </div>
-
-            </div>
-
           </div>
 
           {/* Footer (Totals & Submit) */}
