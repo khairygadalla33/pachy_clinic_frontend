@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search } from 'lucide-react';
+import { Search, ChevronDown } from 'lucide-react';
 import api from '../lib/api';
 import { getInitials } from '../lib/utils';
 
@@ -65,7 +65,7 @@ export default function ClientAutocomplete({ onSelect, placeholder = 'البحث
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [query, isOpen]);
+  }, [query, isOpen, selectedClientName]);
 
   return (
     <div className={`relative ${className}`} ref={wrapperRef}>
@@ -73,16 +73,18 @@ export default function ClientAutocomplete({ onSelect, placeholder = 'البحث
         <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 w-5 h-5" />
         <input
           type="text"
-          className="w-full pl-4 pr-10 py-2 rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800 text-surface-900 dark:text-surface-100 focus:ring-2 focus:ring-primary-500 transition-shadow"
+          className="w-full pl-10 pr-10 py-2 rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800 text-surface-900 dark:text-surface-100 focus:ring-2 focus:ring-primary-500 transition-shadow"
           placeholder={placeholder}
           value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setIsOpen(true);
-          }}
-          onClick={() => setIsOpen(true)}
-          onFocus={() => setIsOpen(true)}
+          onChange={(e) => setQuery(e.target.value)}
         />
+        <button 
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600 focus:outline-none"
+        >
+          <ChevronDown className={`w-5 h-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </button>
         {isLoading && (
           <div className="absolute left-3 top-1/2 -translate-y-1/2">
             <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-500 border-t-transparent" />
