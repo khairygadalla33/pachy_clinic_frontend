@@ -10,9 +10,10 @@ interface PrescriptionFormProps {
   appointmentId?: string;
   onSuccess: () => void;
   onCancel: () => void;
+  onSaveStatusChange?: (status: 'IDLE' | 'SAVING' | 'SAVED' | 'ERROR') => void;
 }
 
-export default function PrescriptionForm({ clientId, appointmentId, onSuccess, onCancel }: PrescriptionFormProps) {
+export default function PrescriptionForm({ clientId, appointmentId, onSuccess, onCancel, onSaveStatusChange }: PrescriptionFormProps) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const branchId = user?.branchId;
@@ -25,6 +26,12 @@ export default function PrescriptionForm({ clientId, appointmentId, onSuccess, o
   // Auto-Save state
   const [prescriptionId, setPrescriptionId] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<'IDLE' | 'SAVING' | 'SAVED' | 'ERROR'>('IDLE');
+
+  useEffect(() => {
+    if (onSaveStatusChange) {
+      onSaveStatusChange(saveStatus);
+    }
+  }, [saveStatus, onSaveStatusChange]);
 
   // Load templates
   const { data: templates } = useQuery({
@@ -115,26 +122,14 @@ export default function PrescriptionForm({ clientId, appointmentId, onSuccess, o
     setMedications(updated);
   };
 
-  return (
-    <div className="relative space-y-6 pt-8">
-      {/* Auto-save indicator */}
-      <div className="absolute top-0 left-0 bg-white px-3 py-1.5 rounded-b-lg border-b border-l border-surface-200 shadow-sm flex items-center gap-2 z-10 text-xs font-medium text-surface-600 transition-all">
-        {saveStatus === 'SAVING' && (
-          <><Loader2 className="w-3.5 h-3.5 text-primary-500 animate-spin" /> جاري الحفظ التلقائي...</>
-        )}
-        {saveStatus === 'SAVED' && (
-          <><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> تم الحفظ كمسودة</>
-        )}
-        {saveStatus === 'ERROR' && (
-          <><AlertCircle className="w-3.5 h-3.5 text-red-500" /> خطأ في الحفظ</>
-        )}
-        {saveStatus === 'IDLE' && (
-          <><Cloud className="w-3.5 h-3.5 text-surface-400" /> في انتظار الكتابة للحفظ...</>
-        )}
-      </div>
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    saveMutation.mutate();
+  };
 
-      {/* Medications */}
-      <div>
+  return (
+    <div className="relative">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="flex justify-between items-center mb-2">
           <h3 className="font-bold text-surface-900">الأدوية</h3>
           <button type="button" onClick={addMedication} className="text-xs font-medium text-primary-600 hover:text-primary-700 flex items-center">
@@ -170,7 +165,6 @@ export default function PrescriptionForm({ clientId, appointmentId, onSuccess, o
             </div>
           ))}
         </div>
-      </div>
 
       {/* Instructions */}
       <div>
@@ -202,7 +196,7 @@ export default function PrescriptionForm({ clientId, appointmentId, onSuccess, o
           <input type="text" className="input-field" value={nextSessionNotes} onChange={e => setNextSessionNotes(e.target.value)} />
         </div>
       </div>
-
+      </form>
     </div>
   );
 }

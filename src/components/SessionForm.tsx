@@ -37,6 +37,7 @@ interface SessionFormProps {
   serviceName?: string;
   onSuccess: () => void;
   onCancel: () => void;
+  onSaveStatusChange?: (status: 'IDLE' | 'SAVING' | 'SAVED' | 'ERROR') => void;
 }
 
 export default function SessionForm({
@@ -47,6 +48,7 @@ export default function SessionForm({
   serviceName,
   onSuccess,
   onCancel,
+  onSaveStatusChange,
 }: SessionFormProps) {
   const queryClient = useQueryClient();
   const sessionType = resolveSessionType(categoryType);
@@ -54,6 +56,12 @@ export default function SessionForm({
   // Auto-Save state
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<'IDLE' | 'SAVING' | 'SAVED' | 'ERROR'>('IDLE');
+
+  useEffect(() => {
+    if (onSaveStatusChange) {
+      onSaveStatusChange(saveStatus);
+    }
+  }, [saveStatus, onSaveStatusChange]);
 
   // Form state
   const [formData, setFormData] = useState<any>({
@@ -231,23 +239,7 @@ export default function SessionForm({
 
   return (
     <div className="relative space-y-5">
-      {/* Auto-save indicator */}
-      <div className="absolute top-0 left-0 bg-white px-3 py-1.5 rounded-b-lg border-b border-l border-surface-200 shadow-sm flex items-center gap-2 z-10 text-xs font-medium text-surface-600 transition-all">
-        {saveStatus === 'SAVING' && (
-          <><Loader2 className="w-3.5 h-3.5 text-primary-500 animate-spin" /> جاري الحفظ التلقائي...</>
-        )}
-        {saveStatus === 'SAVED' && (
-          <><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> تم الحفظ كمسودة</>
-        )}
-        {saveStatus === 'ERROR' && (
-          <><AlertCircle className="w-3.5 h-3.5 text-red-500" /> خطأ في الحفظ</>
-        )}
-        {saveStatus === 'IDLE' && (
-          <><Cloud className="w-3.5 h-3.5 text-surface-400" /> في انتظار الكتابة للحفظ...</>
-        )}
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-5 pt-10">
+      <form onSubmit={handleSubmit} className="space-y-5">
 
       {/* ======================= LASER FORM ======================= */}
       {sessionType === 'LASER' && (

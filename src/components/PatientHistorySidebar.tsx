@@ -51,7 +51,7 @@ export default function PatientHistorySidebar({ clientId, excludeAppointmentId }
 
   if (isLoading) {
     return (
-      <div className="w-[380px] flex-shrink-0 flex flex-col items-center justify-center h-full bg-surface-50 border-l border-surface-200 p-6">
+      <div className="w-[380px] flex-shrink-0 flex flex-col items-center justify-center h-full bg-primary-50 border-l border-surface-200 p-6">
         <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
         <p className="text-surface-500 mt-2 text-sm">جاري تحميل السجل الطبي الكامل للمريض...</p>
       </div>
@@ -159,9 +159,9 @@ export default function PatientHistorySidebar({ clientId, excludeAppointmentId }
   };
 
   return (
-    <div className="w-[450px] flex-shrink-0 flex flex-col h-full bg-surface-50 border-l border-surface-200 overflow-hidden">
+    <div className="w-[450px] flex-shrink-0 flex flex-col h-full bg-primary-50/70 border-l border-primary-100 overflow-hidden">
       {/* Header */}
-      <div className="p-4 bg-white border-b border-surface-200 shadow-sm flex-shrink-0">
+      <div className="p-4 bg-primary-100/50 border-b border-primary-200 shadow-sm flex-shrink-0">
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-bold text-surface-900 flex items-center gap-2 text-base">
             <User className="w-5 h-5 text-primary-600" />
@@ -244,7 +244,7 @@ export default function PatientHistorySidebar({ clientId, excludeAppointmentId }
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-3 bg-surface-100 border-b border-surface-200 flex-shrink-0 space-y-2">
+      <div className="p-3 bg-primary-100/50 border-b border-primary-200 flex-shrink-0 space-y-2">
         {/* Search */}
         <div className="relative">
           <Search className="w-3.5 h-3.5 absolute right-2.5 top-2.5 text-surface-400" />

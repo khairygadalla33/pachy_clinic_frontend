@@ -140,10 +140,14 @@ export default function ClientProfile() {
             <div className="flex justify-start items-start mb-2">
               <div>
                 
-                <div className="flex items-center gap-3 text-sm text-surface-500 mt-1">
+                <div className="flex items-center gap-3 text-sm text-surface-500 mt-2 flex-wrap">
+                  {client.fileNumber && <Badge variant="info">ملف: {client.fileNumber}</Badge>}
                   <span>{client.gender === 'FEMALE' ? 'أنثى' : 'ذكر'}</span>
-                  {client.dateOfBirth && <span>• {calculateAge(client.dateOfBirth)} سنة</span>}
+                  {(client.dateOfBirth || client.age) && (
+                    <span>• {client.dateOfBirth ? calculateAge(client.dateOfBirth) : client.age} سنة</span>
+                  )}
                   <span dir="ltr">📱 {client.phone}</span>
+                  {client.region && <span>📍 {client.region}</span>}
                   {stats.score !== undefined && (
                     <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                       stats.score >= 80 ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' :

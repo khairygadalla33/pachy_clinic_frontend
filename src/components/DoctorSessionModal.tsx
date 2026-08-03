@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { X, Activity, FileText, CheckCircle, Plus, DollarSign, Zap, Syringe, Sparkles, Scissors } from 'lucide-react';
+import { X, Activity, FileText, CheckCircle, Plus, DollarSign, Zap, Syringe, Sparkles, Scissors, Cloud, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
 import SessionForm from './SessionForm';
@@ -32,6 +32,7 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAddingService, setIsAddingService] = useState(false);
   const [selectedNewService, setSelectedNewService] = useState('');
+  const [saveStatus, setSaveStatus] = useState<'IDLE' | 'SAVING' | 'SAVED' | 'ERROR'>('IDLE');
   
   // Track which booked service is currently selected for editing
   const [selectedServiceIdx, setSelectedServiceIdx] = useState(0);
@@ -124,55 +125,49 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-7xl h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         
         {/* ═══════════ HEADER ═══════════ */}
-        <div className="px-6 py-3.5 border-b border-surface-200 bg-surface-50/50 flex-shrink-0">
+        <div className="px-4 py-2 border-b border-primary-700 bg-primary-600 flex-shrink-0 text-white">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {/* Patient Avatar */}
-              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold text-base shadow-sm">
+              <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm shadow-sm">
                 {patient?.fullName?.substring(0, 2) || 'م'}
               </div>
               <div>
-                <h2 className="text-base font-bold text-surface-900">{patient?.fullName}</h2>
-                <div className="flex items-center gap-2 text-xs text-surface-500 mt-0.5">
-                  <span className="font-mono">{patient?.phone}</span>
-                  {totalCost > 0 && (
+                <h2 className="text-sm font-bold text-white">{patient?.fullName}</h2>
+                <div className="flex items-center gap-2 text-[11px] text-white/90 mt-0.5">
+                  <span className="font-mono font-medium">{patient?.fileNumber || 'بدون رقم ملف'}</span>
+                  {patient?.age && (
                     <>
-                      <span className="w-1 h-1 rounded-full bg-surface-300"></span>
-                      <span className="flex items-center gap-1 font-bold text-primary-600">
-                        <DollarSign className="w-3 h-3" />
-                        {totalCost.toFixed(0)} ج.م
-                      </span>
+                      <span className="w-1 h-1 rounded-full bg-white/50"></span>
+                      <span>السن: {patient.age}</span>
                     </>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Booked Services Summary in Header */}
-            <div className="flex items-center gap-2">
-              <div className="flex gap-1.5 flex-wrap justify-end max-w-md">
-                {bookedServices.map((svc: any, idx: number) => {
-                  const meta = getServiceMeta(svc.categoryType, svc.categoryName);
-                  return (
-                    <span
-                      key={idx}
-                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-md border text-[11px] font-bold ${meta.color}`}
-                    >
-                      {meta.icon}
-                      {svc.name}
-                    </span>
-                  );
-                })}
-                {bookedServices.length === 0 && (
-                  <span className="text-xs text-surface-400">لا توجد خدمات محجوزة</span>
+            {/* Save Status in Header */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-xs font-medium text-white/90">
+                {saveStatus === 'SAVING' && (
+                  <><Loader2 className="w-4 h-4 text-white animate-spin" /> جاري الحفظ...</>
+                )}
+                {saveStatus === 'SAVED' && (
+                  <><CheckCircle2 className="w-4 h-4 text-green-300" /> تم الحفظ</>
+                )}
+                {saveStatus === 'ERROR' && (
+                  <><AlertCircle className="w-4 h-4 text-red-200" /> خطأ في الحفظ</>
+                )}
+                {saveStatus === 'IDLE' && (
+                  <><Cloud className="w-4 h-4 text-white/70" /> في انتظار الكتابة للحفظ...</>
                 )}
               </div>
               
               <button 
                 onClick={onClose}
-                className="p-2 text-surface-400 hover:text-surface-600 hover:bg-surface-100 rounded-lg transition-colors mr-2"
+                className="p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors mr-2"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -296,6 +291,7 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
                       serviceName={currentService.name}
                       onSuccess={() => toast.success('تم حفظ تفاصيل الجلسة')}
                       onCancel={onClose}
+                      onSaveStatusChange={setSaveStatus}
                     />
                   ) : (
                     <div className="bg-white p-8 rounded-xl border border-surface-200 text-center text-surface-400">
@@ -313,6 +309,7 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
                    appointmentId={appointment.id}
                    onSuccess={() => toast.success('تم حفظ الروشتة')}
                    onCancel={onClose}
+                   onSaveStatusChange={setSaveStatus}
                  />
               )}
 

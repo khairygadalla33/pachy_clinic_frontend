@@ -2,7 +2,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Search, Eye, UserPlus } from 'lucide-react';
+import { Search, Eye, UserPlus, Edit } from 'lucide-react';
 import api from '../lib/api';
 import Card from '../components/Card';
 import LoadingSkeleton from '../components/LoadingSkeleton';
@@ -15,13 +15,20 @@ export default function Clients() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [editingClient, setEditingClient] = useState<any>(null);
   const [formData, setFormData] = useState({
-    fullName: '', phone: '', email: '', gender: 'FEMALE', skinType: 'TYPE_III',
+    fullName: '', phone: '', email: '', gender: 'FEMALE', skinType: '', dateOfBirth: '', age: '', region: '', address: ''
   });
 
   const { data, isLoading } = useQuery({
     queryKey: ['clients', page, search],
     queryFn: () => api.get(`/clients?page=${page}&limit=20&search=${search}`).then(r => r.data),
+  });
+
+  const { data: nextFileNumberData } = useQuery({
+    queryKey: ['nextFileNumber'],
+    queryFn: () => api.get('/clients/next-file-number').then(r => r.data),
+    enabled: showModal && !editingClient,
   });
 
   const createMutation = useMutation({
@@ -37,6 +44,19 @@ export default function Clients() {
     },
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => api.put(`/clients/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
+      setShowModal(false);
+      toast.success('تم تحديث بيانات العميل بنجاح');
+    },
+    onError: (err) => {
+      console.error(err);
+      toast.error('خطأ في تحديث بيانات العميل');
+    },
+  });
+
   const skinTypeColors: Record<string, string> = {
     TYPE_I: 'bg-rose-100 text-rose-700',
     TYPE_II: 'bg-orange-100 text-orange-700',
@@ -46,11 +66,37 @@ export default function Clients() {
     TYPE_VI: 'bg-black text-white',
   };
 
+  const handleEditClick = (client: any) => {
+    setEditingClient(client);
+    setFormData({
+      fullName: client.fullName || '',
+      phone: client.phone || '',
+      email: client.email || '',
+      gender: client.gender || 'FEMALE',
+      skinType: client.skinType || '',
+      dateOfBirth: client.dateOfBirth ? new Date(client.dateOfBirth).toISOString().split('T')[0] : '',
+      age: client.age ? String(client.age) : '',
+      region: client.region || '',
+      address: client.address || ''
+    });
+    setShowModal(true);
+  };
+
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
     const payload = { ...formData };
     if (!payload.email) delete (payload as any).email;
-    createMutation.mutate(payload);
+    if (!payload.skinType) delete (payload as any).skinType;
+    if (!payload.dateOfBirth) delete (payload as any).dateOfBirth;
+    else (payload as any).dateOfBirth = new Date(payload.dateOfBirth).toISOString();
+    if (payload.age) (payload as any).age = parseInt(payload.age, 10);
+    else delete (payload as any).age;
+    
+    if (editingClient) {
+      updateMutation.mutate({ id: editingClient.id, data: payload });
+    } else {
+      createMutation.mutate(payload);
+    }
   };
 
   return (
@@ -58,7 +104,11 @@ export default function Clients() {
       <div className="flex flex-col sm:flex-row justify-start items-start sm:items-center gap-4">
         
         <button
-          onClick={() => setShowModal(true)}
+          onClick={() => {
+            setEditingClient(null);
+            setFormData({ fullName: '', phone: '', email: '', gender: 'FEMALE', skinType: '', dateOfBirth: '', age: '', region: '', address: '' });
+            setShowModal(true);
+          }}
           className="btn-primary flex items-center gap-2"
         >
           <UserPlus className="w-5 h-5" />
@@ -93,11 +143,12 @@ export default function Clients() {
             <table className="w-full text-right">
               <thead>
                 <tr className="border-b border-surface-200 dark:border-surface-700 text-surface-500">
+                  <th className="pb-3 font-medium">رقم الملف</th>
                   <th className="pb-3 font-medium">الاسم</th>
                   <th className="pb-3 font-medium">الهاتف</th>
                   <th className="pb-3 font-medium">الجنس</th>
                   <th className="pb-3 font-medium">نوع البشرة</th>
-                  <th className="pb-3 font-medium text-center">تقييم 360</th>
+                  <th className="pb-3 font-medium text-center">المنطقة</th>
                   <th className="pb-3 font-medium">الزيارات</th>
                   <th className="pb-3 font-medium">آخر نشاط</th>
                   <th className="pb-3 font-medium"></th>
@@ -106,14 +157,17 @@ export default function Clients() {
               <tbody className="divide-y divide-surface-100 dark:divide-surface-800">
                 {data?.data?.map((client: any) => (
                   <tr key={client.id} className="hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-colors">
-                    <td className="py-4">
+                    <td className="py-2.5">
+                      <div className="font-bold text-primary-600 dark:text-primary-400">{client.fileNumber || '-'}</div>
+                    </td>
+                    <td className="py-2.5">
                       <div className="font-medium text-surface-900 dark:text-surface-100">{client.fullName}</div>
                     </td>
-                    <td className="py-4 text-surface-600 dark:text-surface-300" dir="ltr">{client.phone}</td>
-                    <td className="py-4 text-surface-600 dark:text-surface-300">
+                    <td className="py-2.5 text-surface-600 dark:text-surface-300" dir="ltr">{client.phone}</td>
+                    <td className="py-2.5 text-surface-600 dark:text-surface-300">
                       {client.gender === 'FEMALE' ? 'أنثى' : 'ذكر'}
                     </td>
-                    <td className="py-4">
+                    <td className="py-2.5">
                       {client.skinType ? (
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${skinTypeColors[client.skinType] || 'bg-gray-100 text-gray-800'}`}>
                           {client.skinType.replace('_', ' ')}
@@ -122,33 +176,32 @@ export default function Clients() {
                         <span className="text-surface-400 text-sm">غير محدد</span>
                       )}
                     </td>
-                    <td className="py-4 text-center">
-                      {client.score !== undefined ? (
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          client.score >= 80 ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' :
-                          client.score >= 50 ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' :
-                          'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400'
-                        }`}>
-                          {client.score}/100
-                        </span>
-                      ) : (
-                        <span className="text-surface-400 text-sm">-</span>
-                      )}
+                    <td className="py-2.5 text-center text-surface-600 dark:text-surface-300">
+                      {client.region || '-'}
                     </td>
-                    <td className="py-4 text-surface-600 dark:text-surface-300">
+                    <td className="py-2.5 text-surface-600 dark:text-surface-300">
                       {client.totalVisits}
                     </td>
-                    <td className="py-4 text-surface-600 dark:text-surface-300">
+                    <td className="py-2.5 text-surface-600 dark:text-surface-300">
                       {formatDate(client.updatedAt)}
                     </td>
-                    <td className="py-4 text-left">
-                      <button
-                        onClick={() => navigate(`/clients/${client.id}`)}
-                        className="p-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
-                        title="عرض الملف"
-                      >
-                        <Eye className="w-5 h-5" />
-                      </button>
+                    <td className="py-2.5 text-left">
+                      <div className="flex justify-end gap-1">
+                        <button
+                          onClick={() => navigate(`/clients/${client.id}`)}
+                          className="p-1.5 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
+                          title="عرض الملف"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleEditClick(client)}
+                          className="p-1.5 text-surface-500 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-lg transition-colors"
+                          title="تعديل البيانات"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -193,13 +246,27 @@ export default function Clients() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-surface-900 rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
             <div className="p-6 border-b border-surface-200 dark:border-surface-800 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-surface-900 dark:text-surface-100">إضافة عميل جديد</h3>
+              <h3 className="text-xl font-bold text-surface-900 dark:text-surface-100">
+                {editingClient ? 'تعديل بيانات العميل' : 'إضافة عميل جديد'}
+              </h3>
               <button onClick={() => setShowModal(false)} className="text-surface-400 hover:text-surface-600">&times;</button>
             </div>
             <form onSubmit={handleCreate} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">الاسم بالكامل *</label>
-                <input required type="text" value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} className="input-field w-full" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">الاسم بالكامل *</label>
+                  <input required type="text" value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} className="input-field w-full" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">رقم التسجيل الطبي</label>
+                  <input 
+                    type="text" 
+                    value={editingClient?.fileNumber || nextFileNumberData?.nextFileNumber || 'جاري التحميل...'} 
+                    readOnly 
+                    disabled
+                    className="input-field w-full bg-surface-50 dark:bg-surface-800 text-surface-500 border-dashed cursor-not-allowed font-medium ltr:text-left rtl:text-right" 
+                  />
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -214,9 +281,38 @@ export default function Clients() {
                   </select>
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">تاريخ الميلاد</label>
+                  <input type="date" value={formData.dateOfBirth} onChange={e => {
+                    const dob = e.target.value;
+                    let ageStr = formData.age;
+                    if (dob) {
+                      const ageNum = new Date().getFullYear() - new Date(dob).getFullYear();
+                      ageStr = ageNum.toString();
+                    }
+                    setFormData({...formData, dateOfBirth: dob, age: ageStr});
+                  }} className="input-field w-full" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">السن</label>
+                  <input type="number" min="1" max="150" value={formData.age} onChange={e => setFormData({...formData, age: e.target.value})} className="input-field w-full" placeholder="في حال عدم توفر تاريخ الميلاد" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">المنطقة</label>
+                  <input type="text" value={formData.region} onChange={e => setFormData({...formData, region: e.target.value})} className="input-field w-full" placeholder="مثال: المعادي" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">العنوان بالتفصيل</label>
+                  <input type="text" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} className="input-field w-full" />
+                </div>
+              </div>
               <div>
                 <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">نوع البشرة (Fitzpatrick)</label>
                 <select value={formData.skinType} onChange={e => setFormData({...formData, skinType: e.target.value})} className="input-field w-full">
+                  <option value="">غير محدد (اختياري)</option>
                   <option value="TYPE_I">Type I - أبيض فاتح جداً (يحترق دائماً)</option>
                   <option value="TYPE_II">Type II - أبيض (يحترق بسهولة)</option>
                   <option value="TYPE_III">Type III - حنطي فاتح (يحترق أحياناً)</option>
@@ -227,8 +323,8 @@ export default function Clients() {
               </div>
               <div className="pt-4 flex justify-end gap-3">
                 <button type="button" onClick={() => setShowModal(false)} className="btn-secondary">إلغاء</button>
-                <button type="submit" disabled={createMutation.isPending} className="btn-primary">
-                  {createMutation.isPending ? 'جاري الحفظ...' : 'حفظ الملف'}
+                <button type="submit" disabled={createMutation.isPending || updateMutation.isPending} className="btn-primary">
+                  {(createMutation.isPending || updateMutation.isPending) ? 'جاري الحفظ...' : 'حفظ البيانات'}
                 </button>
               </div>
             </form>
