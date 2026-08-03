@@ -26,6 +26,7 @@ const navGroups = [
       { path: '/clients', label: 'العملاء', icon: Users, roles: ['ADMIN', 'RECEPTIONIST', 'DOCTOR'] },
       { path: '/appointments', label: 'المواعيد', icon: Calendar, roles: ['ADMIN', 'RECEPTIONIST', 'DOCTOR', 'NURSE', 'TECHNICIAN'] },
       { path: '/doctor-workstation', label: 'عيادة الطبيب', icon: Stethoscope, roles: ['ADMIN', 'DOCTOR'] },
+      { path: '/services', label: 'الخدمات', icon: Sparkles, roles: ['ADMIN'] },
     ]
   },
   {
@@ -43,11 +44,10 @@ const navGroups = [
     ]
   },
   {
-    title: 'الأصول والخدمات',
+    title: 'الأصول',
     items: [
       { path: '/inventory', label: 'المخزون', icon: Box, roles: ['ADMIN'] },
       { path: '/devices', label: 'الأجهزة', icon: Box, roles: ['ADMIN'] },
-      { path: '/services', label: 'الخدمات', icon: Sparkles, roles: ['ADMIN'] },
     ]
   },
   {
