@@ -244,12 +244,11 @@ export default function SessionForm({
       {/* ======================= LASER FORM ======================= */}
       {sessionType === 'LASER' && (
         <div className="space-y-5 bg-white p-5 rounded-xl border border-surface-200 shadow-sm">
-          <div className="flex items-center justify-between pb-3 border-b border-surface-100">
+          <div className="flex items-center pb-3 border-b border-surface-100">
             <h4 className="font-bold text-surface-900 flex items-center gap-2 text-sm">
               <Zap className="w-4 h-4 text-red-500" />
               بيانات جلسة الليزر والبارامترات الطبية
             </h4>
-            <span className="text-xs text-surface-500">سجل الإعدادات بدقة للرجوع إليها في الجلسات القادمة</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
