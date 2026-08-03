@@ -12,6 +12,7 @@ import Modal from '../components/Modal';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import ClientAutocomplete from '../components/ClientAutocomplete';
 import CalendarView from '../components/appointments/CalendarView';
+import AppointmentPOSModal from '../components/appointments/AppointmentPOSModal';
 
 export default function Appointments() {
   const queryClient = useQueryClient();
@@ -26,17 +27,8 @@ export default function Appointments() {
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const [formData, setFormData] = useState({
-    clientId: '',
-    serviceIds: [] as string[],
-    staffId: '',
-    scheduledDate: new Date().toISOString().split('T')[0],
-    startTime: '10:00',
-    depositAmount: '',
-    depositMethod: 'CASH',
-    notes: '',
-    source: 'phone',
-  });
+  const [initialDate, setInitialDate] = useState<Date>(new Date());
+  const [initialTime, setInitialTime] = useState<string>('10:00');
 
   const { user } = useAuth();
   const branchId = user?.branchId;
@@ -123,11 +115,6 @@ export default function Appointments() {
     enabled: !!branchId,
   });
 
-  const { data: services } = useQuery({
-    queryKey: ['services', 'all'],
-    queryFn: () => api.get('/services').then(r => r.data),
-  });
-
   const { data: staff } = useQuery({
     queryKey: ['staff', 'doctors'],
     queryFn: () => api.get('/users/doctors').then(r => r.data),
@@ -137,27 +124,6 @@ export default function Appointments() {
     queryKey: ['doctorSchedule', selectedDoctorId],
     queryFn: () => api.get(`/users/${selectedDoctorId}/schedule`).then(r => r.data),
     enabled: !!selectedDoctorId,
-  });
-
-  const createMutation = useMutation({
-    mutationFn: (data: any) => {
-      const endpoint = isWalkIn ? '/appointments/walk-in' : '/appointments';
-      return api.post(endpoint, data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-      queryClient.invalidateQueries({ queryKey: ['workflow-stats'] });
-      queryClient.invalidateQueries({ queryKey: ['workflow-queue'] });
-      setShowModal(false);
-      setFormData({ clientId: '', serviceIds: [], staffId: '', scheduledDate: new Date().toISOString().split('T')[0], startTime: '10:00', depositAmount: '', depositMethod: 'CASH', notes: '', source: 'phone' });
-      if (searchParams.has('newWalkIn')) {
-        searchParams.delete('newWalkIn');
-        setSearchParams(searchParams);
-      }
-    },
-    onError: (err: any) => {
-      toast.error('خطأ في إنشاء الموعد: ' + (err.response?.data?.message || err.message));
-    },
   });
 
   const remindMutation = useMutation({
@@ -194,30 +160,6 @@ export default function Appointments() {
       toast.success('تم إلغاء الموعد بنجاح');
     },
   });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const payload: any = {
-      clientId: formData.clientId,
-      serviceIds: formData.serviceIds,
-      staffId: formData.staffId,
-      branchId,
-      notes: formData.notes,
-      source: formData.source,
-    };
-
-    if (formData.depositAmount) {
-      payload.depositAmount = Number(formData.depositAmount);
-      payload.depositMethod = formData.depositMethod;
-    }
-
-    if (!isWalkIn) {
-      payload.scheduledDate = new Date(formData.scheduledDate).toISOString();
-      payload.startTime = formData.startTime;
-    }
-
-    createMutation.mutate(payload);
-  };
 
   const handleAddNew = (date?: Date, time?: string) => {
     setIsWalkIn(false);
@@ -431,7 +373,6 @@ export default function Appointments() {
             onAppointmentClick={handleEdit}
             onEmptyCellClick={(date, time) => {
               if (date >= new Date(new Date().setHours(0,0,0,0))) {
-                setFormData(prev => ({ ...prev, staffId: selectedDoctorId || prev.staffId }));
                 handleAddNew(date, time);
               }
             }}
@@ -443,135 +384,21 @@ export default function Appointments() {
         )}
       </div>
 
-      {/* New Appointment Modal */}
-      <Modal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        title={isWalkIn ? 'عميل جديد - زيارة مباشرة (Walk-in)' : 'موعد جديد'}
-      >
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">العميل</label>
-            <ClientAutocomplete 
-              onSelect={(client) => setFormData({ ...formData, clientId: client.id })} 
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-surface-700 mb-2">الخدمات (يمكن اختيار أكثر من خدمة)</label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-40 overflow-y-auto p-2 border border-surface-200 rounded-md">
-                {services?.map((s: any) => (
-                  <label key={s.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-surface-50 p-1 rounded">
-                    <input 
-                      type="checkbox"
-                      checked={formData.serviceIds.includes(s.id)}
-                      onChange={(e) => {
-                        const newIds = e.target.checked 
-                          ? [...formData.serviceIds, s.id] 
-                          : formData.serviceIds.filter(id => id !== s.id);
-                        setFormData({ ...formData, serviceIds: newIds });
-                      }}
-                      className="rounded text-primary-600 focus:ring-primary-500"
-                    />
-                    <span>{s.name} ({s.nameAr})</span>
-                  </label>
-                ))}
-              </div>
-              {formData.serviceIds.length === 0 && (
-                <p className="text-xs text-red-500 mt-1">يجب اختيار خدمة واحدة على الأقل</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1">الطبيب</label>
-              <select 
-                className="input-field"
-                required
-                value={formData.staffId}
-                onChange={e => setFormData({ ...formData, staffId: e.target.value })}
-              >
-                <option value="">اختر الطبيب...</option>
-                {staff?.map((s: any) => (
-                  <option key={s.id} value={s.id}>Dr. {s.fullName}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {!isWalkIn && (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1">التاريخ</label>
-                <input 
-                  type="date"
-                  className="input-field"
-                  required
-                  value={formData.scheduledDate}
-                  onChange={e => setFormData({ ...formData, scheduledDate: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1">الوقت</label>
-                <input 
-                  type="time"
-                  className="input-field"
-                  required
-                  value={formData.startTime}
-                  onChange={e => setFormData({ ...formData, startTime: e.target.value })}
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="border-t border-surface-200 pt-4 mt-4">
-            <h4 className="text-sm font-bold text-surface-900 mb-3">عربون (اختياري)</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1">المبلغ</label>
-                <input 
-                  type="number"
-                  className="input-field"
-                  placeholder="0.00"
-                  value={formData.depositAmount}
-                  onChange={e => setFormData({ ...formData, depositAmount: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1">وسيلة الدفع</label>
-                <select 
-                  className="input-field"
-                  value={formData.depositMethod}
-                  onChange={e => setFormData({ ...formData, depositMethod: e.target.value })}
-                >
-                  <option value="CASH">نقدي</option>
-                  <option value="CARD">بطاقة ائتمانية</option>
-                  <option value="INSTAPAY">إنستاباي</option>
-                  <option value="E_WALLET">محفظة إلكترونية</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">ملاحظات</label>
-            <textarea 
-              className="input-field"
-              rows={2}
-              value={formData.notes}
-              onChange={e => setFormData({ ...formData, notes: e.target.value })}
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4 border-t border-surface-200">
-            <button type="button" onClick={() => setShowModal(false)} className="btn-secondary">
-              إلغاء
-            </button>
-            <button type="submit" disabled={createMutation.isPending || !formData.clientId} className="btn-primary">
-              {createMutation.isPending ? 'جاري الحفظ...' : (isWalkIn ? 'إضافة زيارة مباشرة (Walk-in)' : 'حجز الموعد')}
-            </button>
-          </div>
-        </form>
-      </Modal>
+      {/* New POS-style Appointment Modal */}
+      <AppointmentPOSModal 
+        isOpen={showModal} 
+        onClose={() => {
+          setShowModal(false);
+          if (searchParams.has('newWalkIn')) {
+            searchParams.delete('newWalkIn');
+            setSearchParams(searchParams);
+          }
+        }} 
+        isWalkIn={isWalkIn} 
+        branchId={branchId}
+        initialDate={initialDate}
+        initialTime={initialTime}
+      />
 
       {/* Edit Appointment Modal */}
       <Modal
