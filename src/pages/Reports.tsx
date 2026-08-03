@@ -25,11 +25,8 @@ export default function Reports() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6 print-p-0">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 no-print">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">التقارير والإحصائيات</h1>
-          <p className="text-gray-500">تحليل أداء العيادة</p>
-        </div>
+      <div className="flex flex-col md:flex-row md:items-center justify-start gap-4 no-print">
+        
         <div className="flex items-center gap-3">
           <input
             type="date"

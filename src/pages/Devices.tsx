@@ -24,7 +24,7 @@ const Devices = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-start items-center">
         <h1 className="text-3xl font-bold tracking-tight">إدارة الأجهزة</h1>
       </div>
 
@@ -58,7 +58,7 @@ const Devices = () => {
             
           return (
             <Card key={device.id}>
-              <CardHeader className="pb-2 flex flex-row items-start justify-between">
+              <CardHeader className="pb-2 flex flex-row items-start justify-start">
                 <div>
                   <CardTitle>{device.name}</CardTitle>
                   <p className="text-sm text-muted-foreground mt-1">{device.model || 'لا يوجد موديل'}</p>
@@ -69,7 +69,7 @@ const Devices = () => {
                 <div className="space-y-4">
                   {device.maxPulseCount && (
                     <div className="space-y-1">
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-start text-sm">
                         <span>استهلاك النبضات</span>
                         <span className="font-bold">{percent}%</span>
                       </div>
@@ -85,7 +85,7 @@ const Devices = () => {
                     </div>
                   )}
 
-                  <div className="pt-4 flex justify-between border-t border-border">
+                  <div className="pt-4 flex justify-start border-t border-border">
                     <Button variant="outline" size="sm">
                       <Wrench className="w-4 h-4 ml-1" /> سجل الصيانة
                     </Button>

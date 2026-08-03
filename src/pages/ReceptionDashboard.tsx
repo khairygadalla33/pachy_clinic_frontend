@@ -56,11 +56,8 @@ export default function ReceptionDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-surface-900">شاشة الاستقبال</h1>
-          <p className="text-surface-500 text-sm mt-1">متابعة قائمة الانتظار ومسار المرضى المباشر</p>
-        </div>
+      <div className="flex items-center justify-start">
+        
         <button onClick={() => navigate('/appointments?newWalkIn=true')} className="btn-primary">
           <Plus className="w-4 h-4 mr-2" /> مريض بدون موعد
         </button>

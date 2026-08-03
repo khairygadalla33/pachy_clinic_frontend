@@ -5,7 +5,7 @@ import api from '../lib/api';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
 import { formatDate, translateStatus } from '../lib/utils';
-import { MessageSquare, Settings, CheckCircle2, Megaphone, Plus } from 'lucide-react';
+import { Settings, CheckCircle2, Megaphone, Plus } from 'lucide-react';
 import Modal from '../components/Modal';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 
@@ -44,13 +44,8 @@ export default function WhatsApp() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <MessageSquare className="text-emerald-500" /> إدارة الواتساب (WhatsApp)
-          </h1>
-          <p className="text-surface-500 mt-1">إرسال حملات، إدارة القوالب، ورسائل الترحيب</p>
-        </div>
+      <div className="flex justify-start items-center">
+        
         <div className="flex items-center gap-2">
           {status?.connected ? (
             <Badge variant="success" className="text-sm py-1.5"><CheckCircle2 className="w-4 h-4 mr-1"/> متصل</Badge>
@@ -71,7 +66,7 @@ export default function WhatsApp() {
 
       {activeTab === 'campaigns' && (
         <Card>
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-start items-center mb-6">
             <h3 className="font-semibold text-lg">أحدث الحملات</h3>
             <button onClick={() => setIsCampaignModalOpen(true)} className="btn-primary flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700">
               <Plus className="w-4 h-4" /> حملة جديدة

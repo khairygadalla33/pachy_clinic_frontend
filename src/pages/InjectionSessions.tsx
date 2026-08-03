@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import api from '../lib/api';
 import Card from '../components/Card';
 import { formatDate } from '../lib/utils';
-import { Activity } from 'lucide-react';
 
 export default function InjectionSessions() {
   const { data: response, isLoading } = useQuery({
@@ -12,9 +11,7 @@ export default function InjectionSessions() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold flex items-center gap-2"><Activity className="text-primary-600"/> جلسات الحقن</h1>
-      </div>
+      
       <Card>
         <div className="overflow-x-auto">
           <table className="w-full text-right text-sm">

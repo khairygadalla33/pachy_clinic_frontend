@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import api from '../lib/api';
-import { ShieldAlert } from 'lucide-react';
+
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 
@@ -44,13 +44,7 @@ export default function AuditLog() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <ShieldAlert className="text-rose-600" />
-          سجل العمليات (Audit Log)
-        </h1>
-        <p className="text-gray-500 mt-1">تتبع التغييرات التي تمت على النظام</p>
-      </div>
+      
 
       <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4">
         <div className="flex-1">

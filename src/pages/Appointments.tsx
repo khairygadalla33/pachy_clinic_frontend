@@ -198,11 +198,8 @@ export default function Appointments() {
 
   return (
     <div className="space-y-6 h-[calc(100vh-8rem)] flex flex-col">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">المواعيد</h1>
-          <p className="text-surface-500 text-sm mt-1">إدارة جميع مواعيد العيادة</p>
-        </div>
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-start gap-4">
+        
         
         <div className="flex items-center gap-3 flex-wrap">
           {/* View Toggle */}

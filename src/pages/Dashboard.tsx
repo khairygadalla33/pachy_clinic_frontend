@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '../lib/api';
-import { useAuth } from '../lib/auth';
+
 import { formatCurrency } from '../lib/utils';
 import { 
   Users, Calendar, Wallet, TrendingUp, Package, AlertTriangle, Activity 
@@ -29,8 +29,6 @@ interface AdminStats {
 }
 
 export default function Dashboard() {
-  const { user } = useAuth();
-
   const { data: stats, isLoading, error } = useQuery<AdminStats>({
     queryKey: ['dashboard', 'admin'],
     queryFn: async () => {
@@ -44,11 +42,8 @@ export default function Dashboard() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">مرحباً {user?.fullName} 👋</h1>
-          <p className="text-gray-500 mt-1">نظرة عامة على أداء العيادة اليوم</p>
-        </div>
+      <div className="flex items-center justify-start">
+        
         <button onClick={() => window.print()} className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 no-print">
           طباعة التقرير
         </button>
@@ -99,7 +94,7 @@ export default function Dashboard() {
 
       {/* Secondary KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-orange-50 p-4 rounded-xl border border-orange-100 flex items-center justify-between">
+        <div className="bg-orange-50 p-4 rounded-xl border border-orange-100 flex items-center justify-start">
           <div className="flex items-center gap-3">
             <AlertTriangle className="text-orange-500" />
             <span className="font-medium text-orange-800">تنبيهات المخزون</span>
@@ -107,7 +102,7 @@ export default function Dashboard() {
           <span className="text-xl font-bold text-orange-600">{stats.lowStockProducts}</span>
         </div>
         
-        <div className="bg-red-50 p-4 rounded-xl border border-red-100 flex items-center justify-between">
+        <div className="bg-red-50 p-4 rounded-xl border border-red-100 flex items-center justify-start">
           <div className="flex items-center gap-3">
             <Activity className="text-red-500" />
             <span className="font-medium text-red-800">صيانة الأجهزة</span>
@@ -115,7 +110,7 @@ export default function Dashboard() {
           <span className="text-xl font-bold text-red-600">{stats.deviceAlerts}</span>
         </div>
 
-        <div className="bg-purple-50 p-4 rounded-xl border border-purple-100 flex items-center justify-between">
+        <div className="bg-purple-50 p-4 rounded-xl border border-purple-100 flex items-center justify-start">
           <div className="flex items-center gap-3">
             <Package className="text-purple-500" />
             <span className="font-medium text-purple-800">باقات نشطة</span>
@@ -170,7 +165,7 @@ export default function Dashboard() {
             <h3 className="text-lg font-bold text-gray-900 mb-4">توزيع الجلسات</h3>
             <div className="space-y-3">
               {stats.topServices.map((service, idx) => (
-                <div key={idx} className="flex items-center justify-between">
+                <div key={idx} className="flex items-center justify-start">
                   <span className="text-sm font-medium text-gray-700">{service.name}</span>
                   <span className="text-sm font-bold text-rose-600">{service.count} جلسة</span>
                 </div>

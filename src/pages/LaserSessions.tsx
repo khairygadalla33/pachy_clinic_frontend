@@ -4,7 +4,6 @@ import api from '../lib/api';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
 import { formatDate } from '../lib/utils';
-import { Activity } from 'lucide-react';
 
 export default function LaserSessions() {
   const [page] = useState(1);
@@ -27,9 +26,7 @@ export default function LaserSessions() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold flex items-center gap-2"><Activity className="text-primary-600"/> جلسات الليزر</h1>
-      </div>
+      
       <Card>
         <div className="overflow-x-auto">
           <table className="w-full text-right text-sm">

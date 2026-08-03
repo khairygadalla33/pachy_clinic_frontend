@@ -26,7 +26,7 @@ const Inventory = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-start items-center">
         <h1 className="text-3xl font-bold tracking-tight">إدارة المخزون</h1>
       </div>
 

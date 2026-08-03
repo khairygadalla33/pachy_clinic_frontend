@@ -137,9 +137,9 @@ export default function ClientProfile() {
           </div>
           
           <div className="flex-1 w-full">
-            <div className="flex justify-between items-start mb-2">
+            <div className="flex justify-start items-start mb-2">
               <div>
-                <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">{client.fullName}</h1>
+                
                 <div className="flex items-center gap-3 text-sm text-surface-500 mt-1">
                   <span>{client.gender === 'FEMALE' ? 'أنثى' : 'ذكر'}</span>
                   {client.dateOfBirth && <span>• {calculateAge(client.dateOfBirth)} سنة</span>}
@@ -217,7 +217,7 @@ export default function ClientProfile() {
                 {timeline.map((session: any) => (
                   <div key={`${session._type}-${session.id}`} className="relative bg-surface-50 dark:bg-surface-800/50 p-4 rounded-xl border border-surface-100 dark:border-surface-700">
                     <div className="absolute -right-[1.35rem] top-4 w-3 h-3 rounded-full bg-primary-500 ring-4 ring-white dark:ring-surface-900" />
-                    <div className="flex justify-between items-center mb-2">
+                    <div className="flex justify-start items-center mb-2">
                       <div className="font-medium text-surface-900 dark:text-surface-100 flex items-center gap-2">
                         {formatDate(session._date)} — {typeLabels[session._type]}
                       </div>
@@ -237,7 +237,7 @@ export default function ClientProfile() {
         {/* MEDICAL HISTORY */}
         {activeTab === 'medical' && (
           <Card>
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-start items-center mb-4">
               <h3 className="font-semibold text-lg">التاريخ الطبي</h3>
               {!isEditingMedical && (
                 <button onClick={handleEditMedicalClick} className="text-primary-600 hover:bg-primary-50 p-2 rounded-lg">
@@ -336,7 +336,7 @@ export default function ClientProfile() {
                 <div className="grid md:grid-cols-2 gap-4">
                   {activePackages.map((pkg: any) => (
                     <div key={pkg.id} className="p-4 border border-primary-200 bg-primary-50 dark:bg-primary-900/10 rounded-xl">
-                      <div className="flex justify-between items-start">
+                      <div className="flex justify-start items-start">
                         <div className="font-medium">{pkg.package.name}</div>
                         <Badge variant="success">نشط</Badge>
                       </div>
@@ -360,7 +360,7 @@ export default function ClientProfile() {
               <div className="space-y-4">
                 {prescriptions.map((px: any) => (
                   <div key={px.id} className="p-4 border border-surface-200 dark:border-surface-700 rounded-xl bg-surface-50 dark:bg-surface-800/50">
-                    <div className="flex justify-between items-center mb-3">
+                    <div className="flex justify-start items-center mb-3">
                       <div className="font-medium">{formatDate(px.createdAt)}</div>
                       <div className="text-sm text-surface-500">الطبيب: {px.doctor?.fullName}</div>
                     </div>
@@ -383,7 +383,7 @@ export default function ClientProfile() {
         {/* CONSENT FORMS */}
         {activeTab === 'consentForms' && (
           <Card>
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-start items-center mb-4">
               <h3 className="font-semibold text-lg">الإقرارات (Consent Forms)</h3>
               <button className="btn-primary text-sm whitespace-nowrap">+ إضافة إقرار جديد</button>
             </div>

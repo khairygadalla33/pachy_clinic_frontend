@@ -120,11 +120,8 @@ export default function Treasury() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-surface-900">الخزينة والبنوك</h1>
-          <p className="text-sm text-surface-500">إدارة الأرصدة والحركات المالية</p>
-        </div>
+      <div className="flex justify-start items-center">
+        
         <div className="flex gap-3">
           <button onClick={() => setIsTransferModalOpen(true)} className="btn-secondary bg-white">
             <ArrowRightLeft className="w-4 h-4 mr-2" /> تحويل مالي
@@ -164,7 +161,7 @@ export default function Treasury() {
 
           {/* Accounts List */}
           <div className="bg-white rounded-xl shadow-sm border border-surface-200 overflow-hidden">
-            <div className="p-4 border-b border-surface-200 bg-surface-50 flex justify-between items-center">
+            <div className="p-4 border-b border-surface-200 bg-surface-50 flex justify-start items-center">
               <h2 className="font-bold text-surface-900">حسابات الخزينة</h2>
               <button onClick={() => setIsAddAccountModalOpen(true)} className="text-xs font-medium text-primary-600 hover:text-primary-700 flex items-center">
                 <Plus className="w-3 h-3 mr-1" /> حساب جديد
@@ -177,7 +174,7 @@ export default function Treasury() {
                   className={`p-3 rounded-lg border cursor-pointer transition-colors ${selectedAccountId === acc.id ? 'bg-primary-50 border-primary-200' : 'bg-white border-surface-200 hover:bg-surface-50'}`}
                   onClick={() => setSelectedAccountId(acc.id)}
                 >
-                  <div className="flex justify-between items-start mb-2">
+                  <div className="flex justify-start items-start mb-2">
                     <div>
                       <div className="font-bold text-sm text-surface-900">{acc.name}</div>
                       <div className="text-xs text-surface-500">{
@@ -212,7 +209,7 @@ export default function Treasury() {
 
         {/* Transactions DataGrid */}
         <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-surface-200 overflow-hidden flex flex-col">
-          <div className="p-4 border-b border-surface-200 bg-surface-50 flex justify-between items-center">
+          <div className="p-4 border-b border-surface-200 bg-surface-50 flex justify-start items-center">
             <h2 className="font-bold text-surface-900">حركة الخزينة والبنك</h2>
             <div className="flex gap-2">
               {/* Date Filters Placeholder */}
@@ -392,7 +389,7 @@ export default function Treasury() {
       {/* Account Statement Modal */}
       <Modal isOpen={isStatementModalOpen} onClose={() => setIsStatementModalOpen(false)} title={`كشف حساب: ${statementData?.account?.name || '...'}`}>
         <div className="space-y-4">
-          <div className="flex justify-between items-center bg-surface-50 p-4 rounded-lg border border-surface-200">
+          <div className="flex justify-start items-center bg-surface-50 p-4 rounded-lg border border-surface-200">
             <div>
               <div className="text-surface-500 text-sm">الرصيد الحالي</div>
               <div className={`text-2xl font-bold ${Number(statementData?.account?.currentBalance) >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>

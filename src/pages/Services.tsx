@@ -165,8 +165,8 @@ export default function Services() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-surface-900 dark:text-white">الخدمات</h1>
+      <div className="flex justify-start items-center">
+        
         <button
           onClick={() => {
             setFormData({ ...formData, categoryId: activeTab });
@@ -212,7 +212,7 @@ export default function Services() {
           ) : (
             filteredServices.map((service: any) => (
               <Card key={service.id} className="flex flex-col relative overflow-hidden group">
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex justify-start items-start mb-4">
                   <div>
                     <h3 className="text-lg font-bold text-surface-900 dark:text-white mb-1">
                       {service.nameAr || service.name}
@@ -243,7 +243,7 @@ export default function Services() {
                   {service.pricings?.length > 0 ? (
                     <div className="space-y-2">
                       {service.pricings.map((p: any, i: number) => (
-                        <div key={i} className="flex items-center justify-between text-sm p-2 bg-surface-50 dark:bg-surface-800 rounded-md">
+                        <div key={i} className="flex items-center justify-start text-sm p-2 bg-surface-50 dark:bg-surface-800 rounded-md">
                           <span className="font-medium">{p.bodyArea || 'أساسي'}</span>
                           <div className="flex items-center gap-2">
                             {getPricingBadge(p.pricingModel)}
@@ -261,7 +261,7 @@ export default function Services() {
                   )}
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-surface-100 dark:border-surface-700 flex items-center justify-between text-sm">
+                <div className="mt-4 pt-4 border-t border-surface-100 dark:border-surface-700 flex items-center justify-start text-sm">
                   <div className="flex items-center text-surface-500">
                     <ShieldAlert className="h-4 w-4 ml-1.5" />
                     الأدوات المرتبطة: <span className="font-bold mx-1">{service.consumableLinks?.length || 0}</span>
@@ -326,7 +326,7 @@ export default function Services() {
 
           {/* Pricing Section */}
           <div className="border border-surface-200 dark:border-surface-700 rounded-lg p-4">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-start items-center mb-4">
               <h4 className="font-bold text-surface-900 dark:text-white">التسعير</h4>
               <button
                 type="button"
@@ -400,7 +400,7 @@ export default function Services() {
               {availableConsumables?.map((item: any) => {
                 const isSelected = consumables.find(c => c.consumableItemId === item.id);
                 return (
-                  <div key={item.id} className="flex items-center justify-between p-2 hover:bg-surface-50 dark:hover:bg-surface-800 rounded">
+                  <div key={item.id} className="flex items-center justify-start p-2 hover:bg-surface-50 dark:hover:bg-surface-800 rounded">
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
                         type="checkbox"

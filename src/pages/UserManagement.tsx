@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import Card from '../components/Card';
 import Badge from '../components/Badge';
-import { Search, Plus, Edit, Trash2, Shield, User, MapPin } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, User, MapPin } from 'lucide-react';
 import { formatDate, translateStatus } from '../lib/utils';
 import Modal from '../components/Modal';
 
@@ -118,14 +118,8 @@ export default function UserManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 flex items-center gap-2">
-            <Shield className="w-6 h-6 text-primary-600" />
-            إدارة المستخدمين والصلاحيات
-          </h1>
-          <p className="mt-1 text-sm text-surface-500">إضافة وتعديل بيانات الموظفين وتحديد الصلاحيات والفروع</p>
-        </div>
+      <div className="flex flex-col sm:flex-row justify-start items-start sm:items-center gap-4">
+        
         <button onClick={() => handleOpenModal()} className="btn-primary flex items-center gap-2">
           <Plus className="w-4 h-4" />
           مستخدم جديد

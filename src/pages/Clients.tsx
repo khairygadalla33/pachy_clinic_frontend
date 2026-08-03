@@ -55,11 +55,8 @@ export default function Clients() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">إدارة العملاء</h1>
-          <p className="text-surface-500">عرض وإدارة ملفات العملاء والمرضى</p>
-        </div>
+      <div className="flex flex-col sm:flex-row justify-start items-start sm:items-center gap-4">
+        
         <button
           onClick={() => setShowModal(true)}
           className="btn-primary flex items-center gap-2"
@@ -171,7 +168,7 @@ export default function Clients() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-surface-900 rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
-            <div className="p-6 border-b border-surface-200 dark:border-surface-800 flex justify-between items-center">
+            <div className="p-6 border-b border-surface-200 dark:border-surface-800 flex justify-start items-center">
               <h3 className="text-xl font-bold text-surface-900 dark:text-surface-100">إضافة عميل جديد</h3>
               <button onClick={() => setShowModal(false)} className="text-surface-400 hover:text-surface-600">&times;</button>
             </div>
