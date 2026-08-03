@@ -254,7 +254,7 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
                             key={idx}
                             type="button"
                             onClick={() => setSelectedServiceIdx(idx)}
-                            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${
+                            className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-[13px] font-bold transition-all ${
                               isActive ? meta.activeClass : meta.inactiveClass
                             }`}
                           >
