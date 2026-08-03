@@ -252,8 +252,14 @@ export default function AppointmentPOSModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-900/60 backdrop-blur-sm p-4">
-      <div className="bg-surface-50 w-full max-w-[1200px] h-[88vh] rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-surface-200">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-surface-900/60 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-surface-50 w-full max-w-[1200px] h-[88vh] rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-surface-200"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* ======================= RIGHT PANE: SERVICES MENU (65%) ======================= */}
         <div className="w-full md:w-[65%] bg-surface-50 flex flex-col h-full min-h-0 border-l border-surface-200 order-1">
@@ -595,8 +601,14 @@ export default function AppointmentPOSModal({
 
       {/* Pricing Selection Modal */}
       {pricingModalService && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-surface-900/40 backdrop-blur-sm p-4">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden animate-in zoom-in-95 duration-200">
+        <div 
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-surface-900/40 backdrop-blur-sm p-4"
+          onClick={() => setPricingModalService(null)}
+        >
+          <div 
+            className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="p-4 border-b border-surface-200 flex items-center justify-between bg-surface-50">
               <h2 className="text-lg font-bold text-surface-900">
                 حدد اختيارك لـ {pricingModalService.nameAr || pricingModalService.name}
