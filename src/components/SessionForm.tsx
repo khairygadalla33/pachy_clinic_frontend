@@ -532,7 +532,7 @@ export default function SessionForm({
             <label className="block text-xs font-bold text-surface-700 mb-1.5">
               منطقة الحقن المعالجة <span className="text-red-500">*</span>
             </label>
-            <div className="flex flex-wrap gap-1.5 mb-2">
+            <div className="flex flex-wrap gap-2 mb-3">
               {injectionAreas.map((area) => (
                 <button
                   key={area}
@@ -542,7 +542,7 @@ export default function SessionForm({
                     const updated = current ? `${current} + ${area}` : area;
                     setFormData({ ...formData, areaInjected: updated });
                   }}
-                  className="text-xs bg-surface-100 hover:bg-teal-50 hover:text-teal-700 px-2.5 py-1 rounded-md border border-surface-200 transition-colors"
+                  className="text-xs bg-white text-surface-600 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200 px-3 py-1.5 rounded-full border border-surface-200 transition-colors shadow-sm font-medium"
                 >
                   + {area}
                 </button>
@@ -653,13 +653,13 @@ export default function SessionForm({
             <label className="block text-xs font-bold text-surface-700 mb-1.5">
               اسم الإجراء المعالج <span className="text-red-500">*</span>
             </label>
-            <div className="flex flex-wrap gap-1.5 mb-2">
+            <div className="flex flex-wrap gap-2 mb-3">
               {skinCareProcedures.map((proc) => (
                 <button
                   key={proc}
                   type="button"
                   onClick={() => setFormData({ ...formData, procedureName: proc })}
-                  className="text-xs bg-surface-100 hover:bg-purple-50 hover:text-purple-700 px-2.5 py-1 rounded-md border border-surface-200 transition-colors"
+                  className="text-xs bg-white text-surface-600 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-200 px-3 py-1.5 rounded-full border border-surface-200 transition-colors shadow-sm font-medium"
                 >
                   {proc}
                 </button>

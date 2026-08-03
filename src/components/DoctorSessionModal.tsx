@@ -211,7 +211,7 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-5 bg-surface-50/30">
+            <div className="flex-1 overflow-y-auto p-6 bg-surface-50">
               
               {/* Inline Add Service UI */}
               {isAddingService && (
@@ -304,13 +304,15 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
               )}
 
               {activeTab === 'prescription' && (
-                 <PrescriptionForm 
-                   clientId={patient.id}
-                   appointmentId={appointment.id}
-                   onSuccess={() => toast.success('تم حفظ الروشتة')}
-                   onCancel={onClose}
-                   onSaveStatusChange={setSaveStatus}
-                 />
+                <div className="bg-white p-6 rounded-2xl border border-surface-200 shadow-sm">
+                  <PrescriptionForm 
+                    clientId={patient.id}
+                    appointmentId={appointment.id}
+                    onSuccess={() => toast.success('تم حفظ الروشتة')}
+                    onCancel={onClose}
+                    onSaveStatusChange={setSaveStatus}
+                  />
+                </div>
               )}
 
             </div>
@@ -320,7 +322,7 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
               
               {/* Right: Cancel Button */}
               <button 
-                className="whitespace-nowrap px-4 py-1.5 rounded-lg text-sm font-bold transition-all duration-300 bg-red-500/90 text-white hover:bg-red-500 border border-red-500/50 shadow-sm"
+                className="whitespace-nowrap px-4 py-1.5 rounded-lg text-sm font-bold transition-all duration-300 bg-transparent text-red-300 hover:text-white hover:bg-red-500/30 border border-red-500/30"
                 onClick={() => toast.error('جاري برمجة الزر - لم يكتمل بعد')}
                 disabled={isSubmitting}
               >

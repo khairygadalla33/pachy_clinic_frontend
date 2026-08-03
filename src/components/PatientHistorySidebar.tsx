@@ -409,32 +409,32 @@ export default function PatientHistorySidebar({ clientId, excludeAppointmentId }
                     {/* Laser Details */}
                     {laser && (
                       <div className="space-y-2">
-                        <div className="grid grid-cols-2 gap-2 bg-red-50/40 p-2 rounded border border-red-100">
-                          <div>
-                            <span className="text-surface-500 font-medium">رقم الجلسة:</span>{' '}
+                        <div className="grid grid-cols-3 gap-y-3 gap-x-2 bg-surface-50 p-3 rounded-lg border border-surface-200">
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-surface-500 mb-0.5">رقم الجلسة</span>
                             <span className="font-bold text-surface-900">
                               {laser.sessionNumber || 1} {laser.totalPlanned ? `من ${laser.totalPlanned}` : ''}
                             </span>
                           </div>
-                          <div>
-                            <span className="text-surface-500 font-medium">عدد النبضات:</span>{' '}
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-surface-500 mb-0.5">عدد النبضات</span>
                             <span className="font-bold text-red-700">{laser.numberOfPulses || '-'}</span>
                           </div>
-                          <div>
-                            <span className="text-surface-500 font-medium">Energy (J/cm²):</span>{' '}
-                            <span className="font-semibold">{laser.energyLevel ?? '-'}</span>
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-surface-500 mb-0.5">طريقة التبريد</span>
+                            <span className="font-bold text-surface-900 truncate" title={laser.coolingMethod}>{laser.coolingMethod || '-'}</span>
                           </div>
-                          <div>
-                            <span className="text-surface-500 font-medium">Spot Size:</span>{' '}
-                            <span className="font-semibold">{laser.spotSize ? `${laser.spotSize} mm` : '-'}</span>
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-surface-500 mb-0.5">Energy (J/cm²)</span>
+                            <span className="font-bold text-surface-900">{laser.energyLevel ?? '-'}</span>
                           </div>
-                          <div>
-                            <span className="text-surface-500 font-medium">Pulse Width:</span>{' '}
-                            <span className="font-semibold">{laser.pulseWidth ? `${laser.pulseWidth} ms` : '-'}</span>
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-surface-500 mb-0.5">Spot Size</span>
+                            <span className="font-bold text-surface-900">{laser.spotSize ? `${laser.spotSize} mm` : '-'}</span>
                           </div>
-                          <div>
-                            <span className="text-surface-500 font-medium">طريقة التبريد:</span>{' '}
-                            <span className="font-semibold">{laser.coolingMethod || '-'}</span>
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-surface-500 mb-0.5">Pulse Width</span>
+                            <span className="font-bold text-surface-900">{laser.pulseWidth ? `${laser.pulseWidth} ms` : '-'}</span>
                           </div>
                         </div>
 
@@ -500,34 +500,28 @@ export default function PatientHistorySidebar({ clientId, excludeAppointmentId }
                     {/* Injection Details */}
                     {injection && (
                       <div className="space-y-2">
-                        <div className="bg-teal-50/50 p-2.5 rounded border border-teal-100 space-y-1">
-                          <div className="flex justify-between">
-                            <span className="text-surface-500 font-medium">المنتج المستخدم:</span>
-                            <span className="font-bold text-teal-900">{injection.productUsed}</span>
+                        <div className="grid grid-cols-2 gap-y-3 gap-x-2 bg-surface-50 p-3 rounded-lg border border-surface-200">
+                          <div className="flex flex-col col-span-2">
+                            <span className="text-[10px] text-surface-500 mb-0.5">المنتج المستخدم</span>
+                            <span className="font-bold text-teal-900">{injection.productUsed} {injection.productBatch ? `(Batch: ${injection.productBatch})` : ''}</span>
                           </div>
-                          {injection.productBatch && (
-                            <div className="flex justify-between">
-                              <span className="text-surface-500 font-medium">رقم التشغيلة (Batch):</span>
-                              <span className="font-semibold text-surface-800">{injection.productBatch}</span>
-                            </div>
-                          )}
-                          <div className="flex justify-between">
-                            <span className="text-surface-500 font-medium">منطقة الحقن:</span>
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-surface-500 mb-0.5">منطقة الحقن</span>
                             <span className="font-bold text-surface-900">{injection.areaInjected}</span>
                           </div>
-                          <div className="flex justify-between">
-                            <span className="text-surface-500 font-medium">الكمية:</span>
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-surface-500 mb-0.5">الكمية</span>
                             <span className="font-bold text-teal-800">{injection.quantityUsed} {injection.quantityUnit || 'ml'}</span>
                           </div>
                           {injection.techniqueUsed && (
-                            <div className="flex justify-between">
-                              <span className="text-surface-500 font-medium">التقنية:</span>
-                              <span className="font-semibold text-surface-800">{injection.techniqueUsed}</span>
+                            <div className="flex flex-col">
+                              <span className="text-[10px] text-surface-500 mb-0.5">التقنية</span>
+                              <span className="font-bold text-surface-900">{injection.techniqueUsed}</span>
                             </div>
                           )}
-                          <div className="flex justify-between">
-                            <span className="text-surface-500 font-medium">استخدام تخدير:</span>
-                            <span className="font-semibold text-surface-800">{injection.anesthesiaUsed ? 'نعم (بنج موضعي)' : 'لا'}</span>
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-surface-500 mb-0.5">استخدام تخدير</span>
+                            <span className="font-bold text-surface-900">{injection.anesthesiaUsed ? 'نعم (بنج موضعي)' : 'لا'}</span>
                           </div>
                         </div>
 
@@ -569,19 +563,19 @@ export default function PatientHistorySidebar({ clientId, excludeAppointmentId }
                     {/* Skin Care Details */}
                     {skinCare && (
                       <div className="space-y-2">
-                        <div className="bg-purple-50/50 p-2.5 rounded border border-purple-100 space-y-1">
-                          <div className="flex justify-between">
-                            <span className="text-surface-500 font-medium">اسم الإجراء:</span>
+                        <div className="grid grid-cols-1 gap-y-3 bg-surface-50 p-3 rounded-lg border border-surface-200">
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-surface-500 mb-0.5">اسم الإجراء</span>
                             <span className="font-bold text-purple-900">{skinCare.procedureName}</span>
                           </div>
                           {skinCare.productsUsed && (
-                            <div className="mt-1">
-                              <span className="text-surface-500 font-medium block">المواد والسيرومات:</span>
-                              <div className="font-semibold text-surface-800 bg-white/70 p-1.5 rounded mt-0.5">
+                            <div className="flex flex-col">
+                              <span className="text-[10px] text-surface-500 mb-0.5">المواد والسيرومات</span>
+                              <span className="font-semibold text-surface-800">
                                 {typeof skinCare.productsUsed === 'string' 
                                   ? skinCare.productsUsed 
                                   : JSON.stringify(skinCare.productsUsed)}
-                              </div>
+                              </span>
                             </div>
                           )}
                         </div>
