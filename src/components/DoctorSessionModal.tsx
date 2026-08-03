@@ -16,8 +16,8 @@ interface DoctorSessionModalProps {
 // Resolve service category type to an icon and color
 function getServiceMeta(categoryType?: string, categoryName?: string) {
   const ct = (categoryType || categoryName || '').toUpperCase();
-  const activeClass = 'bg-primary-600 text-white border-primary-600 shadow-md';
-  const inactiveClass = 'bg-primary-50 text-primary-700 border-primary-200 hover:bg-primary-100';
+  const activeClass = 'bg-purple-600 text-white border-purple-600 shadow-md';
+  const inactiveClass = 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100';
 
   if (ct.includes('LASER') || ct.includes('CRYO') || ct.includes('CAVITATION'))
     return { icon: <Zap className="w-4 h-4" />, activeClass, inactiveClass, label: 'جلسة ليزر' };
