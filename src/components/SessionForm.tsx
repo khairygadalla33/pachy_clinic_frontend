@@ -243,7 +243,7 @@ export default function SessionForm({
 
       {/* ======================= LASER FORM ======================= */}
       {sessionType === 'LASER' && (
-        <div className="space-y-5 bg-white p-5 rounded-xl border border-surface-200 shadow-sm">
+        <div className="space-y-5 bg-white p-5 rounded-xl border border-primary-300 shadow-sm">
           <div className="flex items-center pb-3 border-b border-surface-100">
             <h4 className="font-bold text-surface-900 flex items-center gap-2 text-sm">
               <Zap className="w-4 h-4 text-red-500" />
@@ -460,7 +460,7 @@ export default function SessionForm({
 
       {/* ======================= INJECTION FORM ======================= */}
       {sessionType === 'INJECTION' && (
-        <div className="space-y-5 bg-white p-5 rounded-xl border border-surface-200 shadow-sm">
+        <div className="space-y-5 bg-white p-5 rounded-xl border border-primary-300 shadow-sm">
           <div className="flex items-center justify-between pb-3 border-b border-surface-100">
             <h4 className="font-bold text-surface-900 flex items-center gap-2 text-sm">
               <Syringe className="w-4 h-4 text-teal-600" />
@@ -638,7 +638,7 @@ export default function SessionForm({
 
       {/* ======================= SKIN CARE FORM ======================= */}
       {sessionType === 'SKIN_CARE' && (
-        <div className="space-y-5 bg-white p-5 rounded-xl border border-surface-200 shadow-sm">
+        <div className="space-y-5 bg-white p-5 rounded-xl border border-primary-300 shadow-sm">
           <div className="flex items-center justify-between pb-3 border-b border-surface-100">
             <h4 className="font-bold text-surface-900 flex items-center gap-2 text-sm">
               <Sparkles className="w-4 h-4 text-purple-600" />
@@ -705,7 +705,7 @@ export default function SessionForm({
       )}
 
       {/* ======================= CLINICAL PHOTOS (ALL TYPES) ======================= */}
-      <div className="bg-white p-5 rounded-xl border border-surface-200 shadow-sm space-y-4">
+      <div className="bg-white p-5 rounded-xl border border-primary-300 shadow-sm space-y-4">
         <h4 className="font-bold text-surface-900 flex items-center gap-2 text-sm">
           <Camera className="w-4 h-4 text-primary-600" />
           التوثيق الفوتوغرافي للجلسة (قبل / أثناء / بعد)

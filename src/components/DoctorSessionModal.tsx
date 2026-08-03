@@ -291,7 +291,7 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
                       onSaveStatusChange={setSaveStatus}
                     />
                   ) : (
-                    <div className="bg-white p-8 rounded-xl border border-surface-200 text-center text-surface-400">
+                    <div className="bg-white p-8 rounded-xl border border-primary-300 text-center text-surface-400">
                       <Activity className="w-12 h-12 mx-auto mb-3 opacity-30" />
                       <p className="text-sm font-medium">لا توجد خدمات محجوزة لهذا الموعد</p>
                       <p className="text-xs mt-1">يمكنك إضافة خدمة من تبويب "إضافة خدمات"</p>
@@ -301,7 +301,7 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
               )}
 
               {activeTab === 'prescription' && (
-                <div className="bg-white p-6 rounded-2xl border border-surface-200 shadow-sm">
+                <div className="bg-white p-6 rounded-2xl border border-primary-300 shadow-sm">
                   <PrescriptionForm 
                     clientId={patient.id}
                     appointmentId={appointment.id}
