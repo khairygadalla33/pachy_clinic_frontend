@@ -122,68 +122,65 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-surface-900/40 backdrop-blur-sm p-4 sm:p-6">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-7xl h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-7xl h-[92vh] flex overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         
-        {/* ═══════════ HEADER ═══════════ */}
-        <div className="px-4 py-2 border-b border-primary-700 bg-primary-600 flex-shrink-0 text-white">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {/* Patient Avatar */}
-              <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm shadow-sm">
-                {patient?.fullName?.substring(0, 2) || 'م'}
-              </div>
-              <div>
-                <h2 className="text-sm font-bold text-white">{patient?.fullName}</h2>
-                <div className="flex items-center gap-2 text-[11px] text-white/90 mt-0.5">
-                  <span className="font-mono font-medium">{patient?.fileNumber || 'بدون رقم ملف'}</span>
-                  {patient?.age && (
-                    <>
-                      <span className="w-1 h-1 rounded-full bg-white/50"></span>
-                      <span>السن: {patient.age}</span>
-                    </>
-                  )}
+        {/* ──── RIGHT SIDE: Patient History (1/3) - Placed first to appear on the right in RTL ──── */}
+        <PatientHistorySidebar clientId={patient.id} excludeAppointmentId={appointment.id} />
+
+        {/* ──── LEFT SIDE: Session Content (2/3) ──── */}
+        <div className="flex-1 flex flex-col min-w-0 bg-surface-50">
+          
+          {/* ═══════════ HEADER (Same style as footer) ═══════════ */}
+          <div className="px-4 py-2 border-b border-[#2d3e4c] bg-[#3a5061] flex-shrink-0 text-white">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {/* Patient Avatar */}
+                <div className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                  {patient?.fullName?.substring(0, 2) || 'م'}
+                </div>
+                <div>
+                  <h2 className="text-sm font-bold text-white">{patient?.fullName}</h2>
+                  <div className="flex items-center gap-2 text-[11px] text-white/70 mt-0.5">
+                    <span className="font-mono font-medium">{patient?.fileNumber || 'بدون رقم ملف'}</span>
+                    {patient?.age && (
+                      <>
+                        <span className="w-1 h-1 rounded-full bg-white/30"></span>
+                        <span>السن: {patient.age}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Save Status in Header */}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-xs font-medium text-white/90">
-                {saveStatus === 'SAVING' && (
-                  <><Loader2 className="w-4 h-4 text-white animate-spin" /> جاري الحفظ...</>
-                )}
-                {saveStatus === 'SAVED' && (
-                  <><CheckCircle2 className="w-4 h-4 text-green-300" /> تم الحفظ</>
-                )}
-                {saveStatus === 'ERROR' && (
-                  <><AlertCircle className="w-4 h-4 text-red-200" /> خطأ في الحفظ</>
-                )}
-                {saveStatus === 'IDLE' && (
-                  <><Cloud className="w-4 h-4 text-white/70" /> في انتظار الكتابة للحفظ...</>
-                )}
+              {/* Save Status in Header */}
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 text-xs font-medium text-white/90 bg-black/20 px-3 py-1.5 rounded-full">
+                  {saveStatus === 'SAVING' && (
+                    <><Loader2 className="w-3.5 h-3.5 text-white animate-spin" /> جاري الحفظ...</>
+                  )}
+                  {saveStatus === 'SAVED' && (
+                    <><CheckCircle2 className="w-3.5 h-3.5 text-green-400" /> تم الحفظ</>
+                  )}
+                  {saveStatus === 'ERROR' && (
+                    <><AlertCircle className="w-3.5 h-3.5 text-red-400" /> خطأ في الحفظ</>
+                  )}
+                  {saveStatus === 'IDLE' && (
+                    <><Cloud className="w-3.5 h-3.5 text-white/50" /> في انتظار الكتابة للحفظ...</>
+                  )}
+                </div>
+                
+                <button 
+                  onClick={onClose}
+                  className="p-1.5 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              
-              <button 
-                onClick={onClose}
-                className="p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors mr-2"
-              >
-                <X className="w-4 h-4" />
-              </button>
             </div>
           </div>
-        </div>
-
-        {/* ═══════════ MAIN BODY: 1/3 Right + 2/3 Left ═══════════ */}
-        <div className="flex-1 flex min-h-0 overflow-hidden">
-          
-          {/* ──── RIGHT SIDE: Patient History (1/3) - Placed first to appear on the right in RTL ──── */}
-          <PatientHistorySidebar clientId={patient.id} excludeAppointmentId={appointment.id} />
-
-          {/* ──── LEFT SIDE: Session Content (2/3) ──── */}
-          <div className="flex-1 flex flex-col min-w-0">
             
-            {/* Tabs */}
-            <div className="flex border-b border-surface-200 px-6 flex-shrink-0 bg-white items-center">
+          {/* Tabs */}
+          <div className="flex border-b border-surface-200 px-6 flex-shrink-0 bg-white items-center">
               <div className="flex">
                 <button
                   onClick={() => setActiveTab('details')}
@@ -365,7 +362,6 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
             </div>
           </div>
 
-        </div>
       </div>
     </div>
   );
