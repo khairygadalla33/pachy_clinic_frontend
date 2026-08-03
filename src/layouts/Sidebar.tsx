@@ -39,16 +39,11 @@ const navGroups = [
     ]
   },
   {
-    title: 'الأصول',
-    items: [
-      { path: '/inventory', label: 'المخزون', icon: Box, roles: ['ADMIN'] },
-      { path: '/devices', label: 'الأجهزة', icon: Box, roles: ['ADMIN'] },
-    ]
-  },
-  {
     title: 'النظام',
     items: [
       { path: '/settings', label: 'الإعدادات', icon: SettingsIcon, roles: ['ADMIN'] },
+      { path: '/inventory', label: 'المخزون', icon: Box, roles: ['ADMIN'] },
+      { path: '/devices', label: 'الأجهزة', icon: Box, roles: ['ADMIN'] },
     ]
   },
   {
