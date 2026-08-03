@@ -158,7 +158,7 @@ export default function Clients() {
                 {data?.data?.map((client: any) => (
                   <tr key={client.id} className="hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-colors">
                     <td className="py-2.5">
-                      <div className="font-bold text-primary-600 dark:text-primary-400">{client.fileNumber || '-'}</div>
+                      <div className="text-surface-900 dark:text-surface-100">{client.fileNumber || '-'}</div>
                     </td>
                     <td className="py-2.5">
                       <div className="font-medium text-surface-900 dark:text-surface-100">{client.fullName}</div>
