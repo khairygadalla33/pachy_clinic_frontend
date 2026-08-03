@@ -61,6 +61,7 @@ export default function PrescriptionForm({ clientId, appointmentId, onSuccess, o
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['prescriptions'] });
+      queryClient.invalidateQueries({ queryKey: ['patientHistory'] });
       onSuccess();
     },
   });

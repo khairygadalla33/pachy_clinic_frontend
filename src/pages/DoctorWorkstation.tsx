@@ -30,7 +30,7 @@ export default function DoctorWorkstation() {
 
   // Filter queue for current doctor (if not admin)
   const doctorQueue = queueItems?.flatMap((group: any) => group.items).filter((q: any) => {
-    const validStatuses = ['WAITING', 'IN_SESSION'];
+    const validStatuses = ['ARRIVED', 'WAITING', 'IN_SESSION'];
     if (!validStatuses.includes(q.stage)) return false;
     if (user?.role !== 'ADMIN' && q.staffId !== user?.id) return false;
     return true;
@@ -54,7 +54,6 @@ export default function DoctorWorkstation() {
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex justify-start items-center">
-        
       </div>
 
       {/* KPI Cards */}

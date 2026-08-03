@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User, Activity, Clock, Loader, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface WorkflowCardProps {
@@ -6,6 +6,21 @@ interface WorkflowCardProps {
   isLoading: boolean;
   onCardClick: (item: any) => void;
   activeQueueId?: string | null;
+}
+
+function WaitingTime({ startTime }: { startTime: string | null }) {
+  const [mins, setMins] = useState(0);
+  useEffect(() => {
+    if (!startTime) return;
+    const update = () => {
+      setMins(Math.floor((Date.now() - new Date(startTime).getTime()) / 60000));
+    };
+    update();
+    const interval = setInterval(update, 30000);
+    return () => clearInterval(interval);
+  }, [startTime]);
+  if (!startTime || mins <= 0) return null;
+  return <span>ينتظر منذ {mins} دقيقة</span>;
 }
 
 export default function WorkflowCardsPanel({ items, isLoading, onCardClick, activeQueueId }: WorkflowCardProps) {
@@ -86,9 +101,11 @@ export default function WorkflowCardsPanel({ items, isLoading, onCardClick, acti
                 <div className="flex items-center gap-2 text-xs text-surface-500">
                   <Clock className="w-3.5 h-3.5 flex-shrink-0 text-surface-400" />
                   <span>
-                    {item.waitingMinutes > 0 
-                      ? `ينتظر منذ ${item.waitingMinutes} دقيقة` 
-                      : (item.stage === 'IN_SESSION' ? 'الجلسة جارية الآن' : 'وصل للتو')}
+                    {item.stage === 'IN_SESSION' 
+                      ? 'الجلسة جارية الآن' 
+                      : <WaitingTime startTime={item.waitingStartTime} />
+                    }
+                    {!item.waitingStartTime && item.stage !== 'IN_SESSION' && 'وصل للتو'}
                   </span>
                 </div>
               </button>

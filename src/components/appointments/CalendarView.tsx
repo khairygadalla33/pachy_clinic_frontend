@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { AlertCircle } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn, translateStatus } from '../../lib/utils';
 
 interface CalendarViewProps {
   appointments: any[];
@@ -102,8 +102,10 @@ export default function CalendarView({
       case 'CONFIRMED': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-green-200';
       case 'COMPLETED': return 'bg-surface-100 text-surface-800 dark:bg-surface-800 dark:text-surface-300 border-surface-200';
       case 'CANCELLED': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border-red-200';
+      case 'NO_SHOW': return 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 border-red-200';
       case 'OVERDUE': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 border-orange-200';
       case 'PENDING': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border-yellow-200';
+      case 'IN_PROGRESS': return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200';
       default: return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border-blue-200';
     }
   };
@@ -235,7 +237,7 @@ export default function CalendarView({
                           >
                             <div className="flex items-center justify-between mb-0.5">
                                <span className="font-bold text-[10px]">{apt.startTime}</span>
-                               <span className="text-[8px] font-black uppercase opacity-60 tracking-widest">{apt.status}</span>
+                               <span className="text-[8px] font-black uppercase opacity-60 tracking-widest">{translateStatus(apt.status)}</span>
                             </div>
                             <p className="font-medium truncate text-[10px]">{apt.client?.fullName}</p>
                           </div>

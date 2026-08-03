@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 
@@ -68,7 +69,11 @@ export default function SessionForm({ type, appointmentId, clientId, serviceId, 
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workflow-queue'] });
+      queryClient.invalidateQueries({ queryKey: ['patientHistory'] });
       onSuccess();
+    },
+    onError: (err: any) => {
+      toast.error('خطأ في حفظ الجلسة: ' + (err.response?.data?.message || err.message));
     },
   });
 

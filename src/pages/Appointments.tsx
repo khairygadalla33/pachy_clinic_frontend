@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { translateStatus } from '../lib/utils';
 import { Plus, Bell, Check, Calendar as CalendarIcon, List, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../lib/api';
@@ -102,7 +103,7 @@ export default function Appointments() {
 
   // Data fetching
   const { data: appointments, isLoading } = useQuery({
-    queryKey: ['appointments', page, dateFilter, view, dateRange.startDate, dateRange.endDate],
+    queryKey: ['appointments', page, dateFilter, view, dateRange.startDate, dateRange.endDate, selectedDoctorId],
     queryFn: () => {
       const params: any = { branchId };
       if (view === 'list') {
@@ -148,10 +149,14 @@ export default function Appointments() {
       queryClient.invalidateQueries({ queryKey: ['workflow-stats'] });
       queryClient.invalidateQueries({ queryKey: ['workflow-queue'] });
       setShowModal(false);
+      setFormData({ clientId: '', serviceId: '', staffId: '', scheduledDate: new Date().toISOString().split('T')[0], startTime: '10:00', depositAmount: '', depositMethod: 'CASH', notes: '', source: 'phone' });
       if (searchParams.has('newWalkIn')) {
         searchParams.delete('newWalkIn');
         setSearchParams(searchParams);
       }
+    },
+    onError: (err: any) => {
+      toast.error('خطأ في إنشاء الموعد: ' + (err.response?.data?.message || err.message));
     },
   });
 
@@ -390,7 +395,7 @@ export default function Appointments() {
                             apt.status === 'PENDING' ? 'warning' :
                             apt.status === 'IN_PROGRESS' ? 'info' :
                             apt.status === 'COMPLETED' ? 'success' : 'danger'
-                          }>{apt.status}</Badge>
+                          }>{translateStatus(apt.status)}</Badge>
                           {apt.isWalkIn && <span className="mr-2 text-[10px] bg-purple-100 text-purple-700 px-1 py-0.5 rounded uppercase font-bold tracking-wider">زيارة مباشرة (Walk-in)</span>}
                         </td>
                         <td className="px-4 py-3 text-center">
@@ -578,6 +583,7 @@ export default function Appointments() {
                 className="input-field"
                 value={selectedAppointment.status}
                 onChange={(e) => setSelectedAppointment({ ...selectedAppointment, status: e.target.value })}
+                disabled={selectedAppointment.status === 'CANCELLED' || selectedAppointment.status === 'COMPLETED'}
               >
                 <option value="PENDING">قيد الانتظار (Pending)</option>
                 <option value="CONFIRMED">مؤكد (Confirmed)</option>
@@ -586,6 +592,9 @@ export default function Appointments() {
                 <option value="NO_SHOW">لم يحضر (No Show)</option>
                 <option value="CANCELLED">ملغي (Cancelled)</option>
               </select>
+              {(selectedAppointment.status === 'CANCELLED' || selectedAppointment.status === 'COMPLETED') && (
+                <p className="text-xs text-surface-400 mt-1">لا يمكن تعديل حالة هذا الموعد.</p>
+              )}
             </div>
 
             <div className="flex justify-between items-center pt-4 border-t border-surface-200 mt-6">

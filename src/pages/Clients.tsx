@@ -12,7 +12,7 @@ import ClientAutocomplete from '../components/ClientAutocomplete';
 export default function Clients() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [page] = useState(1);
+  const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -88,6 +88,7 @@ export default function Clients() {
         {isLoading ? (
           <LoadingSkeleton rows={5} />
         ) : (
+          <>
           <div className="overflow-x-auto">
             <table className="w-full text-right">
               <thead>
@@ -153,7 +154,7 @@ export default function Clients() {
                 ))}
                 {data?.data?.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-surface-400">
+                    <td colSpan={8} className="py-8 text-center text-surface-400">
                       لم يتم العثور على عملاء
                     </td>
                   </tr>
@@ -161,6 +162,29 @@ export default function Clients() {
               </tbody>
             </table>
           </div>
+          {/* Pagination */}
+          {data && data.totalPages > 1 && (
+            <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-surface-200">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="px-3 py-1.5 rounded-lg text-sm font-medium bg-surface-100 hover:bg-surface-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                السابق
+              </button>
+              <span className="text-sm text-surface-600">
+                صفحة {page} من {data.totalPages}
+              </span>
+              <button
+                onClick={() => setPage(p => Math.min(data.totalPages, p + 1))}
+                disabled={page === data.totalPages}
+                className="px-3 py-1.5 rounded-lg text-sm font-medium bg-surface-100 hover:bg-surface-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                التالي
+              </button>
+            </div>
+          )}
+          </>
         )}
       </Card>
 
@@ -168,7 +192,7 @@ export default function Clients() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-surface-900 rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
-            <div className="p-6 border-b border-surface-200 dark:border-surface-800 flex justify-start items-center">
+            <div className="p-6 border-b border-surface-200 dark:border-surface-800 flex justify-between items-center">
               <h3 className="text-xl font-bold text-surface-900 dark:text-surface-100">إضافة عميل جديد</h3>
               <button onClick={() => setShowModal(false)} className="text-surface-400 hover:text-surface-600">&times;</button>
             </div>
