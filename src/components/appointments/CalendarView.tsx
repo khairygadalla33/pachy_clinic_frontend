@@ -153,7 +153,7 @@ export default function CalendarView({
               className="py-2 px-2 text-center border-r border-surface-200 dark:border-surface-800 last:border-r-0 min-h-[62px] flex flex-col justify-center bg-surface-200 dark:bg-surface-700/50"
             >
               <p className="text-sm font-black uppercase text-[#c0389f]">
-                {['الأحـــد', 'الإثنيـــن', 'الثلاثـــاء', 'الأربعـــاء', 'الخميـــس', 'الجمعـــة', 'السبـــت'][idx]}
+                {['الأحـــد', 'الإثنيـــن', 'الثلاثـــاء', 'الأربعـــاء', 'الخميـــس', 'الجمعـــة', 'السبـــت'][day.day]}
               </p>
             </div>
           );
@@ -165,91 +165,61 @@ export default function CalendarView({
         {isWeekly ? (
           <div className="grid grid-cols-7 relative">
             {/* Daily Columns */}
-            {(() => {
-              let globalStartMinutes = 24 * 60;
-              let globalEndMinutes = 0;
+            {days.map((dayColumn, dayIdx) => {
+              const dayOfWeek = dayColumn.date?.getDay();
+              const scheduleForDay = doctorSchedule?.schedules?.find((s: any) => s.dayOfWeek === dayOfWeek);
+              const isDoctorOff = doctorSchedule && (!scheduleForDay || !scheduleForDay.isActive);
+              const allowOverbooking = doctorSchedule?.allowOverbooking ?? false;
 
-              // Pass 1: Find the absolute minimum start time and maximum end time across the week
-              days.forEach(dayColumn => {
-                const dayOfWeek = dayColumn.date?.getDay();
-                const scheduleForDay = doctorSchedule?.schedules?.find((s: any) => s.dayOfWeek === dayOfWeek);
-                
-                if (scheduleForDay && scheduleForDay.isActive) {
-                  const [sh, sm] = scheduleForDay.startTime.split(':').map(Number);
-                  const sMins = sh * 60 + sm;
-                  if (sMins < globalStartMinutes) globalStartMinutes = sMins;
+              let startMinutes = 9 * 60; // default 9:00 AM
+              let endMinutes = 17 * 60;  // default 5:00 PM
+              
+              if (scheduleForDay && scheduleForDay.isActive) {
+                const [sh, sm] = scheduleForDay.startTime.split(':').map(Number);
+                startMinutes = sh * 60 + sm;
+                const [eh, em] = scheduleForDay.endTime.split(':').map(Number);
+                endMinutes = eh * 60 + em;
+              }
 
-                  const [eh, em] = scheduleForDay.endTime.split(':').map(Number);
-                  const eMins = eh * 60 + em;
-                  if (eMins > globalEndMinutes) globalEndMinutes = eMins;
-                }
-                
-                dayColumn.appointments.forEach((a: any) => {
-                  if (a.startTime) {
+              const slotsToRender = doctorSchedule 
+                ? Math.ceil((endMinutes - startMinutes) / appointmentInterval)
+                : maxSlotsPerDay;
+
+              return (
+              <div 
+                key={dayIdx} 
+                className={cn(
+                  "relative border-r border-surface-200 dark:border-surface-800 last:border-r-0 transition-colors flex flex-col",
+                  dayColumn.date && dayColumn.date.toDateString() === new Date().toDateString() && "bg-[#c0389f]/5 dark:bg-[#c0389f]/10",
+                  isDoctorOff && "bg-surface-100 dark:bg-surface-800 opacity-60"
+                )}
+              >
+                {Array.from({ length: Math.max(slotsToRender, 1) }).map((_, slotIdx) => {
+                  const slotMinutes = startMinutes + slotIdx * appointmentInterval;
+                  const h = Math.floor(slotMinutes / 60);
+                  const m = slotMinutes % 60;
+                  const calculatedTime = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                  
+                  // Match appointments by time loosely (within this slot's interval)
+                  const aptsInSlot = dayColumn.appointments.filter(a => {
+                    if (!a.startTime) return false;
                     const [ah, am] = a.startTime.split(':').map(Number);
                     const aptMins = ah * 60 + am;
-                    if (aptMins < globalStartMinutes) globalStartMinutes = aptMins;
-                    if (aptMins + appointmentInterval > globalEndMinutes) globalEndMinutes = aptMins + appointmentInterval;
-                  }
-                });
-              });
+                    return aptMins >= slotMinutes && aptMins < slotMinutes + appointmentInterval;
+                  });
 
-              // Fallbacks if no schedules/appointments exist
-              if (globalStartMinutes === 24 * 60) globalStartMinutes = 9 * 60;
-              if (globalEndMinutes === 0) globalEndMinutes = 17 * 60;
-              
-              const slotsToRender = Math.ceil((globalEndMinutes - globalStartMinutes) / appointmentInterval);
+                  const isOutsideHours = slotMinutes >= endMinutes;
+                  const disabled = isDoctorOff || isOutsideHours;
+                  const canBook = !disabled && (aptsInSlot.length === 0 || allowOverbooking);
 
-              return days.map((dayColumn, dayIdx) => {
-                const dayOfWeek = dayColumn.date?.getDay();
-                const scheduleForDay = doctorSchedule?.schedules?.find((s: any) => s.dayOfWeek === dayOfWeek);
-                const isDoctorOff = doctorSchedule && (!scheduleForDay || !scheduleForDay.isActive);
-                const allowOverbooking = doctorSchedule?.allowOverbooking ?? false;
-                
-                let dayStartMinutes = 9 * 60;
-                let dayEndMinutes = 17 * 60;
-                if (scheduleForDay && scheduleForDay.isActive) {
-                  const [sh, sm] = scheduleForDay.startTime.split(':').map(Number);
-                  dayStartMinutes = sh * 60 + sm;
-                  const [eh, em] = scheduleForDay.endTime.split(':').map(Number);
-                  dayEndMinutes = eh * 60 + em;
-                }
-
-                return (
-                  <div 
-                    key={dayIdx} 
-                    className={cn(
-                      "relative border-r border-surface-200 dark:border-surface-800 last:border-r-0 transition-colors flex flex-col",
-                      dayColumn.date && dayColumn.date.toDateString() === new Date().toDateString() && "bg-primary-50/20 dark:bg-primary-900/10",
-                      isDoctorOff && "bg-surface-100 dark:bg-surface-800 opacity-60"
-                    )}
-                  >
-                    {Array.from({ length: Math.max(slotsToRender, 1) }).map((_, slotIdx) => {
-                      const slotMinutes = globalStartMinutes + slotIdx * appointmentInterval;
-                      const h = Math.floor(slotMinutes / 60);
-                      const m = slotMinutes % 60;
-                      const calculatedTime = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-                      
-                      // Match appointments by time loosely (within this slot's interval)
-                      const aptsInSlot = dayColumn.appointments.filter((a: any) => {
-                        if (!a.startTime) return false;
-                        const [ah, am] = a.startTime.split(':').map(Number);
-                        const aptMins = ah * 60 + am;
-                        return aptMins >= slotMinutes && aptMins < slotMinutes + appointmentInterval;
-                      });
-
-                      const isOutsideHours = slotMinutes < dayStartMinutes || slotMinutes >= dayEndMinutes;
-                      const disabled = isDoctorOff || isOutsideHours;
-                      const canBook = !disabled && (aptsInSlot.length === 0 || allowOverbooking);
-
-                      return (
+                  return (
                     <div 
                       key={slotIdx} 
                       onClick={() => {
                         if (canBook && dayColumn.date) onEmptyCellClick(dayColumn.date, calculatedTime);
                       }}
                       className={cn(
-                        "min-h-[4rem] border-b border-surface-100 dark:border-surface-800/50 p-1 group hover:bg-primary-50/30 dark:hover:bg-primary-900/10 transition-colors relative flex flex-col gap-1",
+                        "min-h-[4rem] border-b border-surface-100 dark:border-surface-800/50 p-1 group hover:bg-[#c0389f]/5 dark:hover:bg-[#c0389f]/10 transition-colors relative flex flex-col gap-1",
                         canBook ? "cursor-pointer" : "cursor-not-allowed",
                         disabled && "bg-surface-50 dark:bg-surface-900/50"
                       )}
@@ -275,7 +245,7 @@ export default function CalendarView({
 
                         {canBook && (
                           <div className={cn(
-                            "flex items-center justify-center rounded-md border border-dashed border-primary-300 text-primary-500 hover:bg-primary-50 hover:border-primary-400 transition-colors py-1 text-[10px] font-bold mt-auto",
+                            "flex items-center justify-center rounded-md border border-dashed border-[#c0389f]/40 text-[#c0389f] hover:bg-[#c0389f]/10 hover:border-[#c0389f]/60 transition-colors py-1 text-[10px] font-bold mt-auto",
                             aptsInSlot.length > 0 ? "opacity-0 group-hover:opacity-100 h-6" : "h-full opacity-0 group-hover:opacity-100"
                           )}>
                              + موعد
@@ -286,9 +256,7 @@ export default function CalendarView({
                   );
                 })}
               </div>
-            );
-          });
-        })()}
+            )})}
           </div>
         ) : (
           <div className="grid min-h-full grid-cols-7 auto-rows-fr">
