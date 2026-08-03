@@ -155,6 +155,16 @@ export default function AppointmentPOSModal({
     },
   });
 
+  const getPricingBadge = (model: string) => {
+    switch (model) {
+      case 'PER_AREA': return <span className="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded text-[10px] font-bold">بالمنطقة</span>;
+      case 'PER_PULSE': return <span className="bg-sky-100 text-sky-700 px-1.5 py-0.5 rounded text-[10px] font-bold">بالنبضات</span>;
+      case 'HYBRID': return <span className="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[10px] font-bold">هجين</span>;
+      case 'PACKAGE': return <span className="bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[10px] font-bold">باقة</span>;
+      default: return null;
+    }
+  };
+
   // -- Handlers --
   const handleAddToBasket = (service: any, pricing?: any) => {
     const pricingId = pricing?.id;
@@ -169,7 +179,7 @@ export default function AppointmentPOSModal({
     setBasket([...basket, { 
       service, 
       pricingId,
-      pricingName: pricing?.nameAr || pricing?.name,
+      pricingName: pricing?.bodyArea || pricing?.nameAr || pricing?.name,
       unitPrice: price, 
       quantity: 1, 
       total: price 
@@ -604,8 +614,17 @@ export default function AppointmentPOSModal({
                     className={`flex items-center justify-between p-3 border-b border-surface-100 last:border-0 rounded-lg mb-1 ${inBasket ? 'bg-primary-50/50' : 'hover:bg-surface-50'}`}
                   >
                     <div>
-                      <p className="font-bold text-surface-900 text-sm">{pricing.nameAr || pricing.name}</p>
-                      <p className="text-primary-600 font-bold text-sm mt-0.5">{Number(pricing.price).toLocaleString()} ج.م</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-bold text-surface-900 text-sm">
+                          {pricing.bodyArea || pricing.nameAr || pricing.name || 'أساسي'}
+                        </p>
+                        {getPricingBadge(pricing.pricingModel)}
+                      </div>
+                      <p className="text-primary-600 font-bold text-sm mt-0.5">
+                        {pricing.pricingModel === 'PER_PULSE' 
+                          ? `${Number(pricing.pricePerPulse || 0).toLocaleString()} ج.م / نبضة` 
+                          : `${Number(pricing.price).toLocaleString()} ج.م`}
+                      </p>
                     </div>
                     {inBasket ? (
                       <span className="text-xs font-bold text-primary-600 bg-primary-100 px-2 py-1 rounded-md">مضافة</span>
