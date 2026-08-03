@@ -217,13 +217,122 @@ export default function AppointmentPOSModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-900/60 backdrop-blur-sm p-4">
-      <div className="bg-surface-50 w-full max-w-[1400px] h-[90vh] rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-surface-200">
+      <div className="bg-surface-50 w-full max-w-[1400px] h-[96vh] rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-surface-200">
         
+        {/* ======================= RIGHT PANE: SERVICES MENU (60%) ======================= */}
+        <div className="w-full md:w-[60%] bg-surface-50 flex flex-col h-full border-l border-surface-200 order-1">
+          
+          {/* Header & Search */}
+          <div className="p-5 border-b border-surface-200 bg-white shrink-0">
+            <h1 className="text-xl font-black text-surface-900 mb-4">قائمة الخدمات</h1>
+            
+            <div className="relative">
+              <input 
+                type="text" 
+                placeholder="ابحث عن خدمة بالاسم..." 
+                className="w-full pl-10 pr-4 py-3 rounded-xl border border-surface-200 bg-surface-50 focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-sm font-medium"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+              />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400" />
+            </div>
+          </div>
+
+          {/* Categories Tabs */}
+          <div className="px-5 pt-4 bg-white border-b border-surface-100 overflow-x-auto hide-scrollbar shrink-0">
+            <div className="flex items-center gap-2 pb-3">
+              <button
+                onClick={() => setActiveCategory('ALL')}
+                className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold transition-colors ${
+                  activeCategory === 'ALL' 
+                    ? 'bg-primary-600 text-white shadow-md' 
+                    : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
+                }`}
+              >
+                الكل
+              </button>
+              {categories.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold transition-colors ${
+                    activeCategory === cat.id 
+                      ? 'bg-primary-600 text-white shadow-md' 
+                      : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
+                  }`}
+                >
+                  {cat.nameAr || cat.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Services Grid */}
+          <div className="flex-1 overflow-y-auto p-5 custom-scrollbar">
+            {isLoadingServices ? (
+              <div className="flex justify-center items-center h-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
+              </div>
+            ) : filteredServices.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-surface-400 space-y-3">
+                <Search className="w-12 h-12 opacity-20" />
+                <p className="font-medium text-lg">لا توجد خدمات مطابقة للبحث</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max">
+                {filteredServices.map((service: any) => {
+                  const price = Number(service.pricings?.[0]?.price || 0);
+                  const inBasket = basket.some(b => b.service.id === service.id);
+                  
+                  return (
+                    <div 
+                      key={service.id} 
+                      onClick={() => !inBasket && handleAddToBasket(service)}
+                      className={`bg-white rounded-2xl p-4 border-2 transition-all cursor-pointer relative overflow-hidden group ${
+                        inBasket 
+                          ? 'border-primary-400 ring-4 ring-primary-50 shadow-md bg-primary-50/30' 
+                          : 'border-surface-100 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1'
+                      }`}
+                    >
+                      {inBasket && (
+                        <div className="absolute top-0 right-0 bg-primary-500 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg z-10">
+                          مضافة
+                        </div>
+                      )}
+                      <div className="flex flex-col h-full gap-3">
+                        <div className="flex-1">
+                          <p className="text-[10px] font-bold text-primary-600 uppercase tracking-wider mb-1">
+                            {service.category?.nameAr || service.category?.name}
+                          </p>
+                          <h3 className="font-bold text-surface-900 text-sm leading-tight line-clamp-2">
+                            {service.nameAr || service.name}
+                          </h3>
+                        </div>
+                        <div className="flex items-end justify-between mt-auto pt-2 border-t border-surface-50">
+                          <div className="flex items-baseline gap-1 text-primary-700">
+                            <span className="text-lg font-black">{price.toLocaleString()}</span>
+                            <span className="text-xs font-bold">ج.م</span>
+                          </div>
+                          {!inBasket && (
+                            <div className="w-8 h-8 rounded-full bg-surface-100 flex items-center justify-center text-surface-500 group-hover:bg-primary-500 group-hover:text-white transition-colors">
+                              <Plus className="w-5 h-5" />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* ======================= LEFT PANE: BASKET & DETAILS (40%) ======================= */}
-        <div className="w-full md:w-[40%] bg-white border-l border-surface-200 flex flex-col h-full z-10 shadow-[4px_0_24px_rgba(0,0,0,0.05)] order-2 md:order-1">
+        <div className="w-full md:w-[40%] bg-white flex flex-col h-full z-10 shadow-xl order-2">
           
           {/* Header */}
-          <div className="p-4 border-b border-surface-100 bg-surface-50/50 flex items-center justify-between">
+          <div className="p-4 border-b border-surface-100 bg-surface-50 flex items-center justify-between shrink-0">
             <h2 className="text-lg font-bold text-surface-900 flex items-center gap-2">
               <span className="w-8 h-8 rounded-lg bg-primary-100 text-primary-600 flex items-center justify-center">
                 <CheckCircle className="w-5 h-5" />
@@ -235,65 +344,67 @@ export default function AppointmentPOSModal({
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
-            
-            {/* --- Appointment Meta --- */}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-bold text-surface-700 mb-1.5 flex items-center gap-1.5">
-                  <User className="w-4 h-4 text-primary-500" /> العميل <span className="text-red-500">*</span>
-                </label>
-                <div className="relative z-50">
-                  <ClientAutocomplete onSelect={(client) => setFormData({ ...formData, clientId: client.id })} />
-                </div>
+          {/* Fixed Meta: Client & Doctor */}
+          <div className="p-4 border-b border-surface-200 bg-white grid grid-cols-2 gap-3 shrink-0">
+            <div>
+              <label className="block text-xs font-bold text-surface-700 mb-1.5 flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-primary-500" /> العميل <span className="text-red-500">*</span>
+              </label>
+              <div className="relative z-50">
+                <ClientAutocomplete onSelect={(client) => setFormData({ ...formData, clientId: client.id })} />
               </div>
-
-              <div>
-                <label className="block text-sm font-bold text-surface-700 mb-1.5 flex items-center gap-1.5">
-                  <User className="w-4 h-4 text-purple-500" /> الطبيب المعالج <span className="text-red-500">*</span>
-                </label>
-                <select 
-                  className="input-field text-sm font-medium bg-surface-50 border-surface-200"
-                  required
-                  value={formData.staffId}
-                  onChange={e => setFormData({ ...formData, staffId: e.target.value })}
-                >
-                  <option value="">اختر الطبيب...</option>
-                  {staffData?.map((s: any) => (
-                    <option key={s.id} value={s.id}>د. {s.fullName}</option>
-                  ))}
-                </select>
-              </div>
-
-              {!isWalkIn && (
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-bold text-surface-700 mb-1.5 flex items-center gap-1.5">
-                      <Calendar className="w-4 h-4 text-teal-500" /> التاريخ
-                    </label>
-                    <input 
-                      type="date"
-                      className="input-field text-sm font-medium"
-                      required
-                      value={formData.scheduledDate}
-                      onChange={e => setFormData({ ...formData, scheduledDate: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-surface-700 mb-1.5 flex items-center gap-1.5">
-                      <Clock className="w-4 h-4 text-amber-500" /> الوقت
-                    </label>
-                    <input 
-                      type="time"
-                      className="input-field text-sm font-medium"
-                      required
-                      value={formData.startTime}
-                      onChange={e => setFormData({ ...formData, startTime: e.target.value })}
-                    />
-                  </div>
-                </div>
-              )}
             </div>
+
+            <div>
+              <label className="block text-xs font-bold text-surface-700 mb-1.5 flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-purple-500" /> الطبيب المعالج <span className="text-red-500">*</span>
+              </label>
+              <select 
+                className="input-field text-sm font-medium bg-surface-50 border-surface-200"
+                required
+                value={formData.staffId}
+                onChange={e => setFormData({ ...formData, staffId: e.target.value })}
+              >
+                <option value="">اختر الطبيب...</option>
+                {staffData?.map((s: any) => (
+                  <option key={s.id} value={s.id}>د. {s.fullName}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Scrollable Basket Area */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar bg-surface-50/30">
+            
+            {/* --- Date & Time (Only for future bookings) --- */}
+            {!isWalkIn && (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-surface-700 mb-1.5 flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-teal-500" /> التاريخ
+                  </label>
+                  <input 
+                    type="date"
+                    className="input-field text-sm font-medium"
+                    required
+                    value={formData.scheduledDate}
+                    onChange={e => setFormData({ ...formData, scheduledDate: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-surface-700 mb-1.5 flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-amber-500" /> الوقت
+                  </label>
+                  <input 
+                    type="time"
+                    className="input-field text-sm font-medium"
+                    required
+                    value={formData.startTime}
+                    onChange={e => setFormData({ ...formData, startTime: e.target.value })}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* --- Basket Items --- */}
             <div>
@@ -390,7 +501,7 @@ export default function AppointmentPOSModal({
           </div>
 
           {/* Footer (Totals & Submit) */}
-          <div className="p-5 border-t border-surface-200 bg-white">
+          <div className="p-4 border-t border-surface-200 bg-white shrink-0">
             <div className="space-y-2 mb-4 text-sm font-medium text-surface-600">
               {/* 1. Subtotal */}
               <div className="flex justify-between items-center text-surface-600">
@@ -448,116 +559,6 @@ export default function AppointmentPOSModal({
               {createMutation.isPending ? 'جاري التنفيذ...' : (isWalkIn ? 'تسجيل كزيارة مباشرة' : 'تأكيد وحجز الموعد')}
             </button>
           </div>
-        </div>
-
-        {/* ======================= RIGHT PANE: SERVICES MENU (60%) ======================= */}
-        <div className="w-full md:w-[60%] bg-surface-50 flex flex-col h-full order-1 md:order-2">
-          
-          {/* Header & Search */}
-          <div className="p-5 border-b border-surface-200 bg-white">
-            <h1 className="text-xl font-black text-surface-900 mb-4">قائمة الخدمات</h1>
-            
-            <div className="relative">
-              <input 
-                type="text" 
-                placeholder="ابحث عن خدمة بالاسم..." 
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-surface-200 bg-surface-50 focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-sm font-medium"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-              />
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400" />
-            </div>
-          </div>
-
-          {/* Categories Tabs */}
-          <div className="px-5 pt-4 bg-white border-b border-surface-100 overflow-x-auto hide-scrollbar">
-            <div className="flex items-center gap-2 pb-3">
-              <button
-                onClick={() => setActiveCategory('ALL')}
-                className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold transition-colors ${
-                  activeCategory === 'ALL' 
-                    ? 'bg-primary-600 text-white shadow-md' 
-                    : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
-                }`}
-              >
-                الكل
-              </button>
-              {categories.map(cat => (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold transition-colors ${
-                    activeCategory === cat.id 
-                      ? 'bg-primary-600 text-white shadow-md' 
-                      : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
-                  }`}
-                >
-                  {cat.nameAr || cat.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Services Grid */}
-          <div className="flex-1 overflow-y-auto p-5 custom-scrollbar">
-            {isLoadingServices ? (
-              <div className="flex justify-center items-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
-              </div>
-            ) : filteredServices.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-surface-400 space-y-3">
-                <Search className="w-12 h-12 opacity-20" />
-                <p className="font-medium text-lg">لا توجد خدمات مطابقة للبحث</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max">
-                {filteredServices.map((service: any) => {
-                  const price = Number(service.pricings?.[0]?.price || 0);
-                  const inBasket = basket.some(b => b.service.id === service.id);
-                  
-                  return (
-                    <div 
-                      key={service.id} 
-                      onClick={() => !inBasket && handleAddToBasket(service)}
-                      className={`bg-white rounded-2xl p-4 border-2 transition-all cursor-pointer relative overflow-hidden group ${
-                        inBasket 
-                          ? 'border-primary-400 ring-4 ring-primary-50 shadow-md bg-primary-50/30' 
-                          : 'border-surface-100 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1'
-                      }`}
-                    >
-                      {inBasket && (
-                        <div className="absolute top-0 right-0 bg-primary-500 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg z-10">
-                          مضافة
-                        </div>
-                      )}
-                      <div className="flex flex-col h-full gap-3">
-                        <div className="flex-1">
-                          <p className="text-[10px] font-bold text-primary-600 uppercase tracking-wider mb-1">
-                            {service.category?.nameAr || service.category?.name}
-                          </p>
-                          <h3 className="font-bold text-surface-900 text-sm leading-tight line-clamp-2">
-                            {service.nameAr || service.name}
-                          </h3>
-                        </div>
-                        <div className="flex items-end justify-between mt-auto pt-2 border-t border-surface-50">
-                          <div className="flex items-baseline gap-1 text-primary-700">
-                            <span className="text-lg font-black">{price.toLocaleString()}</span>
-                            <span className="text-xs font-bold">ج.م</span>
-                          </div>
-                          {!inBasket && (
-                            <div className="w-8 h-8 rounded-full bg-surface-100 flex items-center justify-center text-surface-500 group-hover:bg-primary-500 group-hover:text-white transition-colors">
-                              <Plus className="w-5 h-5" />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
         </div>
       </div>
     </div>
