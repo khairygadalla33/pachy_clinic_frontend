@@ -178,11 +178,11 @@ export default function Appointments() {
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 relative w-full">
         {/* Right Side (Buttons + Doctor Filter) */}
         <div className="flex items-center gap-3 shrink-0">
-          <button onClick={() => handleAddNew(new Date())} className="btn-primary whitespace-nowrap">
-            <Plus className="w-4 h-4 mr-2" /> موعد جديد
+          <button onClick={() => handleAddNew(new Date())} className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm text-white bg-[#6b4c9a] hover:opacity-90 transition-opacity whitespace-nowrap">
+            <CalendarIcon className="w-4 h-4 ml-2" /> حجز موعد جديد
           </button>
-          <button onClick={() => { setIsWalkIn(true); setShowModal(true); }} className="btn-secondary whitespace-nowrap hidden sm:flex">
-            <Plus className="w-4 h-4 mr-2" /> Walk-in
+          <button onClick={() => { setIsWalkIn(true); setShowModal(true); }} className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm text-white bg-[#c0389f] hover:opacity-90 transition-opacity whitespace-nowrap hidden sm:flex">
+            <Plus className="w-4 h-4 ml-2" /> مريض بدون موعد
           </button>
           
           {/* Doctor Filter */}
