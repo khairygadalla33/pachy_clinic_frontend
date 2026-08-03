@@ -10,7 +10,7 @@ import { formatCurrency } from '../lib/utils';
 
 export default function Services() {
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState('');
+  const [activeTab, setActiveTab] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -51,9 +51,9 @@ export default function Services() {
     }
   });
 
-  // Default active tab to first category
+  // Default active tab to 'all'
   if (categories && categories.length > 0 && !activeTab) {
-    setActiveTab(categories[0].id);
+    setActiveTab('all');
   }
 
   // Mutations
@@ -80,7 +80,7 @@ export default function Services() {
     }
   });
 
-  const filteredServices = services?.filter((s: any) => s.categoryId === activeTab) || [];
+  const filteredServices = services?.filter((s: any) => activeTab === 'all' || s.categoryId === activeTab) || [];
 
   const handleEdit = (service: any) => {
     setEditingId(service.id);
@@ -182,8 +182,18 @@ export default function Services() {
       {categoriesLoading ? (
         <LoadingSkeleton rows={1} />
       ) : (
-        <div className="border-b border-surface-200 dark:border-surface-700">
-          <nav className="-mb-px flex space-x-8 space-x-reverse">
+        <div className="border-b border-surface-200 dark:border-surface-700 overflow-x-auto">
+          <nav className="-mb-px flex space-x-8 space-x-reverse whitespace-nowrap px-2">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`${
+                activeTab === 'all'
+                  ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                  : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+            >
+              الكل
+            </button>
             {categories?.map((category: any) => (
               <button
                 key={category.id}
