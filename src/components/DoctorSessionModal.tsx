@@ -137,7 +137,10 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
         <div className="flex-1 flex flex-col min-w-0 bg-surface-50">
           
           {/* ═══════════ HEADER ═══════════ */}
-          <div className="px-4 py-2 border-b border-primary-700 bg-primary-600 flex-shrink-0 text-white rounded-tr-2xl">
+          <div 
+            className="px-4 py-2 border-b flex-shrink-0 text-white rounded-tr-2xl" 
+            style={{ backgroundColor: '#c0389f', borderColor: '#c0389f' }}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {/* Patient Avatar */}
