@@ -83,7 +83,7 @@ export default function WorkflowCardsPanel({ items, isLoading, onCardClick, acti
                       {item.stage === 'IN_SESSION' ? 'في الجلسة' : 'في الانتظار'}
                     </span>
                     {item.stage === 'WAITING' && item.queuePosition > 0 && (
-                      <span className="text-sm font-black text-red-600 bg-red-50 px-2 py-0.5 rounded shadow-sm">
+                      <span className="text-lg mt-1 font-black text-red-600 bg-red-50 px-2.5 py-0.5 rounded-lg shadow-sm border border-red-100">
                         #{item.queuePosition}
                       </span>
                     )}

@@ -102,14 +102,14 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
                         className={`flex-shrink-0 w-64 p-4 rounded-xl border-2 shadow-sm transition-all ${stageColors[item.stage]}`}
                       >
                         {/* Header */}
-                        <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-bold text-surface-900 truncate pr-2">{item.client?.fullName}</h4>
+                        <div className="flex items-start justify-between mb-1">
+                          <h4 className="font-bold text-surface-900 truncate pr-2 pt-1">{item.client?.fullName}</h4>
                           <div className="flex flex-col items-center gap-1">
                             <span className={`text-xs font-bold px-2 py-1 rounded-md bg-white/50 ${stageTextColors[item.stage]}`}>
                               {stageLabels[item.stage]}
                             </span>
                             {item.stage === 'WAITING' && item.queuePosition > 0 && (
-                              <span className="text-sm font-black text-red-600 bg-white/80 px-2 py-0.5 rounded shadow-sm">
+                              <span className="text-lg mt-1 font-black text-red-600 bg-white/90 px-2.5 py-0.5 rounded-lg shadow-sm border border-red-100">
                                 #{item.queuePosition}
                               </span>
                             )}
@@ -117,7 +117,7 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
                         </div>
 
                         {/* Details */}
-                        <div className="space-y-1.5 mb-3">
+                        <div className="space-y-1 mb-3">
                           <div className="flex items-center gap-1.5 text-xs text-surface-600">
                             <Phone className="w-3.5 h-3.5" />
                             <span>{item.client?.phone || 'لا يوجد هاتف'}</span>
