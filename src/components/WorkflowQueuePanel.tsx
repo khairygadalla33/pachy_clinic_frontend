@@ -151,8 +151,16 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
                           {item.stage === 'IN_SESSION' && (
                             <button onClick={() => onAction(item.id, 'end-session')} className="px-2 py-1 text-xs font-medium bg-blue-500 text-white rounded hover:bg-blue-600">إنهاء الجلسة</button>
                           )}
-                          {item.stage === 'PENDING_CHECKOUT' && onCheckout && (
-                            <button onClick={() => onCheckout(item)} className="px-2 py-1 text-xs font-medium bg-surface-900 text-white rounded hover:bg-black">الدفع</button>
+                          
+                          {['ARRIVED', 'WAITING', 'IN_SESSION', 'PENDING_CHECKOUT'].includes(item.stage) && onCheckout && (
+                            <button 
+                              onClick={() => onCheckout(item)} 
+                              className={`px-2 py-1 text-xs font-medium rounded ${item.appointment?.invoices?.[0]?.status === 'PAID' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200 hover:bg-emerald-200' : 'bg-surface-900 text-white hover:bg-black'}`}
+                            >
+                              {item.appointment?.invoices?.[0]?.status === 'PAID' 
+                                ? (item.stage === 'PENDING_CHECKOUT' ? 'خالص (إنهاء)' : 'خالص') 
+                                : 'التسوية'}
+                            </button>
                           )}
 
                           <button onClick={() => onViewClient(item.clientId)} className="px-2 py-1 text-xs font-medium bg-white border border-surface-200 rounded hover:bg-surface-50 flex items-center">
