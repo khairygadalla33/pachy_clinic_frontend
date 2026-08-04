@@ -514,13 +514,13 @@ export default function AppointmentPOSModal({
             <div className="space-y-3 mb-4 text-sm font-medium text-surface-600">
               {/* 1. Subtotal */}
               <div className="flex justify-between items-center text-surface-600">
-                <span>الإجمالي (Total):</span>
+                <span>الإجمالي:</span>
                 <span className="font-bold">{subTotal.toLocaleString()} ج.م</span>
               </div>
 
               {/* 2. Discount */}
               <div className="flex items-center justify-between text-surface-600">
-                <span>الخصم (Discount):</span>
+                <span>الخصم:</span>
                 <div className="flex items-center gap-1">
                   <select 
                     className="input-field py-1 pl-6 pr-2 w-28 h-8 text-sm"
@@ -543,13 +543,13 @@ export default function AppointmentPOSModal({
               
               {/* 3. Account / Net Total */}
               <div className="flex justify-between items-center text-[#c0389f] font-bold border-t border-surface-100 pt-2">
-                <span>الحساب (Net):</span>
+                <span>الحساب:</span>
                 <span>{netAccount.toLocaleString()} ج.م</span>
               </div>
 
               {/* 4. Paid / Deposit (Merged) */}
               <div className="flex items-center justify-between text-emerald-600 pb-2 border-b border-surface-100">
-                <span>المدفوع (Paid):</span>
+                <span>المدفوع:</span>
                 <div className="flex items-center gap-1">
                   <select 
                     className="input-field py-1 pl-6 pr-2 w-28 h-8 text-sm"
@@ -574,7 +574,7 @@ export default function AppointmentPOSModal({
 
               {/* 5. Remaining */}
               <div className="flex justify-between items-center pt-1 text-[#c0389f]">
-                <span className="font-bold text-base">المتبقي (Remaining):</span>
+                <span className="font-bold text-base">المتبقي:</span>
                 <span className="font-black text-xl">{remaining.toLocaleString()} ج.م</span>
               </div>
             </div>
