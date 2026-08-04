@@ -297,16 +297,16 @@ export default function Services() {
                   {service.pricings?.length > 0 ? (
                     <div className="space-y-2">
                       {service.pricings.map((p: any, i: number) => (
-                        <div key={i} className="flex items-center justify-start text-sm p-2 bg-surface-50 dark:bg-surface-800 rounded-md">
-                          <span className="font-medium">{p.bodyArea || 'أساسي'}</span>
-                          <div className="flex items-center gap-2">
+                        <div key={i} className="grid grid-cols-3 items-center text-sm p-2 bg-surface-50 dark:bg-surface-800 rounded-md gap-2">
+                          <span className="font-medium text-start truncate" title={p.bodyArea || 'أساسي'}>{p.bodyArea || 'أساسي'}</span>
+                          <div className="flex justify-center">
                             {getPricingBadge(p.pricingModel)}
-                            <span className="font-bold">
-                              {p.pricingModel === 'PER_PULSE' 
-                                ? `${formatCurrency(p.pricePerPulse)}/نبضة` 
-                                : formatCurrency(p.price)}
-                            </span>
                           </div>
+                          <span className="font-bold text-end text-primary-600 dark:text-primary-400 whitespace-nowrap">
+                            {p.pricingModel === 'PER_PULSE' 
+                              ? `${formatCurrency(p.pricePerPulse)}/نبضة` 
+                              : formatCurrency(p.price)}
+                          </span>
                         </div>
                       ))}
                     </div>
