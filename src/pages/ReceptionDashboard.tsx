@@ -111,6 +111,7 @@ export default function ReceptionDashboard() {
 
       {showPOS && (
         <AppointmentPOSModal 
+          isOpen={true}
           onClose={() => setShowPOS(false)}
           onSuccess={() => {
             setShowPOS(false);
