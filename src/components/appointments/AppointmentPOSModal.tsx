@@ -489,7 +489,7 @@ export default function AppointmentPOSModal({
                         <div className="relative">
                           <input 
                             type="number" 
-                            className="w-24 text-sm font-bold text-center border-[#c0389f] border-2 rounded-lg focus:ring-[#c0389f] focus:border-[#c0389f] py-1.5"
+                            className="w-24 text-sm font-bold text-center border-surface-200 rounded-lg focus:ring-primary-500 focus:border-primary-500 py-1.5"
                             value={item.unitPrice}
                             onChange={(e) => handleUpdatePrice(idx, Number(e.target.value))}
                           />
@@ -525,7 +525,7 @@ export default function AppointmentPOSModal({
                 <span>الخصم (Discount):</span>
                 <div className="flex items-center gap-1">
                   <select 
-                    className="input-field py-1 pl-6 pr-2 w-28 h-8 text-sm border-[#c0389f] border-2 focus:ring-[#c0389f] focus:border-[#c0389f]"
+                    className="input-field py-1 pl-6 pr-2 w-28 h-8 text-sm"
                     value={formData.discountType}
                     onChange={(e: any) => setFormData({ ...formData, discountType: e.target.value })}
                   >
@@ -536,7 +536,7 @@ export default function AppointmentPOSModal({
                     type="number" 
                     min="0"
                     placeholder="0"
-                    className="input-field py-1 px-2 w-20 text-center h-8 text-sm border-[#c0389f] border-2 focus:ring-[#c0389f] focus:border-[#c0389f]"
+                    className="input-field py-1 px-2 w-20 text-center h-8 text-sm"
                     value={formData.discountValue}
                     onChange={(e) => setFormData({ ...formData, discountValue: e.target.value })}
                   />
@@ -544,7 +544,7 @@ export default function AppointmentPOSModal({
               </div>
               
               {/* 3. Account / Net Total */}
-              <div className="flex justify-between items-center text-primary-700 font-bold border-t border-surface-100 pt-2">
+              <div className="flex justify-between items-center text-[#c0389f] font-bold border-t border-surface-100 pt-2">
                 <span>الحساب (Net):</span>
                 <span>{netAccount.toLocaleString()} ج.م</span>
               </div>
@@ -554,7 +554,7 @@ export default function AppointmentPOSModal({
                 <span>المدفوع (Paid):</span>
                 <div className="flex items-center gap-1">
                   <select 
-                    className="input-field py-1 pl-6 pr-2 w-28 h-8 text-sm border-[#c0389f] border-2 focus:ring-[#c0389f] focus:border-[#c0389f]"
+                    className="input-field py-1 pl-6 pr-2 w-28 h-8 text-sm"
                     value={formData.depositMethod}
                     onChange={(e: any) => setFormData({ ...formData, depositMethod: e.target.value })}
                   >
@@ -567,7 +567,7 @@ export default function AppointmentPOSModal({
                     type="number" 
                     min="0"
                     placeholder="0"
-                    className="input-field py-1 px-2 w-20 text-center h-8 text-sm font-bold text-emerald-700 border-[#c0389f] border-2 focus:ring-[#c0389f] focus:border-[#c0389f]"
+                    className="input-field py-1 px-2 w-20 text-center h-8 text-sm font-bold text-emerald-700"
                     value={formData.depositAmount}
                     onChange={(e) => setFormData({ ...formData, depositAmount: e.target.value })}
                   />
@@ -575,9 +575,9 @@ export default function AppointmentPOSModal({
               </div>
 
               {/* 5. Remaining */}
-              <div className="flex justify-between items-center pt-1">
-                <span className="text-[#c0389f] font-bold text-base">المتبقي (Remaining):</span>
-                <span className="text-[#c0389f] font-black text-xl">{remaining.toLocaleString()} ج.م</span>
+              <div className="flex justify-between items-center pt-1 text-[#c0389f]">
+                <span className="font-bold text-base">المتبقي (Remaining):</span>
+                <span className="font-black text-xl">{remaining.toLocaleString()} ج.م</span>
               </div>
             </div>
             <div className="flex gap-2 mt-2">
@@ -591,7 +591,7 @@ export default function AppointmentPOSModal({
               <button 
                 onClick={handleSubmit} 
                 disabled={createMutation.isPending || !formData.clientId || !formData.staffId || basket.length === 0}
-                className="flex-1 bg-primary-600 hover:bg-primary-700 text-white py-2.5 text-base font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors"
+                className="flex-1 bg-[#c0389f] hover:bg-[#a62c88] text-white py-2.5 text-base font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors"
               >
                 {createMutation.isPending ? 'جاري التنفيذ...' : (isWalkIn ? 'تسجيل كزيارة مباشرة' : 'تأكيد وحجز الموعد')}
               </button>
