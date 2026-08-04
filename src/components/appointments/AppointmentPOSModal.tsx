@@ -400,7 +400,7 @@ export default function AppointmentPOSModal({
 
 
           {/* Fixed Meta: Client & Doctor */}
-          <div className="p-4 border-b border-surface-200 bg-white grid grid-cols-2 gap-3 shrink-0">
+          <div className="p-4 bg-white grid grid-cols-2 gap-3 shrink-0 pb-0">
             <div>
               <label className="block text-xs font-bold text-surface-700 mb-1.5 flex items-center gap-1.5">
                 <User className="w-3.5 h-3.5 text-primary-500" /> العميل <span className="text-red-500">*</span>
