@@ -285,11 +285,12 @@ export default function AppointmentPOSModal({
             <nav className="-mb-px flex space-x-8 space-x-reverse whitespace-nowrap px-5">
               <button
                 onClick={() => setActiveCategory('ALL')}
-                className={`${
+                style={activeCategory === 'ALL' ? { borderBottomColor: '#6b4c9a', color: '#6b4c9a' } : {}}
+                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeCategory === 'ALL'
-                    ? 'border-b-[#6b4c9a] text-[#6b4c9a]'
+                    ? ''
                     : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'
-                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                }`}
               >
                 الكل
               </button>
@@ -297,11 +298,12 @@ export default function AppointmentPOSModal({
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
-                  className={`${
+                  style={activeCategory === cat.id ? { borderBottomColor: '#6b4c9a', color: '#6b4c9a' } : {}}
+                  className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                     activeCategory === cat.id
-                      ? 'border-b-[#6b4c9a] text-[#6b4c9a]'
+                      ? ''
                       : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'
-                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                  }`}
                 >
                   {cat.nameAr || cat.name}
                 </button>
