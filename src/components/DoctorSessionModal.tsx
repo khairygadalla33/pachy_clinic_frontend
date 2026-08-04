@@ -71,8 +71,9 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
     return sum + price;
   }, 0);
 
-  const depositAmount = Number(appointment?.depositAmount || 0);
-  const remainingAmount = Math.max(0, totalCost - depositAmount);
+  const previousPayments = (appointment?.invoices || []).flatMap((inv: any) => inv.payments || []).reduce((sum: number, p: any) => sum + Number(p.amount || 0), 0);
+  const totalPaidSoFar = previousPayments > 0 ? previousPayments : Number(appointment?.depositAmount || 0);
+  const remainingAmount = Math.max(0, totalCost - totalPaidSoFar);
 
   const handleAddService = async () => {
     if (!selectedNewService) return;
@@ -90,6 +91,8 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
     }
   };
 
+  const isEditMode = queueItem?.stage === 'COMPLETED' || queueItem?.stage === 'PENDING_CHECKOUT';
+
   const handleFinish = async () => {
     try {
       setIsSubmitting(true);
@@ -104,10 +107,8 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
         const prescriptions = presRes.data;
         if (prescriptions && prescriptions.length > 0) {
            const latestPrescription = prescriptions[0]; // ordered by createdAt desc
-           if (!latestPrescription.sentViaWhatsApp) {
-             await api.post(`/prescriptions/${latestPrescription.id}/send-whatsapp`);
-             toast.success('تم إرسال الروشتة عبر الواتساب بنجاح');
-           }
+           await api.post(`/prescriptions/${latestPrescription.id}/send-whatsapp`);
+           toast.success('تم إرسال الروشتة عبر الواتساب بنجاح');
         }
       } catch (err) {
         console.error('Failed to send WhatsApp', err);
@@ -115,12 +116,12 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
 
       await api.put(`/workflow/${queueItem.id}/end-session`);
       
-      toast.success('تم إنهاء الجلسة وتحويل المريض للاستقبال');
+      toast.success(isEditMode ? 'تم تحديث الزيارة وتحويلها للاستقبال للتسوية' : 'تم إنهاء الجلسة وتحويل المريض للاستقبال');
       onSessionComplete();
       onClose();
     } catch (error) {
       console.error(error);
-      toast.error('حدث خطأ أثناء إنهاء الجلسة');
+      toast.error('حدث خطأ أثناء إنهاء/تحديث الزيارة');
     } finally {
       setIsSubmitting(false);
     }
@@ -148,7 +149,14 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
                   {patient?.fullName?.substring(0, 2) || 'م'}
                 </div>
                 <div>
-                  <h2 className="text-sm font-bold text-white">{patient?.fullName}</h2>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-sm font-bold text-white">{patient?.fullName}</h2>
+                    {isEditMode && (
+                      <span className="px-2 py-0.5 text-[10px] font-bold bg-amber-400/90 text-amber-950 rounded-full shadow-sm">
+                        تعديل زيارة
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 text-[11px] text-white/90 mt-0.5">
                     <span className="font-mono font-medium">{patient?.fileNumber || 'بدون رقم ملف'}</span>
                     {patient?.age && (
@@ -366,7 +374,7 @@ export default function DoctorSessionModal({ queueItem, onClose, onSessionComple
                   ) : (
                     <CheckCircle className="w-4 h-4" />
                   )}
-                  إنهاء وتحويل للاستقبال
+                  {isEditMode ? 'تحديث وإرسال للاستقبال' : 'إنهاء وتحويل للاستقبال'}
                 </button>
               </div>
             </div>

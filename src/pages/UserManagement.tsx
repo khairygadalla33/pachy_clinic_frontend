@@ -18,6 +18,7 @@ export default function UserManagement() {
     fullName: '',
     email: '',
     password: '',
+    pinCode: '',
     role: 'RECEPTIONIST',
     branchId: '',
     phone: '',
@@ -65,6 +66,7 @@ export default function UserManagement() {
         fullName: user.fullName,
         email: user.email || '',
         password: '',
+        pinCode: user.pinCode || '',
         role: user.role,
         branchId: user.branchId || '',
         phone: user.phone || '',
@@ -77,6 +79,7 @@ export default function UserManagement() {
         fullName: '',
         email: '',
         password: '',
+        pinCode: '',
         role: 'RECEPTIONIST',
         branchId: branches[0]?.id || '',
         phone: '',
@@ -91,6 +94,7 @@ export default function UserManagement() {
     e.preventDefault();
     const payload: any = { ...formData };
     if (!payload.password) delete payload.password; // Don't send empty password
+    if (!payload.pinCode) delete payload.pinCode;
     if (payload.commissionRate) payload.commissionRate = Number(payload.commissionRate);
     
     if (editingUser) {
@@ -154,6 +158,7 @@ export default function UserManagement() {
               <tr className="border-b border-surface-200 dark:border-surface-700 text-surface-500">
                 <th className="pb-3 px-4 font-semibold">المستخدم</th>
                 <th className="pb-3 px-4 font-semibold">الدور</th>
+                <th className="pb-3 px-4 font-semibold">رمز PIN</th>
                 <th className="pb-3 px-4 font-semibold">الفرع</th>
                 <th className="pb-3 px-4 font-semibold">الحالة</th>
                 <th className="pb-3 px-4 font-semibold">آخر دخول</th>
@@ -162,9 +167,9 @@ export default function UserManagement() {
             </thead>
             <tbody className="divide-y divide-surface-100 dark:divide-surface-800">
               {isLoading ? (
-                <tr><td colSpan={6} className="text-center py-8 text-surface-500">جاري التحميل...</td></tr>
+                <tr><td colSpan={7} className="text-center py-8 text-surface-500">جاري التحميل...</td></tr>
               ) : filteredUsers.length === 0 ? (
-                <tr><td colSpan={6} className="text-center py-8 text-surface-500">لا يوجد مستخدمين مطابقين</td></tr>
+                <tr><td colSpan={7} className="text-center py-8 text-surface-500">لا يوجد مستخدمين مطابقين</td></tr>
               ) : (
                 filteredUsers.map((user: any) => (
                   <tr key={user.id} className="hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-colors">
@@ -181,6 +186,15 @@ export default function UserManagement() {
                     </td>
                     <td className="py-3 px-4">
                       <Badge variant={roleColors[user.role] || 'default'}>{translateStatus(user.role)}</Badge>
+                    </td>
+                    <td className="py-3 px-4">
+                      {user.pinCode ? (
+                        <span className="font-mono bg-purple-50 text-purple-700 px-2 py-0.5 rounded text-xs font-bold border border-purple-200">
+                          {user.pinCode}
+                        </span>
+                      ) : (
+                        <span className="text-surface-400 text-xs">غير محدد</span>
+                      )}
                     </td>
                     <td className="py-3 px-4 text-surface-600 dark:text-surface-300">
                       {user.branch ? (
@@ -201,7 +215,7 @@ export default function UserManagement() {
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center justify-center gap-2">
-                        <button onClick={() => handleOpenModal(user)} className="p-1 text-surface-400 hover:text-primary-600 transition-colors">
+                        <button onClick={() => handleOpenModal(user)} className="p-1 text-surface-400 hover:text-primary-600 transition-colors" title="تعديل">
                           <Edit className="w-4 h-4" />
                         </button>
                         <button 
@@ -211,6 +225,7 @@ export default function UserManagement() {
                             }
                           }} 
                           className={`p-1 transition-colors ${user.isActive ? 'text-surface-400 hover:text-rose-600' : 'text-rose-600 hover:text-rose-700'}`}
+                          title="تعطيل / تفعيل"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -238,6 +253,10 @@ export default function UserManagement() {
             <div>
               <label className="block text-sm font-medium mb-1">{editingUser ? 'كلمة المرور (اتركه فارغاً لعدم التغيير)' : 'كلمة المرور *'}</label>
               <input required={!editingUser} type="password" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="input-field w-full text-left" dir="ltr" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">رمز PIN (دخول سريع 4 أرقام)</label>
+              <input type="text" maxLength={6} placeholder="مثال: 1234" value={formData.pinCode} onChange={e => setFormData({...formData, pinCode: e.target.value})} className="input-field w-full text-left font-mono tracking-widest" dir="ltr" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">الدور *</label>

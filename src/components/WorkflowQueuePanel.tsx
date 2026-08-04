@@ -145,7 +145,7 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
                             </>
                           )}
                           {item.stage === 'WAITING' && (
-                            <button onClick={() => onAction(item.id, 'start-session')} className="px-2 py-1 text-xs font-medium bg-emerald-500 text-white rounded hover:bg-emerald-600">بدء الجلسة</button>
+                            <button onClick={() => onAction(item.id, 'start-session')} className="px-2 py-1 text-xs font-medium bg-emerald-500 text-white rounded hover:bg-emerald-600">دخول العيادة</button>
                           )}
                           {item.stage === 'IN_SESSION' && (
                             <button onClick={() => onAction(item.id, 'end-session')} className="px-2 py-1 text-xs font-medium bg-blue-500 text-white rounded hover:bg-blue-600">إنهاء الجلسة</button>

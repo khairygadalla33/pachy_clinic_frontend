@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Users, CheckCircle, Clock, Calendar, Activity } from 'lucide-react';
+import { Users, CheckCircle, Clock, Calendar, Activity, Edit3 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '../lib/api';
 import { useAuth } from '../lib/auth';
 import WorkflowCardsPanel from '../components/WorkflowCardsPanel';
@@ -10,6 +11,7 @@ export default function DoctorWorkstation() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const branchId = user?.branchId;
+  const activeDoctorId = user?.id;
 
   const [activeQueueItem, setActiveQueueItem] = useState<any | null>(null);
 
@@ -23,18 +25,33 @@ export default function DoctorWorkstation() {
 
   // History Polling
   const { data: historyItems, isLoading: isHistoryLoading } = useQuery({
-    queryKey: ['workflow-history', branchId, user?.id],
-    queryFn: () => api.get('/workflow/history/by-doctor', { params: { branchId, staffId: user?.id } }).then(r => r.data),
-    enabled: !!branchId && !!user?.id,
+    queryKey: ['workflow-history', branchId, activeDoctorId],
+    queryFn: () => api.get('/workflow/history/by-doctor', { params: { branchId, staffId: activeDoctorId } }).then(r => r.data),
+    enabled: !!branchId && !!activeDoctorId,
   });
 
-  // Filter queue for current doctor (if not admin)
-  const doctorQueue = queueItems?.flatMap((group: any) => group.items).filter((q: any) => {
+  // Filter and sort queue for logged-in doctor: IN_SESSION first (far right), then WAITING by arrival order
+  const doctorQueue = (queueItems?.flatMap((group: any) => group.items).filter((q: any) => {
     const validStatuses = ['ARRIVED', 'WAITING', 'IN_SESSION'];
     if (!validStatuses.includes(q.stage)) return false;
-    if (q.staffId !== user?.id) return false;
+    if (q.staffId !== activeDoctorId) return false;
     return true;
-  }) || [];
+  }) || []).sort((a: any, b: any) => {
+    // 1. IN_SESSION always comes first (at the far right in RTL)
+    if (a.stage === 'IN_SESSION' && b.stage !== 'IN_SESSION') return -1;
+    if (b.stage === 'IN_SESSION' && a.stage !== 'IN_SESSION') return 1;
+
+    // 2. For waiting / arrived patients: sort by queuePosition or arrival/waiting time
+    if (a.queuePosition && b.queuePosition) {
+      return a.queuePosition - b.queuePosition;
+    }
+    if (a.queuePosition) return -1;
+    if (b.queuePosition) return 1;
+
+    const timeA = new Date(a.waitingStartTime || a.arrivalTime || a.createdAt).getTime();
+    const timeB = new Date(b.waitingStartTime || b.arrivalTime || b.createdAt).getTime();
+    return timeA - timeB;
+  });
 
   // Derived KPI Stats
   const waitingCount = doctorQueue.filter((q: any) => q.stage === 'WAITING').length;
@@ -48,10 +65,71 @@ export default function DoctorWorkstation() {
 
   const handleCallClick = async (item: any) => {
     try {
-      await api.put(`/workflow/${item.id}/call`);
+      if (item.calledByDoctor) {
+        await api.put(`/workflow/${item.id}/cancel-call`);
+      } else {
+        await api.put(`/workflow/${item.id}/call`);
+      }
       queryClient.invalidateQueries({ queryKey: ['workflow-queue'] });
     } catch (err) {
-      console.error('Error calling patient:', err);
+      console.error('Error calling/cancelling patient call:', err);
+    }
+  };
+
+  const handleEndVisit = async (queueItem: any) => {
+    try {
+      const appointment = queueItem.appointment;
+
+      // 1. If not yet marked in session, start session
+      if (queueItem.stage !== 'IN_SESSION') {
+        await api.put(`/workflow/${queueItem.id}/start-session`);
+      }
+
+      // 2. Automatically send the latest prescription via WhatsApp if it exists and unsent
+      if (appointment?.id) {
+        try {
+          const presRes = await api.get('/prescriptions', { params: { appointmentId: appointment.id } });
+          const prescriptions = presRes.data;
+          if (prescriptions && prescriptions.length > 0) {
+            const latestPrescription = prescriptions[0];
+            if (!latestPrescription.sentViaWhatsApp) {
+              await api.post(`/prescriptions/${latestPrescription.id}/send-whatsapp`);
+              toast.success('تم إرسال الروشتة عبر الواتساب بنجاح');
+            }
+          }
+        } catch (err) {
+          console.error('Failed to send WhatsApp prescription:', err);
+        }
+      }
+
+      // 3. End session and transfer to reception
+      await api.put(`/workflow/${queueItem.id}/end-session`);
+      
+      toast.success('تم إنهاء الزيارة وتحويل المريض للاستقبال للتسوية');
+      queryClient.invalidateQueries({ queryKey: ['workflow-queue'] });
+      queryClient.invalidateQueries({ queryKey: ['workflow-history'] });
+      if (activeQueueItem?.id === queueItem.id) {
+        setActiveQueueItem(null);
+      }
+    } catch (error: any) {
+      console.error(error);
+      toast.error('حدث خطأ أثناء إنهاء الزيارة: ' + (error.response?.data?.message || ''));
+    }
+  };
+
+  const handleEditCompletedVisit = async (item: any) => {
+    try {
+      // Reopen visit back to active session
+      const res = await api.put(`/workflow/${item.id}/reopen`);
+      const reloadedItem = res.data;
+      setActiveQueueItem(reloadedItem);
+      queryClient.invalidateQueries({ queryKey: ['workflow-queue'] });
+      queryClient.invalidateQueries({ queryKey: ['workflow-history'] });
+      toast.success('تم إعادة فتح الزيارة للتعديل');
+    } catch (err: any) {
+      console.error('Failed to reopen visit:', err);
+      // Fallback: open modal directly with the item
+      setActiveQueueItem(item);
     }
   };
 
@@ -62,9 +140,6 @@ export default function DoctorWorkstation() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div className="flex justify-start items-center">
-      </div>
-
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-4 rounded-xl border border-surface-200 shadow-sm flex items-center gap-4">
@@ -114,6 +189,7 @@ export default function DoctorWorkstation() {
         isLoading={isQueueLoading} 
         onCardClick={handleCardClick}
         onCallClick={handleCallClick}
+        onEndSession={handleEndVisit}
         activeQueueId={activeQueueItem?.id}
       />
       
@@ -132,18 +208,19 @@ export default function DoctorWorkstation() {
                 <th className="px-6 py-4 border-b border-surface-200">رقم الهاتف</th>
                 <th className="px-6 py-4 border-b border-surface-200">الحالة</th>
                 <th className="px-6 py-4 border-b border-surface-200">وقت الانتهاء</th>
+                <th className="px-6 py-4 border-b border-surface-200 text-center">الإجراءات</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-100">
               {isHistoryLoading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-surface-400">
+                  <td colSpan={6} className="px-6 py-8 text-center text-surface-400">
                     جاري تحميل السجل...
                   </td>
                 </tr>
               ) : historyItems?.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-surface-400">
+                  <td colSpan={6} className="px-6 py-8 text-center text-surface-400">
                     لم تقم بإنهاء أي جلسات اليوم.
                   </td>
                 </tr>
@@ -160,6 +237,16 @@ export default function DoctorWorkstation() {
                     </td>
                     <td className="px-6 py-4 text-surface-500">
                       {new Date(item.updatedAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => handleEditCompletedVisit(item)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-primary-700 bg-primary-50 hover:bg-primary-100 border border-primary-200 rounded-lg transition-colors shadow-sm cursor-pointer"
+                        title="إعادة فتح وتعديل الزيارة"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>تعديل الزيارة</span>
+                      </button>
                     </td>
                   </tr>
                 ))
