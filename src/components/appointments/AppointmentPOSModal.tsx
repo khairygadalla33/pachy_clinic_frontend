@@ -618,7 +618,10 @@ export default function AppointmentPOSModal({
                 return (
                   <div 
                     key={pricing.id}
-                    className={`flex items-center gap-2 p-3 border-b border-surface-100 last:border-0 rounded-lg mb-1 ${inBasket ? 'bg-primary-50/50' : 'hover:bg-surface-50'}`}
+                    onClick={() => {
+                      if (!inBasket) handleAddToBasket(pricingModalService, pricing);
+                    }}
+                    className={`flex items-center gap-2 p-3 border-b border-surface-100 last:border-0 rounded-lg mb-1 cursor-pointer transition-colors ${inBasket ? 'bg-primary-50/50' : 'hover:bg-surface-50'}`}
                   >
                     <p className="font-bold text-surface-900 text-sm flex-1 text-start truncate" title={pricing.bodyArea || pricing.nameAr || pricing.name || 'أساسي'}>
                       {pricing.bodyArea || pricing.nameAr || pricing.name || 'أساسي'}
