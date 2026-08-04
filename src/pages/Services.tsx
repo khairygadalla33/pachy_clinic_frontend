@@ -253,7 +253,7 @@ export default function Services() {
                     {/* Toggle Switch */}
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-bold text-surface-500 uppercase tracking-wider">
-                        {service.isActive ? 'Active ✅' : 'Non-Active ❌'}
+                        {service.isActive ? 'Active' : 'Non-Active'}
                       </span>
                       <button
                         type="button"
