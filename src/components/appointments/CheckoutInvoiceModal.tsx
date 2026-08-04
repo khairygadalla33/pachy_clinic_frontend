@@ -174,7 +174,6 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
                     className="input-field py-2 px-3 h-[46px] w-full text-base font-bold bg-white"
                     value={paymentMethod}
                     onChange={(e: any) => setPaymentMethod(e.target.value)}
-                    disabled={parsedCollected <= 0}
                   >
                     <option value="CASH">نقدي (الخزينة)</option>
                     <option value="CARD">بطاقة (شبكة)</option>
