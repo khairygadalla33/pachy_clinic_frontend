@@ -120,6 +120,7 @@ export default function ReceptionDashboard() {
             queryClient.invalidateQueries({ queryKey: ['appointments-upcoming'] });
           }}
           isWalkIn={isWalkInPOS}
+          branchId={branchId}
         />
       )}
 
