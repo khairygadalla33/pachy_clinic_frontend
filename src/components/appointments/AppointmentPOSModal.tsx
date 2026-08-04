@@ -415,7 +415,7 @@ export default function AppointmentPOSModal({
                 <User className="w-3.5 h-3.5 text-purple-500" /> الطبيب المعالج <span className="text-red-500">*</span>
               </label>
               <select 
-                className="input-field text-sm font-medium bg-surface-50 border-surface-200"
+                className="input-field text-sm font-medium bg-surface-50 border-surface-200 h-8 py-1"
                 required
                 value={formData.staffId}
                 onChange={e => setFormData({ ...formData, staffId: e.target.value })}
@@ -438,7 +438,7 @@ export default function AppointmentPOSModal({
                   <div className="relative">
                     <input 
                       type="date"
-                      className="input-field text-sm font-medium w-full pr-10 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:left-auto [&::-webkit-calendar-picker-indicator]:w-10 [&::-webkit-calendar-picker-indicator]:h-full"
+                      className="input-field text-sm font-medium w-full h-8 py-1 pr-10 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:left-auto [&::-webkit-calendar-picker-indicator]:w-10 [&::-webkit-calendar-picker-indicator]:h-full"
                       required
                       value={formData.scheduledDate}
                       onChange={e => setFormData({ ...formData, scheduledDate: e.target.value })}
@@ -450,7 +450,7 @@ export default function AppointmentPOSModal({
                   <div className="relative">
                     <input 
                       type="time"
-                      className="input-field text-sm font-medium w-full pr-10 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:left-auto [&::-webkit-calendar-picker-indicator]:w-10 [&::-webkit-calendar-picker-indicator]:h-full"
+                      className="input-field text-sm font-medium w-full h-8 py-1 pr-10 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:left-auto [&::-webkit-calendar-picker-indicator]:w-10 [&::-webkit-calendar-picker-indicator]:h-full"
                       required
                       value={formData.startTime}
                       onChange={e => setFormData({ ...formData, startTime: e.target.value })}

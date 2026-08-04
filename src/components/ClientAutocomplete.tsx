@@ -16,7 +16,7 @@ interface ClientAutocompleteProps {
   className?: string;
 }
 
-export default function ClientAutocomplete({ onSelect, placeholder = 'البحث عن عميل (اسم أو هاتف)...', className = '' }: ClientAutocompleteProps) {
+export default function ClientAutocomplete({ onSelect, placeholder = 'اختر العميل', className = '' }: ClientAutocompleteProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ClientOption[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -70,10 +70,9 @@ export default function ClientAutocomplete({ onSelect, placeholder = 'البحث
   return (
     <div className={`relative ${className}`} ref={wrapperRef}>
       <div className="relative">
-        <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 w-5 h-5" />
         <input
           type="text"
-          className="w-full pl-10 pr-10 py-2 rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800 text-surface-900 dark:text-surface-100 focus:ring-2 focus:ring-primary-500 transition-shadow"
+          className="w-full pl-10 pr-3 h-8 py-1 text-sm rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800 text-surface-900 dark:text-surface-100 focus:ring-2 focus:ring-primary-500 transition-shadow"
           placeholder={placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
