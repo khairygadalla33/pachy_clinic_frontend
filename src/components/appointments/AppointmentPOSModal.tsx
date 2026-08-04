@@ -489,7 +489,7 @@ export default function AppointmentPOSModal({
                         <div className="relative">
                           <input 
                             type="number" 
-                            className="w-24 text-sm font-bold text-center border-surface-200 rounded-lg focus:ring-primary-500 focus:border-primary-500 py-1.5"
+                            className="w-24 text-sm font-bold text-center border-[#c0389f] border-2 rounded-lg focus:ring-[#c0389f] focus:border-[#c0389f] py-1.5"
                             value={item.unitPrice}
                             onChange={(e) => handleUpdatePrice(idx, Number(e.target.value))}
                           />
@@ -525,7 +525,7 @@ export default function AppointmentPOSModal({
                 <span>الخصم (Discount):</span>
                 <div className="flex items-center gap-1">
                   <select 
-                    className="input-field py-1 pl-6 pr-2 w-28 h-8 text-sm"
+                    className="input-field py-1 pl-6 pr-2 w-28 h-8 text-sm border-[#c0389f] border-2 focus:ring-[#c0389f] focus:border-[#c0389f]"
                     value={formData.discountType}
                     onChange={(e: any) => setFormData({ ...formData, discountType: e.target.value })}
                   >
@@ -536,7 +536,7 @@ export default function AppointmentPOSModal({
                     type="number" 
                     min="0"
                     placeholder="0"
-                    className="input-field py-1 px-2 w-20 text-center h-8 text-sm"
+                    className="input-field py-1 px-2 w-20 text-center h-8 text-sm border-[#c0389f] border-2 focus:ring-[#c0389f] focus:border-[#c0389f]"
                     value={formData.discountValue}
                     onChange={(e) => setFormData({ ...formData, discountValue: e.target.value })}
                   />
@@ -554,7 +554,7 @@ export default function AppointmentPOSModal({
                 <span>المدفوع (Paid):</span>
                 <div className="flex items-center gap-1">
                   <select 
-                    className="input-field py-1 pl-6 pr-2 w-28 h-8 text-sm"
+                    className="input-field py-1 pl-6 pr-2 w-28 h-8 text-sm border-[#c0389f] border-2 focus:ring-[#c0389f] focus:border-[#c0389f]"
                     value={formData.depositMethod}
                     onChange={(e: any) => setFormData({ ...formData, depositMethod: e.target.value })}
                   >
@@ -567,7 +567,7 @@ export default function AppointmentPOSModal({
                     type="number" 
                     min="0"
                     placeholder="0"
-                    className="input-field py-1 px-2 w-20 text-center h-8 text-sm font-bold text-emerald-700"
+                    className="input-field py-1 px-2 w-20 text-center h-8 text-sm font-bold text-emerald-700 border-[#c0389f] border-2 focus:ring-[#c0389f] focus:border-[#c0389f]"
                     value={formData.depositAmount}
                     onChange={(e) => setFormData({ ...formData, depositAmount: e.target.value })}
                   />
@@ -576,8 +576,8 @@ export default function AppointmentPOSModal({
 
               {/* 5. Remaining */}
               <div className="flex justify-between items-center pt-1">
-                <span className="text-red-600 font-bold text-base">المتبقي (Remaining):</span>
-                <span className="text-red-600 font-black text-xl">{remaining.toLocaleString()} ج.م</span>
+                <span className="text-[#c0389f] font-bold text-base">المتبقي (Remaining):</span>
+                <span className="text-[#c0389f] font-black text-xl">{remaining.toLocaleString()} ج.م</span>
               </div>
             </div>
             <div className="flex gap-2 mt-2">
