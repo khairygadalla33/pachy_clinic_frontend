@@ -164,7 +164,7 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
             </div>
 
             {/* --- BOTTOM PANEL FOR COLLECTION & DEBT --- */}
-            <div className="bg-surface-50 border border-surface-200 rounded-xl p-3 mb-3 flex flex-wrap md:flex-nowrap justify-center gap-8">
+            <div className="bg-surface-50 border border-surface-200 rounded-xl p-3 mb-3 flex flex-wrap md:flex-nowrap justify-between items-center gap-4">
               
               {/* 1. Payment Method (حساب التحصيل) */}
               <div className="flex flex-col gap-1 w-full md:w-36 shrink-0">
