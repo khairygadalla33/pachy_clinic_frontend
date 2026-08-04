@@ -480,7 +480,6 @@ export default function AppointmentPOSModal({
                           {item.service.nameAr || item.service.name}
                           {item.pricingName && <span className="text-primary-600 mr-1 text-xs">({item.pricingName})</span>}
                         </p>
-                        <p className="text-xs text-surface-500">{item.service.category?.nameAr}</p>
                       </div>
                       
                       <div className="flex items-center gap-3">
