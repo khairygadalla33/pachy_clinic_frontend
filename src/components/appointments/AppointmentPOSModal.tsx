@@ -542,7 +542,7 @@ export default function AppointmentPOSModal({
               </div>
               
               {/* 3. Account / Net Total */}
-              <div className="flex justify-between items-center text-[#c0389f] font-bold border-t border-surface-100 pt-2">
+              <div className="flex justify-between items-center text-[#c0389f] font-bold">
                 <span>الحساب:</span>
                 <span>{netAccount.toLocaleString()} ج.م</span>
               </div>
