@@ -16,7 +16,8 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [paymentMethod, setPaymentMethod] = useState('CASH');
-  const [discount, setDiscount] = useState(0);
+  const [discountType, setDiscountType] = useState<'value' | 'percentage'>('value');
+  const [discountValue, setDiscountValue] = useState<number | string>('');
 
   useEffect(() => {
     if (queueItem?.appointmentId) {
@@ -37,10 +38,15 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
   const handleCheckout = async () => {
     try {
       setIsSubmitting(true);
+      const parsedDiscount = Number(discountValue) || 0;
+      const finalDiscount = discountType === 'percentage'
+        ? (settlement.subTotal * (parsedDiscount / 100))
+        : parsedDiscount;
+
       // We process checkout by ending the workflow explicitly with payment details
       await api.put(`/workflow/${queueItem.id}/checkout`, {
         paymentMethod,
-        discount
+        discount: finalDiscount
       });
       toast.success('تم تسوية الفاتورة بنجاح');
       onSuccess();
@@ -52,8 +58,17 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
     }
   };
 
-  const netTotalAfterDiscount = settlement ? (settlement.subTotal - settlement.deposit - discount) : 0;
-  const finalTotal = netTotalAfterDiscount < 0 ? 0 : netTotalAfterDiscount;
+  const parsedDiscountVal = Number(discountValue) || 0;
+  const calculatedDiscount = discountType === 'percentage' 
+    ? ((settlement?.subTotal || 0) * (parsedDiscountVal / 100)) 
+    : parsedDiscountVal;
+
+  const subTotal = settlement?.subTotal || 0;
+  const deposit = settlement?.deposit || 0;
+  
+  const netAccount = subTotal - calculatedDiscount;
+  const remainingCalc = netAccount - deposit;
+  const remaining = remainingCalc < 0 ? 0 : remainingCalc;
 
   return (
     <Modal isOpen={!!queueItem} onClose={onClose} title="تسوية فاتورة العميل" maxWidth="max-w-3xl">
@@ -96,85 +111,91 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
             </div>
           </div>
 
-          {/* Totals */}
-          <div className="bg-surface-50 p-4 rounded-xl space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-surface-600">الإجمالي (قبل الخصم والدفعة المقدمة):</span>
-              <span className="font-medium">{settlement?.subTotal} ر.س</span>
-            </div>
-            
-            {settlement?.deposit > 0 && (
-              <div className="flex justify-between text-sm text-emerald-600">
-                <span>دفعة مقدمة (مخصومة):</span>
-                <span>- {settlement?.deposit} ر.س</span>
+          {/* Totals & Submit */}
+          <div className="p-4 border-t border-surface-200 bg-white shrink-0">
+            <div className="space-y-2 mb-4 text-sm font-medium text-surface-600">
+              {/* 1. Subtotal */}
+              <div className="flex justify-between items-center text-surface-600">
+                <span>الإجمالي:</span>
+                <span className="font-bold">{subTotal.toLocaleString()} ج.م</span>
               </div>
-            )}
 
-            <div className="flex items-center justify-between text-sm py-2 border-y border-surface-200 my-2">
-              <span className="text-surface-600">الخصم الإضافي (إن وجد):</span>
-              <div className="flex items-center gap-2">
-                <input 
-                  type="number" 
-                  min="0"
-                  max={settlement?.subTotal}
-                  className="input-field py-1 text-left w-24" 
-                  value={discount} 
-                  onChange={e => setDiscount(Number(e.target.value))} 
-                />
-                <span>ر.س</span>
+              {/* 2. Discount */}
+              <div className="flex items-center justify-between text-surface-600">
+                <span>الخصم:</span>
+                <div className="flex items-center gap-1">
+                  <select 
+                    className="input-field py-1 pl-6 pr-2 w-28 h-8 text-sm"
+                    value={discountType}
+                    onChange={(e: any) => setDiscountType(e.target.value)}
+                  >
+                    <option value="value">قيمة</option>
+                    <option value="percentage">% نسبة</option>
+                  </select>
+                  <input 
+                    type="number" 
+                    min="0"
+                    placeholder="0"
+                    className="input-field py-1 px-2 w-20 text-center h-8 text-sm"
+                    value={discountValue}
+                    onChange={(e) => setDiscountValue(e.target.value)}
+                  />
+                </div>
               </div>
+              
+              {/* 3. Account / Net Total */}
+              <div className="flex justify-between items-center text-[#c0389f] font-bold">
+                <span>الصافي بعد الخصم:</span>
+                <span>{netAccount.toLocaleString()} ج.م</span>
+              </div>
+
+              {/* 4. Paid / Deposit */}
+              <div className="flex justify-between items-center text-emerald-600">
+                <span>المدفوع (دفعة مقدمة):</span>
+                <span>{deposit.toLocaleString()} ج.م</span>
+              </div>
+
+              {/* 5. Remaining */}
+              <div className="flex justify-center items-center gap-2 text-[#c0389f]">
+                <span className="font-bold text-base">المتبقي:</span>
+                <span className="font-black text-xl">{remaining.toLocaleString()} ج.م</span>
+              </div>
+
+              {/* 6. Payment Method for Remaining */}
+              {remaining > 0 && (
+                <div className="flex items-center justify-between text-surface-600 pt-2 border-t border-surface-100">
+                  <span>طريقة الدفع للمتبقي:</span>
+                  <select 
+                    className="input-field py-1 pl-6 pr-2 w-40 h-8 text-sm font-bold"
+                    value={paymentMethod}
+                    onChange={(e: any) => setPaymentMethod(e.target.value)}
+                  >
+                    <option value="CASH">نقدي</option>
+                    <option value="CARD">بطاقة (شبكة)</option>
+                    <option value="INSTAPAY">إنستاباي</option>
+                    <option value="E_WALLET">محفظة إلكترونية</option>
+                  </select>
+                </div>
+              )}
             </div>
 
-            <div className="flex justify-between text-lg font-bold text-primary-700 pt-2">
-              <span>المطلوب سداده:</span>
-              <span>{finalTotal} ر.س</span>
-            </div>
-          </div>
-
-          {/* Payment Method */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-bold text-surface-900">طريقة الدفع</h3>
-            <div className="grid grid-cols-2 gap-3">
-              <button
+            <div className="flex gap-2 mt-2">
+              <button 
                 type="button"
-                onClick={() => setPaymentMethod('CASH')}
-                className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all ${
-                  paymentMethod === 'CASH'
-                    ? 'border-primary-500 bg-primary-50 text-primary-700'
-                    : 'border-surface-200 bg-white text-surface-600 hover:border-primary-200'
-                }`}
+                onClick={onClose}
+                disabled={isSubmitting}
+                className="px-5 py-2 bg-surface-100 hover:bg-surface-200 text-surface-700 rounded-xl font-bold transition-colors shrink-0"
               >
-                <Banknote className="w-6 h-6" />
-                <span className="font-medium">نقداً</span>
+                إلغاء
               </button>
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('CARD')}
-                className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all ${
-                  paymentMethod === 'CARD'
-                    ? 'border-primary-500 bg-primary-50 text-primary-700'
-                    : 'border-surface-200 bg-white text-surface-600 hover:border-primary-200'
-                }`}
+              <button 
+                onClick={handleCheckout} 
+                disabled={isSubmitting}
+                className="flex-1 bg-[#c0389f] hover:bg-[#a62c88] text-white py-2 text-base font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors"
               >
-                <CreditCard className="w-6 h-6" />
-                <span className="font-medium">بطاقة دفع (شبكة)</span>
+                {isSubmitting ? 'جاري التنفيذ...' : 'تأكيد الدفع وإنهاء'}
               </button>
             </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-surface-200">
-            <button className="btn-ghost" onClick={onClose} disabled={isSubmitting}>
-              إلغاء
-            </button>
-            <button 
-              className="btn-primary" 
-              onClick={handleCheckout} 
-              disabled={isSubmitting}
-            >
-              <CheckCircle className="w-4 h-4 ml-2" />
-              تأكيد الدفع وإنهاء
-            </button>
           </div>
         </div>
       )}
