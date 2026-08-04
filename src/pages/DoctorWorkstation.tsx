@@ -32,7 +32,7 @@ export default function DoctorWorkstation() {
   const doctorQueue = queueItems?.flatMap((group: any) => group.items).filter((q: any) => {
     const validStatuses = ['ARRIVED', 'WAITING', 'IN_SESSION'];
     if (!validStatuses.includes(q.stage)) return false;
-    if (user?.role !== 'ADMIN' && q.staffId !== user?.id) return false;
+    if (q.staffId !== user?.id) return false;
     return true;
   }) || [];
 
