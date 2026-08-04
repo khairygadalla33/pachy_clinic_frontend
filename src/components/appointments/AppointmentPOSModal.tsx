@@ -287,7 +287,7 @@ export default function AppointmentPOSModal({
                 onClick={() => setActiveCategory('ALL')}
                 className={`${
                   activeCategory === 'ALL'
-                    ? 'border-[#6b4c9a] text-[#6b4c9a]'
+                    ? 'border-b-[#6b4c9a] text-[#6b4c9a]'
                     : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'
                 } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
               >
@@ -299,7 +299,7 @@ export default function AppointmentPOSModal({
                   onClick={() => setActiveCategory(cat.id)}
                   className={`${
                     activeCategory === cat.id
-                      ? 'border-[#6b4c9a] text-[#6b4c9a]'
+                      ? 'border-b-[#6b4c9a] text-[#6b4c9a]'
                       : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'
                   } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
                 >
