@@ -165,54 +165,51 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
 
             {/* --- BOTTOM PANEL FOR COLLECTION & DEBT --- */}
             <div className="bg-surface-50 border border-surface-200 rounded-xl p-4 mb-4">
-              <div className="flex items-center justify-between gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 
-                {/* Collected Amount */}
-                <div className="flex-1">
-                  <div className="flex flex-col gap-2">
-                    <span className="font-bold text-emerald-600">المبلغ المُحصّل (الآن):</span>
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="number" 
-                        min="0"
-                        max={netAccount}
-                        placeholder="0"
-                        className="input-field py-2 px-3 flex-1 text-xl text-center font-black text-emerald-700 bg-white"
-                        value={collectedAmount}
-                        onChange={(e) => setCollectedAmount(e.target.value)}
-                      />
-                      <span className="font-bold text-surface-500">ج.م</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Remaining Debt */}
-                <div className="flex-1 bg-red-50 p-3 rounded-xl border border-red-100 flex flex-col items-center justify-center">
-                  <span className="text-red-600 font-bold text-sm mb-1">المتبقي (رصيد مدين يُضاف للعميل)</span>
-                  <div className="flex items-center gap-1 text-red-600">
-                    <span className="font-black text-2xl">{remaining.toLocaleString()}</span>
-                    <span className="font-bold">ج.م</span>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Payment Method for Collected */}
-              {parsedCollected > 0 && (
-                <div className="flex items-center justify-between text-surface-600 pt-4 mt-4 border-t border-surface-200">
-                  <span className="font-medium">طريقة الدفع للمبلغ المُحصّل:</span>
+                {/* 1. Payment Method (حساب التحصيل) */}
+                <div className="flex flex-col gap-2">
+                  <span className="font-bold text-surface-600">حساب التحصيل:</span>
                   <select 
-                    className="input-field py-1 pl-6 pr-2 w-48 h-10 text-sm font-bold bg-white"
+                    className="input-field py-2 px-3 h-[46px] w-full text-base font-bold bg-white"
                     value={paymentMethod}
                     onChange={(e: any) => setPaymentMethod(e.target.value)}
+                    disabled={parsedCollected <= 0}
                   >
-                    <option value="CASH">نقدي</option>
+                    <option value="CASH">نقدي (الخزينة)</option>
                     <option value="CARD">بطاقة (شبكة)</option>
                     <option value="INSTAPAY">إنستاباي</option>
                     <option value="E_WALLET">محفظة إلكترونية</option>
                   </select>
                 </div>
-              )}
+
+                {/* 2. Collected Amount (المبلغ المحصل) */}
+                <div className="flex flex-col gap-2">
+                  <span className="font-bold text-emerald-600">المبلغ المُحصّل:</span>
+                  <div className="flex items-center gap-2 h-[46px]">
+                    <input 
+                      type="number" 
+                      min="0"
+                      max={netAccount}
+                      placeholder="0"
+                      className="input-field py-2 px-3 h-full flex-1 text-xl text-center font-black text-emerald-700 bg-white"
+                      value={collectedAmount}
+                      onChange={(e) => setCollectedAmount(e.target.value)}
+                    />
+                    <span className="font-bold text-surface-500">ج.م</span>
+                  </div>
+                </div>
+
+                {/* 3. Remaining Debt (المتبقي على العميل) */}
+                <div className="bg-red-50 p-2 rounded-xl border border-red-100 flex flex-col items-center justify-center">
+                  <span className="text-red-600 font-bold text-sm mb-1">المتبقي على العميل (دين)</span>
+                  <div className="flex items-center gap-1 text-red-600">
+                    <span className="font-black text-2xl">{remaining.toLocaleString()}</span>
+                    <span className="font-bold text-sm">ج.م</span>
+                  </div>
+                </div>
+
+              </div>
             </div>
 
             <div className="flex gap-2">
