@@ -438,25 +438,31 @@ export default function AppointmentPOSModal({
                   <label className="block text-xs font-bold text-surface-700 mb-1.5 flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5 text-teal-500" /> التاريخ
                   </label>
-                  <input 
-                    type="date"
-                    className="input-field text-sm font-medium"
-                    required
-                    value={formData.scheduledDate}
-                    onChange={e => setFormData({ ...formData, scheduledDate: e.target.value })}
-                  />
+                  <div className="relative">
+                    <input 
+                      type="date"
+                      className="input-field text-sm font-medium w-full [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:left-0 [&::-webkit-calendar-picker-indicator]:w-8 [&::-webkit-calendar-picker-indicator]:h-full"
+                      required
+                      value={formData.scheduledDate}
+                      onChange={e => setFormData({ ...formData, scheduledDate: e.target.value })}
+                    />
+                    <Calendar className="w-4 h-4 text-teal-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-surface-700 mb-1.5 flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-amber-500" /> الوقت
                   </label>
-                  <input 
-                    type="time"
-                    className="input-field text-sm font-medium"
-                    required
-                    value={formData.startTime}
-                    onChange={e => setFormData({ ...formData, startTime: e.target.value })}
-                  />
+                  <div className="relative">
+                    <input 
+                      type="time"
+                      className="input-field text-sm font-medium w-full [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:left-0 [&::-webkit-calendar-picker-indicator]:w-8 [&::-webkit-calendar-picker-indicator]:h-full"
+                      required
+                      value={formData.startTime}
+                      onChange={e => setFormData({ ...formData, startTime: e.target.value })}
+                    />
+                    <Clock className="w-4 h-4 text-amber-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
                 </div>
               </div>
             )}
@@ -465,7 +471,6 @@ export default function AppointmentPOSModal({
             <div>
               <h3 className="text-sm font-bold text-surface-800 mb-3 flex items-center justify-between border-b border-surface-100 pb-2">
                 <span>الخدمات المضافة ({basket.length})</span>
-                <span className="text-primary-600 bg-primary-50 px-2 py-0.5 rounded text-xs">{subTotal.toLocaleString()} ج.م</span>
               </h3>
               
               {basket.length === 0 ? (
