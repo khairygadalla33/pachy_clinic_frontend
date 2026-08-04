@@ -164,14 +164,14 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
             </div>
 
             {/* --- BOTTOM PANEL FOR COLLECTION & DEBT --- */}
-            <div className="bg-surface-50 border border-surface-200 rounded-xl p-4 mb-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-surface-50 border border-surface-200 rounded-xl p-3 mb-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 
                 {/* 1. Payment Method (حساب التحصيل) */}
-                <div className="flex flex-col gap-2">
-                  <span className="font-bold text-surface-600">حساب التحصيل:</span>
+                <div className="flex flex-col gap-1">
+                  <span className="font-bold text-sm text-surface-600">حساب التحصيل:</span>
                   <select 
-                    className="input-field py-2 px-3 h-[46px] w-full text-base font-bold bg-white"
+                    className="input-field py-1.5 px-2 w-full text-sm font-bold bg-white h-[38px]"
                     value={paymentMethod}
                     onChange={(e: any) => setPaymentMethod(e.target.value)}
                   >
@@ -183,28 +183,28 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
                 </div>
 
                 {/* 2. Collected Amount (المبلغ المحصل) */}
-                <div className="flex flex-col gap-2">
-                  <span className="font-bold text-emerald-600">المبلغ المُحصّل:</span>
-                  <div className="flex items-center gap-2 h-[46px]">
+                <div className="flex flex-col gap-1">
+                  <span className="font-bold text-sm text-emerald-600">المبلغ المُحصّل:</span>
+                  <div className="flex items-center gap-2 h-[38px]">
                     <input 
                       type="number" 
                       min="0"
                       max={netAccount}
                       placeholder="0"
-                      className="input-field py-2 px-3 h-full flex-1 text-xl text-center font-black text-emerald-700 bg-white"
+                      className="input-field py-1.5 px-2 h-full flex-1 text-base text-center font-black text-emerald-700 bg-white"
                       value={collectedAmount}
                       onChange={(e) => setCollectedAmount(e.target.value)}
                     />
-                    <span className="font-bold text-surface-500">ج.م</span>
+                    <span className="font-bold text-sm text-surface-500">ج.م</span>
                   </div>
                 </div>
 
                 {/* 3. Remaining Debt (المتبقي على العميل) */}
-                <div className="bg-red-50 p-2 rounded-xl border border-red-100 flex flex-col items-center justify-center">
-                  <span className="text-red-600 font-bold text-sm mb-1">المتبقي على العميل (دين)</span>
+                <div className="bg-red-50 px-2 py-1.5 rounded-lg border border-red-100 flex flex-col items-center justify-center">
+                  <span className="text-red-600 font-bold text-xs mb-0.5">المتبقي على العميل (دين)</span>
                   <div className="flex items-center gap-1 text-red-600">
-                    <span className="font-black text-2xl">{remaining.toLocaleString()}</span>
-                    <span className="font-bold text-sm">ج.م</span>
+                    <span className="font-black text-lg">{remaining.toLocaleString()}</span>
+                    <span className="font-bold text-xs">ج.م</span>
                   </div>
                 </div>
 
