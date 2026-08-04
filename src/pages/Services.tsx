@@ -81,19 +81,9 @@ export default function Services() {
   });
 
   const uniqueCategories = useMemo(() => {
-    if (!categories || !services) return [];
-    const map = new Map();
-    categories.forEach((c: any) => {
-      const hasServices = services.some((s: any) => s.categoryId === c.id);
-      if (hasServices) {
-        const name = c.nameAr || c.name;
-        if (!map.has(name)) {
-          map.set(name, c);
-        }
-      }
-    });
-    return Array.from(map.values());
-  }, [categories, services]);
+    if (!categories) return [];
+    return categories.map((c: any) => c);
+  }, [categories]);
 
   const dropdownCategories = useMemo(() => {
     return categories || [];
@@ -253,7 +243,7 @@ export default function Services() {
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="text-lg font-bold text-surface-900 dark:text-white mb-1">
+                    <h3 className={`text-lg font-bold mb-1 ${service.isActive ? 'text-[#6b4c9a]' : 'text-surface-500'}`}>
                       {service.nameAr || service.name}
                     </h3>
                     <p className="text-sm text-surface-500">{service.duration} دقيقة</p>
@@ -262,8 +252,8 @@ export default function Services() {
                   <div className="flex flex-col items-end gap-3">
                     {/* Toggle Switch */}
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold text-surface-500">
-                        {service.isActive ? 'مفعل ✅' : 'غير مفعل ❌'}
+                      <span className="text-[10px] font-bold text-surface-500 uppercase tracking-wider">
+                        {service.isActive ? 'Active ✅' : 'Non-Active ❌'}
                       </span>
                       <button
                         type="button"
