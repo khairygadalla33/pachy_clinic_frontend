@@ -285,27 +285,31 @@ export default function AppointmentPOSModal({
             <nav className="-mb-px flex space-x-8 space-x-reverse whitespace-nowrap px-5">
               <button
                 onClick={() => setActiveCategory('ALL')}
-                style={activeCategory === 'ALL' ? { borderBottomColor: '#6b4c9a', color: '#6b4c9a' } : {}}
-                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                className={`relative whitespace-nowrap py-4 px-1 font-medium text-sm transition-colors ${
                   activeCategory === 'ALL'
-                    ? ''
-                    : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'
+                    ? 'text-[#6b4c9a]'
+                    : 'text-surface-500 hover:text-surface-700 hover:border-b hover:border-surface-300'
                 }`}
               >
                 الكل
+                {activeCategory === 'ALL' && (
+                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#6b4c9a]" />
+                )}
               </button>
               {categories.map(cat => (
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
-                  style={activeCategory === cat.id ? { borderBottomColor: '#6b4c9a', color: '#6b4c9a' } : {}}
-                  className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  className={`relative whitespace-nowrap py-4 px-1 font-medium text-sm transition-colors ${
                     activeCategory === cat.id
-                      ? ''
-                      : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'
+                      ? 'text-[#6b4c9a]'
+                      : 'text-surface-500 hover:text-surface-700 hover:border-b hover:border-surface-300'
                   }`}
                 >
                   {cat.nameAr || cat.name}
+                  {activeCategory === cat.id && (
+                    <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#6b4c9a]" />
+                  )}
                 </button>
               ))}
             </nav>
