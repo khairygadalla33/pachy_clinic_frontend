@@ -435,9 +435,6 @@ export default function AppointmentPOSModal({
             {!isWalkIn && (
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-surface-700 mb-1.5 flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-teal-500" /> التاريخ
-                  </label>
                   <div className="relative">
                     <input 
                       type="date"
@@ -450,9 +447,6 @@ export default function AppointmentPOSModal({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-surface-700 mb-1.5 flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-amber-500" /> الوقت
-                  </label>
                   <div className="relative">
                     <input 
                       type="time"
