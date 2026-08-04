@@ -511,7 +511,7 @@ export default function AppointmentPOSModal({
 
           {/* Footer (Totals & Submit) */}
           <div className="p-4 border-t border-surface-200 bg-white shrink-0">
-            <div className="space-y-3 mb-4 text-sm font-medium text-surface-600">
+            <div className="space-y-1.5 mb-4 text-sm font-medium text-surface-600">
               {/* 1. Subtotal */}
               <div className="flex justify-between items-center text-surface-600">
                 <span>الإجمالي:</span>
@@ -548,7 +548,7 @@ export default function AppointmentPOSModal({
               </div>
 
               {/* 4. Paid / Deposit (Merged) */}
-              <div className="flex items-center justify-between text-emerald-600 pb-2">
+              <div className="flex items-center justify-between text-emerald-600">
                 <span>المدفوع:</span>
                 <div className="flex items-center gap-1">
                   <select 
@@ -573,7 +573,7 @@ export default function AppointmentPOSModal({
               </div>
 
               {/* 5. Remaining */}
-              <div className="flex justify-center items-center gap-2 pt-1 text-[#c0389f]">
+              <div className="flex justify-center items-center gap-2 text-[#c0389f]">
                 <span className="font-bold text-base">المتبقي:</span>
                 <span className="font-black text-xl">{remaining.toLocaleString()} ج.م</span>
               </div>
