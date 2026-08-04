@@ -474,7 +474,7 @@ export default function AppointmentPOSModal({
               ) : (
                 <div className="space-y-2.5">
                   {basket.map((item, idx) => (
-                    <div key={idx} className="group flex items-center justify-between bg-white border border-surface-200 p-3 rounded-xl hover:border-primary-300 hover:shadow-sm transition-all">
+                    <div key={idx} className="group flex items-center justify-between bg-white border border-surface-200 p-2 rounded-xl hover:border-primary-300 hover:shadow-sm transition-all">
                       <div className="flex-1 min-w-0 pr-3">
                         <p className="text-sm font-bold text-surface-900 truncate">
                           {item.service.nameAr || item.service.name}
@@ -487,7 +487,7 @@ export default function AppointmentPOSModal({
                         <div className="relative">
                           <input 
                             type="number" 
-                            className="w-24 text-sm font-bold text-center border-surface-200 rounded-lg focus:ring-primary-500 focus:border-primary-500 py-1.5"
+                            className="w-24 text-sm font-bold text-center border-surface-200 rounded-lg focus:ring-primary-500 focus:border-primary-500 py-1"
                             value={item.unitPrice}
                             onChange={(e) => handleUpdatePrice(idx, Number(e.target.value))}
                           />
