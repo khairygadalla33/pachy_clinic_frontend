@@ -573,7 +573,7 @@ export default function AppointmentPOSModal({
               </div>
 
               {/* 5. Remaining */}
-              <div className="flex justify-between items-center pt-1 text-[#c0389f]">
+              <div className="flex justify-center items-center gap-2 pt-1 text-[#c0389f]">
                 <span className="font-bold text-base">المتبقي:</span>
                 <span className="font-black text-xl">{remaining.toLocaleString()} ج.م</span>
               </div>
