@@ -582,14 +582,14 @@ export default function AppointmentPOSModal({
               <button 
                 type="button"
                 onClick={onClose}
-                className="px-5 py-2.5 bg-surface-100 hover:bg-surface-200 text-surface-700 rounded-xl font-bold transition-colors shrink-0"
+                className="px-5 py-2 bg-surface-100 hover:bg-surface-200 text-surface-700 rounded-xl font-bold transition-colors shrink-0"
               >
                 إلغاء
               </button>
               <button 
                 onClick={handleSubmit} 
                 disabled={createMutation.isPending || !formData.clientId || !formData.staffId || basket.length === 0}
-                className="flex-1 bg-[#c0389f] hover:bg-[#a62c88] text-white py-2.5 text-base font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors"
+                className="flex-1 bg-[#c0389f] hover:bg-[#a62c88] text-white py-2 text-base font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors"
               >
                 {createMutation.isPending ? 'جاري التنفيذ...' : (isWalkIn ? 'تسجيل كزيارة مباشرة' : 'تأكيد وحجز الموعد')}
               </button>
