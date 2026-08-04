@@ -46,6 +46,15 @@ export default function DoctorWorkstation() {
     setActiveQueueItem(item);
   };
 
+  const handleCallClick = async (item: any) => {
+    try {
+      await api.put(`/workflow/${item.id}/call`);
+      queryClient.invalidateQueries({ queryKey: ['workflow-queue'] });
+    } catch (err) {
+      console.error('Error calling patient:', err);
+    }
+  };
+
   const handleSessionComplete = () => {
     queryClient.invalidateQueries({ queryKey: ['workflow-queue'] });
     queryClient.invalidateQueries({ queryKey: ['workflow-history'] });
@@ -104,9 +113,10 @@ export default function DoctorWorkstation() {
         items={doctorQueue} 
         isLoading={isQueueLoading} 
         onCardClick={handleCardClick}
+        onCallClick={handleCallClick}
+        activeQueueId={activeQueueItem?.id}
       />
-
-      {/* Data Grid for History */}
+      
       <div className="bg-white border border-surface-200 rounded-xl shadow-sm overflow-hidden mt-8">
         <div className="px-6 py-4 border-b border-surface-200 bg-surface-50 flex items-center gap-2">
           <Calendar className="w-5 h-5 text-surface-500" />

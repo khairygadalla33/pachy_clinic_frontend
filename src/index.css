@@ -44,6 +44,17 @@
   .sidebar-link.active {
     @apply bg-rose-500/20 text-rose-400 border-l-4 border-rose-400;
   }
+
+  @keyframes wave {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+  }
+  
+  .wave-effect {
+    animation: wave 1.5s infinite;
+    border-color: #ef4444 !important;
+  }
 }
 
 ::-webkit-scrollbar { width: 0px; height: 0px; display: none; }

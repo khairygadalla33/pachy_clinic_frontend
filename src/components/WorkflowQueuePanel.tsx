@@ -99,7 +99,7 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
                     group.items.map((item) => (
                       <div 
                         key={item.id} 
-                        className={`flex-shrink-0 w-64 p-4 rounded-xl border-2 shadow-sm transition-all ${stageColors[item.stage]}`}
+                        className={`flex-shrink-0 w-64 p-4 rounded-xl border-2 shadow-sm transition-all flex flex-col ${item.calledByDoctor ? 'wave-effect bg-red-50' : stageColors[item.stage]}`}
                       >
                         {/* Header */}
                         <div className="flex items-start justify-between mb-0">
@@ -137,34 +137,32 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
                         </div>
 
                         {/* Actions */}
-                        <div className="flex items-center justify-between w-full mt-auto pt-2 border-t border-black/5">
-                          <div className="flex flex-wrap gap-1">
-                            {item.stage === 'BOOKED' && (
-                              <>
-                                <button onClick={() => onAction(item.id, 'check-in')} className="px-2 py-1 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded hover:bg-emerald-100">تسجيل وصول (انتظار)</button>
-                                <button onClick={() => onAction(item.id, 'no-show')} className="px-2 py-1 text-xs font-medium bg-red-50 text-red-600 border border-red-200 rounded hover:bg-red-100">لم يحضر</button>
-                              </>
-                            )}
-                            {item.stage === 'WAITING' && (
-                              <button onClick={() => onAction(item.id, 'start-session')} className="px-2 py-1 text-xs font-medium bg-emerald-500 text-white rounded hover:bg-emerald-600">بدء الجلسة</button>
-                            )}
-                            {item.stage === 'IN_SESSION' && (
-                              <button onClick={() => onAction(item.id, 'end-session')} className="px-2 py-1 text-xs font-medium bg-blue-500 text-white rounded hover:bg-blue-600">إنهاء الجلسة</button>
-                            )}
-                            
-                            {['ARRIVED', 'WAITING', 'IN_SESSION', 'PENDING_CHECKOUT'].includes(item.stage) && onCheckout && (
-                              <button 
-                                onClick={() => onCheckout(item)} 
-                                className={`px-2 py-1 text-xs font-medium rounded ${item.appointment?.invoices?.[0]?.status === 'PAID' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200 hover:bg-emerald-200' : 'bg-surface-900 text-white hover:bg-black'}`}
-                              >
-                                {item.appointment?.invoices?.[0]?.status === 'PAID' 
-                                  ? (item.stage === 'PENDING_CHECKOUT' ? 'خالص (إنهاء)' : 'خالص') 
-                                  : 'التسوية'}
-                              </button>
-                            )}
-                          </div>
+                        <div className="flex flex-wrap gap-1 mt-auto pt-2 border-t border-black/5">
+                          {item.stage === 'BOOKED' && (
+                            <>
+                              <button onClick={() => onAction(item.id, 'check-in')} className="px-2 py-1 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded hover:bg-emerald-100">تسجيل وصول (انتظار)</button>
+                              <button onClick={() => onAction(item.id, 'no-show')} className="px-2 py-1 text-xs font-medium bg-red-50 text-red-600 border border-red-200 rounded hover:bg-red-100">لم يحضر</button>
+                            </>
+                          )}
+                          {item.stage === 'WAITING' && (
+                            <button onClick={() => onAction(item.id, 'start-session')} className="px-2 py-1 text-xs font-medium bg-emerald-500 text-white rounded hover:bg-emerald-600">بدء الجلسة</button>
+                          )}
+                          {item.stage === 'IN_SESSION' && (
+                            <button onClick={() => onAction(item.id, 'end-session')} className="px-2 py-1 text-xs font-medium bg-blue-500 text-white rounded hover:bg-blue-600">إنهاء الجلسة</button>
+                          )}
+                          
+                          {['ARRIVED', 'WAITING', 'IN_SESSION', 'PENDING_CHECKOUT'].includes(item.stage) && onCheckout && (
+                            <button 
+                              onClick={() => onCheckout(item)} 
+                              className={`px-2 py-1 text-xs font-medium rounded ${item.appointment?.invoices?.[0]?.status === 'PAID' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200 hover:bg-emerald-200' : 'bg-surface-900 text-white hover:bg-black'}`}
+                            >
+                              {item.appointment?.invoices?.[0]?.status === 'PAID' 
+                                ? (item.stage === 'PENDING_CHECKOUT' ? 'خالص (إنهاء)' : 'خالص') 
+                                : 'التسوية'}
+                            </button>
+                          )}
 
-                          <button onClick={() => onViewClient(item.clientId)} className="px-2 py-1 text-xs font-medium bg-white border border-surface-200 rounded hover:bg-surface-50 flex items-center flex-shrink-0">
+                          <button onClick={() => onViewClient(item.clientId)} className="px-2 py-1 text-xs font-medium bg-white border border-surface-200 rounded hover:bg-surface-50 flex items-center">
                             <User className="w-3 h-3 ml-1" /> الملف
                           </button>
                         </div>

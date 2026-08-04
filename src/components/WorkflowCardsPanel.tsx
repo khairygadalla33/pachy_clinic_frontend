@@ -5,6 +5,7 @@ interface WorkflowCardProps {
   items: any[];
   isLoading: boolean;
   onCardClick: (item: any) => void;
+  onCallClick?: (item: any) => void;
   activeQueueId?: string | null;
 }
 
@@ -23,7 +24,7 @@ function WaitingTime({ startTime }: { startTime: string | null }) {
   return <span>ينتظر منذ {mins} دقيقة</span>;
 }
 
-export default function WorkflowCardsPanel({ items, isLoading, onCardClick, activeQueueId }: WorkflowCardProps) {
+export default function WorkflowCardsPanel({ items, isLoading, onCardClick, onCallClick, activeQueueId }: WorkflowCardProps) {
   const [isOpen, setIsOpen] = useState(true);
 
   if (isLoading) {
@@ -108,16 +109,29 @@ export default function WorkflowCardsPanel({ items, isLoading, onCardClick, acti
                 
 
                 
-                {/* Time */}
-                <div className="flex items-center gap-2 text-xs text-surface-500">
-                  <Clock className="w-3.5 h-3.5 flex-shrink-0 text-surface-400" />
-                  <span>
-                    {item.stage === 'IN_SESSION' 
-                      ? 'الجلسة جارية الآن' 
-                      : <WaitingTime startTime={item.waitingStartTime} />
-                    }
-                    {!item.waitingStartTime && item.stage !== 'IN_SESSION' && 'وصل للتو'}
-                  </span>
+                {/* Time & Call */}
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-surface-100 w-full">
+                  <div className="flex items-center gap-2 text-xs text-surface-500">
+                    <Clock className="w-3.5 h-3.5 flex-shrink-0 text-surface-400" />
+                    <span>
+                      {item.stage === 'IN_SESSION' 
+                        ? 'الجلسة جارية الآن' 
+                        : <WaitingTime startTime={item.waitingStartTime} />
+                      }
+                      {!item.waitingStartTime && item.stage !== 'IN_SESSION' && 'وصل للتو'}
+                    </span>
+                  </div>
+                  {item.stage === 'WAITING' && onCallClick && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCallClick(item);
+                      }}
+                      className="px-2 py-1 text-xs font-bold bg-primary-50 text-primary-700 rounded hover:bg-primary-100 transition-colors border border-primary-200 shadow-sm"
+                    >
+                      استدعاء
+                    </button>
+                  )}
                 </div>
               </button>
             ))}
