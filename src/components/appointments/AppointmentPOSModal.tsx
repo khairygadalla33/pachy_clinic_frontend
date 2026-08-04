@@ -468,7 +468,7 @@ export default function AppointmentPOSModal({
               </h3>
               
               {basket.length === 0 ? (
-                <div className="text-center py-8 bg-surface-50 rounded-xl border border-dashed border-surface-200">
+                <div className="text-center py-8">
                   <span className="text-surface-400 text-sm">لم يتم إضافة خدمات. اختر من القائمة الجانبية.</span>
                 </div>
               ) : (
