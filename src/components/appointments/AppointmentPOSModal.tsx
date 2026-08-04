@@ -511,7 +511,7 @@ export default function AppointmentPOSModal({
 
           {/* Footer (Totals & Submit) */}
           <div className="p-4 border-t border-surface-200 bg-white shrink-0">
-            <div className="space-y-1.5 mb-4 text-sm font-medium text-surface-600">
+            <div className="space-y-2 mb-4 text-sm font-medium text-surface-600">
               {/* 1. Subtotal */}
               <div className="flex justify-between items-center text-surface-600">
                 <span>الإجمالي:</span>
