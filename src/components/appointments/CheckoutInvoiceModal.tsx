@@ -18,6 +18,7 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
   const [paymentMethod, setPaymentMethod] = useState('CASH');
   const [discountType, setDiscountType] = useState<'value' | 'percentage'>('value');
   const [discountValue, setDiscountValue] = useState<number | string>('');
+  const [collectedAmount, setCollectedAmount] = useState<number | string>('');
 
   useEffect(() => {
     if (queueItem?.appointmentId) {
@@ -43,10 +44,13 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
         ? (settlement.subTotal * (parsedDiscount / 100))
         : parsedDiscount;
 
+      const parsedCollected = Number(collectedAmount) || 0;
+
       // We process checkout by ending the workflow explicitly with payment details
       await api.put(`/workflow/${queueItem.id}/checkout`, {
         paymentMethod,
-        discount: finalDiscount
+        discount: finalDiscount,
+        collectedAmount: parsedCollected
       });
       toast.success('تم تسوية الفاتورة بنجاح');
       onSuccess();
@@ -58,16 +62,19 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
     }
   };
 
-  const parsedDiscountVal = Number(discountValue) || 0;
-  const calculatedDiscount = discountType === 'percentage' 
-    ? ((settlement?.subTotal || 0) * (parsedDiscountVal / 100)) 
-    : parsedDiscountVal;
-
   const subTotal = settlement?.subTotal || 0;
   const deposit = settlement?.deposit || 0;
-  
-  const netAccount = subTotal - calculatedDiscount;
-  const remainingCalc = netAccount - deposit;
+
+  const parsedDiscountVal = Number(discountValue) || 0;
+  const calculatedDiscount = discountType === 'percentage' 
+    ? (subTotal * (parsedDiscountVal / 100)) 
+    : parsedDiscountVal;
+
+  const netAccountCalc = subTotal - deposit - calculatedDiscount;
+  const netAccount = netAccountCalc < 0 ? 0 : netAccountCalc;
+
+  const parsedCollected = Number(collectedAmount) || 0;
+  const remainingCalc = netAccount - parsedCollected;
   const remaining = remainingCalc < 0 ? 0 : remainingCalc;
 
   return (
@@ -120,7 +127,13 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
                 <span className="font-bold">{subTotal.toLocaleString()} ج.م</span>
               </div>
 
-              {/* 2. Discount */}
+              {/* 2. Previous Payments */}
+              <div className="flex justify-between items-center text-emerald-600">
+                <span>الدفعات السابقة:</span>
+                <span>{deposit.toLocaleString()} ج.م</span>
+              </div>
+
+              {/* 3. Discount */}
               <div className="flex items-center justify-between text-surface-600">
                 <span>الخصم:</span>
                 <div className="flex items-center gap-1">
@@ -143,28 +156,39 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
                 </div>
               </div>
               
-              {/* 3. Account / Net Total */}
+              {/* 4. Net Total (After Discount & Previous Payments) */}
               <div className="flex justify-between items-center text-[#c0389f] font-bold">
-                <span>الصافي بعد الخصم:</span>
+                <span>الصافي بعد الخصم والدفعات السابقة:</span>
                 <span>{netAccount.toLocaleString()} ج.م</span>
               </div>
 
-              {/* 4. Paid / Deposit */}
-              <div className="flex justify-between items-center text-emerald-600">
-                <span>المدفوع (دفعة مقدمة):</span>
-                <span>{deposit.toLocaleString()} ج.م</span>
+              {/* 5. Collected Amount (Input) */}
+              <div className="flex items-center justify-between text-emerald-600 pt-2 border-t border-surface-100">
+                <span className="font-bold">المبلغ المُحصّل:</span>
+                <div className="flex items-center gap-1">
+                  <input 
+                    type="number" 
+                    min="0"
+                    max={netAccount}
+                    placeholder="0"
+                    className="input-field py-1 px-2 w-28 text-center h-8 text-sm font-bold text-emerald-700"
+                    value={collectedAmount}
+                    onChange={(e) => setCollectedAmount(e.target.value)}
+                  />
+                  <span>ج.م</span>
+                </div>
               </div>
 
-              {/* 5. Remaining */}
-              <div className="flex justify-center items-center gap-2 text-[#c0389f]">
-                <span className="font-bold text-base">المتبقي:</span>
+              {/* 6. Remaining (Debt) */}
+              <div className="flex justify-center items-center gap-2 text-red-500 bg-red-50 p-2 rounded-lg mt-2">
+                <span className="font-bold text-base">المتبقي (رصيد مدين يُضاف للعميل):</span>
                 <span className="font-black text-xl">{remaining.toLocaleString()} ج.م</span>
               </div>
 
-              {/* 6. Payment Method for Remaining */}
-              {remaining > 0 && (
+              {/* 7. Payment Method for Collected */}
+              {parsedCollected > 0 && (
                 <div className="flex items-center justify-between text-surface-600 pt-2 border-t border-surface-100">
-                  <span>طريقة الدفع للمتبقي:</span>
+                  <span>طريقة الدفع للمبلغ المُحصّل:</span>
                   <select 
                     className="input-field py-1 pl-6 pr-2 w-40 h-8 text-sm font-bold"
                     value={paymentMethod}

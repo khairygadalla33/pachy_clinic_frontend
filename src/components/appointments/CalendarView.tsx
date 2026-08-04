@@ -224,7 +224,7 @@ export default function CalendarView({
                         disabled && "bg-surface-50 dark:bg-surface-900/50"
                       )}
                     >
-                      <div className="absolute top-1 left-1 opacity-70 text-[10px] font-bold text-[#c0389f] z-0">
+                      <div className="absolute top-1 left-1 opacity-70 text-[10px] font-bold text-[#6b4c9a] z-0">
                         {calculatedTime}
                       </div>
 
@@ -245,7 +245,7 @@ export default function CalendarView({
 
                         {canBook && (
                           <div className={cn(
-                            "flex items-center justify-center rounded-md border border-dashed border-[#c0389f]/50 text-[#c0389f] hover:bg-[#c0389f]/10 hover:border-[#c0389f] transition-colors py-1 text-[10px] font-bold mt-auto",
+                            "flex items-center justify-center rounded-md border border-dashed border-[#6b4c9a]/50 text-[#6b4c9a] hover:bg-[#6b4c9a]/10 hover:border-[#6b4c9a] transition-colors py-1 text-[10px] font-bold mt-auto",
                             aptsInSlot.length > 0 ? "opacity-0 group-hover:opacity-100 h-6" : "h-full opacity-0 group-hover:opacity-100"
                           )}>
                              + موعد

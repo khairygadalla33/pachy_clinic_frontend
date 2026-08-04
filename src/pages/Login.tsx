@@ -33,17 +33,17 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-50 flex items-center justify-center p-4 dir-rtl">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-surface-200">
+    <div className="min-h-screen bg-rose-50 flex items-center justify-center p-4 dir-rtl">
+      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-rose-100">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary-600 mb-2">باتشي كلينك</h1>
-          <p className="text-surface-600">نظام إدارة عيادة التجميل والليزر</p>
+          <h1 className="text-3xl font-bold text-rose-600 mb-2">باتشي كلينك</h1>
+          <p className="text-gray-500">نظام إدارة عيادة التجميل والليزر</p>
         </div>
 
         <div className="flex gap-4 mb-6">
           <button
             className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
-              method === 'email' ? 'bg-primary-100 text-primary-700' : 'text-surface-600 hover:bg-surface-100'
+              method === 'email' ? 'bg-rose-100 text-rose-700' : 'text-gray-500 hover:bg-gray-50'
             }`}
             onClick={() => setMethod('email')}
           >
@@ -51,7 +51,7 @@ export default function Login() {
           </button>
           <button
             className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
-              method === 'pin' ? 'bg-primary-100 text-primary-700' : 'text-surface-600 hover:bg-surface-100'
+              method === 'pin' ? 'bg-rose-100 text-rose-700' : 'text-gray-500 hover:bg-gray-50'
             }`}
             onClick={() => setMethod('pin')}
           >
@@ -68,30 +68,30 @@ export default function Login() {
         {method === 'email' ? (
           <form onSubmit={handleEmailLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1">البريد الإلكتروني</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border border-surface-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                 required
                 dir="ltr"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1">كلمة المرور</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-surface-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                 required
                 dir="ltr"
               />
             </div>
             <button
               type="submit"
-              className="w-full btn-gradient py-2 rounded-lg font-medium"
+              className="w-full bg-rose-600 text-white py-2 rounded-lg font-medium hover:bg-rose-700 transition-colors"
             >
               تسجيل الدخول
             </button>
@@ -99,12 +99,12 @@ export default function Login() {
         ) : (
           <form onSubmit={handlePinLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1">رمز الدخول السريع (PIN)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">رمز الدخول السريع (PIN)</label>
               <input
                 type="password"
                 value={pinCode}
                 onChange={(e) => setPinCode(e.target.value)}
-                className="w-full px-4 py-2 border border-surface-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-center text-xl tracking-widest"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-center text-xl tracking-widest"
                 required
                 maxLength={4}
                 dir="ltr"
@@ -112,7 +112,7 @@ export default function Login() {
             </div>
             <button
               type="submit"
-              className="w-full btn-gradient py-2 rounded-lg font-medium"
+              className="w-full bg-rose-600 text-white py-2 rounded-lg font-medium hover:bg-rose-700 transition-colors"
             >
               دخول
             </button>
