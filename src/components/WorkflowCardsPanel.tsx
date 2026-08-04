@@ -74,35 +74,39 @@ export default function WorkflowCardsPanel({ items, isLoading, onCardClick, acti
                 )}
                 
                 {/* Patient Name + Status */}
-                <div className="flex items-start justify-between gap-1 mb-3">
+                <div className="flex items-start justify-between gap-1 mb-0">
                   <span className="font-bold text-sm text-surface-900 leading-tight">
                     {item.client?.fullName || 'عميل غير محدد'}
                   </span>
-                  <div className="flex flex-col items-center gap-1">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${item.stage === 'IN_SESSION' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
-                      {item.stage === 'IN_SESSION' ? 'في الجلسة' : 'في الانتظار'}
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${item.stage === 'IN_SESSION' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
+                    {item.stage === 'IN_SESSION' ? 'في الجلسة' : 'في الانتظار'}
+                  </span>
+                </div>
+                
+                {/* Phone & Queue Position */}
+                <div className="flex items-center justify-between text-xs text-surface-500 mb-1 mt-1">
+                  {item.client?.phone ? (
+                    <div className="flex items-center gap-2">
+                      <User className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span className="font-mono">{item.client.phone}</span>
+                    </div>
+                  ) : (
+                    <div />
+                  )}
+                  {item.stage === 'WAITING' && item.queuePosition > 0 && (
+                    <span className="text-sm font-black text-red-600 bg-red-50 px-2 py-0.5 rounded shadow-sm">
+                      #{item.queuePosition}
                     </span>
-                    {item.stage === 'WAITING' && item.queuePosition > 0 && (
-                      <span className="text-lg mt-1 font-black text-red-600 bg-red-50 px-2.5 py-0.5 rounded-lg shadow-sm border border-red-100">
-                        #{item.queuePosition}
-                      </span>
-                    )}
-                  </div>
+                  )}
                 </div>
                 
                 {/* Service */}
-                <div className="flex items-center gap-2 text-xs text-surface-600 mb-2">
+                <div className="flex items-center gap-2 text-xs text-surface-600 mb-1">
                   <Activity className="w-3.5 h-3.5 flex-shrink-0 text-primary-500" />
                   <span className="font-medium truncate">{item.appointment?.service?.nameAr || item.appointment?.service?.name}</span>
                 </div>
                 
-                {/* Phone */}
-                {item.client?.phone && (
-                  <div className="flex items-center gap-2 text-xs text-surface-500 mb-2">
-                    <User className="w-3.5 h-3.5 flex-shrink-0" />
-                    <span className="font-mono">{item.client.phone}</span>
-                  </div>
-                )}
+
                 
                 {/* Time */}
                 <div className="flex items-center gap-2 text-xs text-surface-500">
