@@ -281,15 +281,15 @@ export default function AppointmentPOSModal({
           </div>
 
           {/* Categories Tabs */}
-          <div className="px-5 pt-4 bg-white border-b border-surface-100 overflow-x-auto hide-scrollbar shrink-0">
-            <div className="flex items-center gap-2 pb-3">
+          <div className="border-b border-surface-200 dark:border-surface-700 overflow-x-auto shrink-0 bg-white">
+            <nav className="-mb-px flex space-x-8 space-x-reverse whitespace-nowrap px-5">
               <button
                 onClick={() => setActiveCategory('ALL')}
-                className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold transition-colors ${
-                  activeCategory === 'ALL' 
-                    ? 'bg-primary-600 text-white shadow-md' 
-                    : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
-                }`}
+                className={`${
+                  activeCategory === 'ALL'
+                    ? 'border-[#6b4c9a] text-[#6b4c9a]'
+                    : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
               >
                 الكل
               </button>
@@ -297,16 +297,16 @@ export default function AppointmentPOSModal({
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
-                  className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold transition-colors ${
-                    activeCategory === cat.id 
-                      ? 'bg-primary-600 text-white shadow-md' 
-                      : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
-                  }`}
+                  className={`${
+                    activeCategory === cat.id
+                      ? 'border-[#6b4c9a] text-[#6b4c9a]'
+                      : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'
+                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
                 >
                   {cat.nameAr || cat.name}
                 </button>
               ))}
-            </div>
+            </nav>
           </div>
 
           {/* Services Grid */}
@@ -339,18 +339,18 @@ export default function AppointmentPOSModal({
                       }}
                       className={`bg-white rounded-2xl p-4 border-2 transition-all cursor-pointer relative overflow-hidden group ${
                         inBasket 
-                          ? 'border-primary-400 ring-4 ring-primary-50 shadow-md bg-primary-50/30' 
-                          : 'border-surface-100 hover:border-primary-300 hover:shadow-lg hover:-translate-y-1'
+                          ? 'border-[#6b4c9a] ring-4 ring-[#6b4c9a]/10 shadow-md bg-[#6b4c9a]/5' 
+                          : 'border-surface-100 hover:border-[#6b4c9a] hover:shadow-lg hover:-translate-y-1'
                       }`}
                     >
                       {inBasket && (
-                        <div className="absolute top-0 right-0 bg-primary-500 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg z-10">
+                        <div className="absolute top-0 right-0 bg-[#6b4c9a] text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg z-10">
                           مضافة
                         </div>
                       )}
                       <div className="flex flex-col h-full gap-3">
                         <div className="flex-1">
-                          <p className="text-[10px] font-bold text-primary-600 uppercase tracking-wider mb-1">
+                          <p className="text-[10px] font-bold text-[#6b4c9a] uppercase tracking-wider mb-1">
                             {service.category?.nameAr || service.category?.name}
                           </p>
                           <h3 className="font-bold text-surface-900 text-sm leading-tight line-clamp-2">
@@ -358,7 +358,7 @@ export default function AppointmentPOSModal({
                           </h3>
                         </div>
                         <div className="flex items-end justify-between mt-auto pt-2 border-t border-surface-50">
-                          <div className="flex items-baseline gap-1 text-primary-700">
+                          <div className="flex items-baseline gap-1 text-[#6b4c9a]">
                             {hasMultiplePricings ? (
                               <span className="text-xs font-bold text-surface-500">متعدد الأسعار</span>
                             ) : (
@@ -370,11 +370,11 @@ export default function AppointmentPOSModal({
                           </div>
                           {!inBasket && (
                             hasMultiplePricings ? (
-                              <button className="text-[10px] font-bold text-white bg-primary-500 hover:bg-primary-600 px-3 py-1.5 rounded-lg transition-colors">
+                              <button className="text-[10px] font-bold text-white bg-[#6b4c9a] hover:bg-[#5a3f85] px-3 py-1.5 rounded-lg transition-colors">
                                 حدد اختيارك
                               </button>
                             ) : (
-                              <div className="w-8 h-8 rounded-full bg-surface-100 flex items-center justify-center text-surface-500 group-hover:bg-primary-500 group-hover:text-white transition-colors">
+                              <div className="w-8 h-8 rounded-full bg-surface-100 flex items-center justify-center text-surface-500 group-hover:bg-[#6b4c9a] group-hover:text-white transition-colors">
                                 <Plus className="w-5 h-5" />
                               </div>
                             )
