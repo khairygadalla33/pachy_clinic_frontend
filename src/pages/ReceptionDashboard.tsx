@@ -8,12 +8,15 @@ import Card from '../components/Card';
 import Badge from '../components/Badge';
 import WorkflowQueuePanel from '../components/WorkflowQueuePanel';
 import CheckoutInvoiceModal from '../components/appointments/CheckoutInvoiceModal';
+import AppointmentPOSModal from '../components/appointments/AppointmentPOSModal';
 import { translateStatus } from '../lib/utils';
 
 export default function ReceptionDashboard() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [checkoutItem, setCheckoutItem] = useState<any>(null);
+  const [showPOS, setShowPOS] = useState(false);
+  const [isWalkInPOS, setIsWalkInPOS] = useState(false);
   const { user } = useAuth();
   const branchId = user?.branchId;
 
@@ -60,10 +63,10 @@ export default function ReceptionDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-start gap-3">
-        <button onClick={() => navigate('/appointments?newBooking=true')} className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm text-white bg-[#6b4c9a] hover:opacity-90 transition-opacity">
+        <button onClick={() => { setIsWalkInPOS(false); setShowPOS(true); }} className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm text-white bg-[#6b4c9a] hover:opacity-90 transition-opacity">
           <Calendar className="w-4 h-4 ml-2" /> حجز موعد جديد
         </button>
-        <button onClick={() => navigate('/appointments?newWalkIn=true')} className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm text-white bg-[#c0389f] hover:opacity-90 transition-opacity">
+        <button onClick={() => { setIsWalkInPOS(true); setShowPOS(true); }} className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg shadow-sm text-white bg-[#c0389f] hover:opacity-90 transition-opacity">
           <Plus className="w-4 h-4 ml-2" /> مريض بدون موعد
         </button>
       </div>
@@ -106,7 +109,19 @@ export default function ReceptionDashboard() {
         }}
       />
 
-      {/* Upcoming Appointments Table */}
+      {showPOS && (
+        <AppointmentPOSModal 
+          onClose={() => setShowPOS(false)}
+          onSuccess={() => {
+            setShowPOS(false);
+            queryClient.invalidateQueries({ queryKey: ['workflow-queue'] });
+            queryClient.invalidateQueries({ queryKey: ['workflow-stats'] });
+            queryClient.invalidateQueries({ queryKey: ['appointments-upcoming'] });
+          }}
+          isWalkIn={isWalkInPOS}
+        />
+      )}
+
       {/* Upcoming Appointments Table */}
       <Card title="مواعيد اليوم القادمة">
         <div className="overflow-x-auto -mx-6">
