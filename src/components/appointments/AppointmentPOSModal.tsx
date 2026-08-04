@@ -618,31 +618,33 @@ export default function AppointmentPOSModal({
                 return (
                   <div 
                     key={pricing.id}
-                    className={`flex items-center justify-between p-3 border-b border-surface-100 last:border-0 rounded-lg mb-1 ${inBasket ? 'bg-primary-50/50' : 'hover:bg-surface-50'}`}
+                    className={`flex items-center gap-2 p-3 border-b border-surface-100 last:border-0 rounded-lg mb-1 ${inBasket ? 'bg-primary-50/50' : 'hover:bg-surface-50'}`}
                   >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-bold text-surface-900 text-sm">
-                          {pricing.bodyArea || pricing.nameAr || pricing.name || 'أساسي'}
-                        </p>
-                        {getPricingBadge(pricing.pricingModel)}
-                      </div>
-                      <p className="text-primary-600 font-bold text-sm mt-0.5">
+                    <p className="font-bold text-surface-900 text-sm flex-1 text-start truncate" title={pricing.bodyArea || pricing.nameAr || pricing.name || 'أساسي'}>
+                      {pricing.bodyArea || pricing.nameAr || pricing.name || 'أساسي'}
+                    </p>
+                    
+                    <div className="flex-1 flex justify-center shrink-0">
+                      {getPricingBadge(pricing.pricingModel)}
+                    </div>
+                    
+                    <div className="flex-1 flex justify-end items-center gap-3">
+                      <p className="text-primary-600 font-bold text-sm whitespace-nowrap">
                         {pricing.pricingModel === 'PER_PULSE' 
-                          ? `${Number(pricing.pricePerPulse || 0).toLocaleString()} ج.م / نبضة` 
+                          ? `${Number(pricing.pricePerPulse || 0).toLocaleString()} ج.م/نبضة` 
                           : `${Number(pricing.price).toLocaleString()} ج.م`}
                       </p>
+                      {inBasket ? (
+                        <span className="text-[10px] font-bold text-primary-600 bg-primary-100 px-2 py-1 rounded-md shrink-0">مضافة</span>
+                      ) : (
+                        <button 
+                          onClick={() => handleAddToBasket(pricingModalService, pricing)}
+                          className="w-7 h-7 rounded-full shrink-0 bg-surface-100 hover:bg-primary-500 hover:text-white flex items-center justify-center text-surface-600 transition-colors"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
-                    {inBasket ? (
-                      <span className="text-xs font-bold text-primary-600 bg-primary-100 px-2 py-1 rounded-md">مضافة</span>
-                    ) : (
-                      <button 
-                        onClick={() => handleAddToBasket(pricingModalService, pricing)}
-                        className="w-8 h-8 rounded-full bg-surface-100 hover:bg-primary-500 hover:text-white flex items-center justify-center text-surface-600 transition-colors"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
-                    )}
                   </div>
                 );
               })}
