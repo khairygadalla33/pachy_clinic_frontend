@@ -103,7 +103,7 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
                   {settlement?.services?.map((s: any, idx: number) => (
                     <tr key={idx}>
                       <td className="py-3 px-4 font-medium text-surface-900">{s.name}</td>
-                      <td className="py-3 px-4 text-center font-bold">{s.price} ر.س</td>
+                      <td className="py-3 px-4 text-center font-bold">{s.price} ج.م</td>
                     </tr>
                   ))}
                 </tbody>
