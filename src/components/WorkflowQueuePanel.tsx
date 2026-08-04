@@ -104,9 +104,16 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
                         {/* Header */}
                         <div className="flex items-start justify-between mb-2">
                           <h4 className="font-bold text-surface-900 truncate pr-2">{item.client?.fullName}</h4>
-                          <span className={`text-xs font-bold px-2 py-1 rounded-md bg-white/50 ${stageTextColors[item.stage]}`}>
-                            {stageLabels[item.stage]}
-                          </span>
+                          <div className="flex flex-col items-center gap-1">
+                            <span className={`text-xs font-bold px-2 py-1 rounded-md bg-white/50 ${stageTextColors[item.stage]}`}>
+                              {stageLabels[item.stage]}
+                            </span>
+                            {item.stage === 'WAITING' && item.queuePosition > 0 && (
+                              <span className="text-sm font-black text-red-600 bg-white/80 px-2 py-0.5 rounded shadow-sm">
+                                #{item.queuePosition}
+                              </span>
+                            )}
+                          </div>
                         </div>
 
                         {/* Details */}
@@ -125,11 +132,6 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
                             <div className="flex items-center gap-1.5 text-xs text-surface-600 font-medium">
                               <Clock className="w-3.5 h-3.5" />
                               <WaitingTime startTime={item.waitingStartTime} />
-                              {item.stage === 'WAITING' && item.queuePosition > 0 && (
-                                <span className="ml-1 px-1.5 py-0.5 rounded bg-white text-red-600 border border-red-200">
-                                  #{item.queuePosition}
-                                </span>
-                              )}
                             </div>
                           )}
                         </div>
@@ -138,12 +140,9 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
                         <div className="flex flex-wrap gap-1 mt-auto pt-2 border-t border-black/5">
                           {item.stage === 'BOOKED' && (
                             <>
-                              <button onClick={() => onAction(item.id, 'check-in')} className="px-2 py-1 text-xs font-medium bg-white border border-surface-200 rounded hover:bg-surface-50">تسجيل وصول</button>
+                              <button onClick={() => onAction(item.id, 'check-in')} className="px-2 py-1 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded hover:bg-emerald-100">تسجيل وصول (انتظار)</button>
                               <button onClick={() => onAction(item.id, 'no-show')} className="px-2 py-1 text-xs font-medium bg-red-50 text-red-600 border border-red-200 rounded hover:bg-red-100">لم يحضر</button>
                             </>
-                          )}
-                          {item.stage === 'ARRIVED' && (
-                            <button onClick={() => onAction(item.id, 'ready')} className="px-2 py-1 text-xs font-medium bg-red-500 text-white rounded hover:bg-red-600">انتظار (جاهز)</button>
                           )}
                           {item.stage === 'WAITING' && (
                             <button onClick={() => onAction(item.id, 'start-session')} className="px-2 py-1 text-xs font-medium bg-emerald-500 text-white rounded hover:bg-emerald-600">بدء الجلسة</button>

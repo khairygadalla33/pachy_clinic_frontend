@@ -78,9 +78,16 @@ export default function WorkflowCardsPanel({ items, isLoading, onCardClick, acti
                   <span className="font-bold text-sm text-surface-900 leading-tight">
                     {item.client?.fullName || 'عميل غير محدد'}
                   </span>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${item.stage === 'IN_SESSION' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
-                    {item.stage === 'IN_SESSION' ? 'في الجلسة' : 'في الانتظار'}
-                  </span>
+                  <div className="flex flex-col items-center gap-1">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${item.stage === 'IN_SESSION' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
+                      {item.stage === 'IN_SESSION' ? 'في الجلسة' : 'في الانتظار'}
+                    </span>
+                    {item.stage === 'WAITING' && item.queuePosition > 0 && (
+                      <span className="text-sm font-black text-red-600 bg-red-50 px-2 py-0.5 rounded shadow-sm">
+                        #{item.queuePosition}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 
                 {/* Service */}
