@@ -112,15 +112,14 @@ export default function ReceptionDashboard() {
       {showPOS && (
         <AppointmentPOSModal 
           isOpen={true}
-          onClose={() => setShowPOS(false)}
-          onSuccess={() => {
+          onClose={() => {
             setShowPOS(false);
             queryClient.invalidateQueries({ queryKey: ['workflow-queue'] });
             queryClient.invalidateQueries({ queryKey: ['workflow-stats'] });
             queryClient.invalidateQueries({ queryKey: ['appointments-upcoming'] });
           }}
           isWalkIn={isWalkInPOS}
-          branchId={branchId}
+          branchId={branchId ?? undefined}
         />
       )}
 

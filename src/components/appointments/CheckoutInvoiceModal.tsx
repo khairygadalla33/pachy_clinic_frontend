@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle, CreditCard, Banknote } from 'lucide-react';
+
 import Modal from '../Modal';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';

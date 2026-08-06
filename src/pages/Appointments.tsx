@@ -10,7 +10,6 @@ import Card from '../components/Card';
 import Badge from '../components/Badge';
 import Modal from '../components/Modal';
 import LoadingSkeleton from '../components/LoadingSkeleton';
-import ClientAutocomplete from '../components/ClientAutocomplete';
 import CalendarView from '../components/appointments/CalendarView';
 import AppointmentPOSModal from '../components/appointments/AppointmentPOSModal';
 
@@ -39,7 +38,7 @@ export default function Appointments() {
     if (saved) return saved;
     return window.innerWidth < 768 ? 'list' : 'calendar';
   });
-  const [timeframe, setTimeframe] = useState<'week' | 'month' | '6months' | 'year'>(() => {
+  const [timeframe] = useState<'week' | 'month' | '6months' | 'year'>(() => {
     return (localStorage.getItem('appointments-timeframe') as any) || 'week';
   });
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -378,7 +377,7 @@ export default function Appointments() {
           }
         }} 
         isWalkIn={isWalkIn} 
-        branchId={branchId}
+        branchId={branchId ?? undefined}
         initialDate={initialDate}
         initialTime={initialTime}
       />

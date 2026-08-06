@@ -6,8 +6,8 @@ import { useQuery } from '@tanstack/react-query';
 import api from '../lib/api';
 import { 
   LayoutDashboard, Users, Calendar, Settings as SettingsIcon,
-  Activity, Syringe, Sparkles, Receipt, Wallet,
-  Package, Box, Stethoscope, BarChart3, ShieldAlert,
+  Sparkles, Receipt, Wallet,
+  Package, Box, Stethoscope, BarChart3,
   MessageSquare, ChevronRight, ChevronLeft, LogOut, X, HeartPulse
 } from 'lucide-react';
 import InstallPWA from '../components/InstallPWA';

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import api from '../lib/api';
-import { getInitials } from '../lib/utils';
+
 
 interface ClientOption {
   id: string;

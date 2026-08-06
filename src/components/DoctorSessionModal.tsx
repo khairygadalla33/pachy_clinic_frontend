@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { X, Activity, FileText, CheckCircle, Plus, DollarSign, Zap, Syringe, Sparkles, Scissors, Cloud, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { X, Activity, FileText, CheckCircle, Plus, Zap, Syringe, Sparkles, Scissors, Cloud, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
 import SessionForm from './SessionForm';

@@ -1,10 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { X, Search, Calendar, Clock, User, CheckCircle, Plus, Minus, CreditCard, Banknote, Trash2, Smartphone, Wallet } from 'lucide-react';
+import { X, Search, Calendar, Clock, User, CheckCircle, Plus, Trash2 } from 'lucide-react';
 import api from '../../lib/api';
 import ClientAutocomplete from '../ClientAutocomplete';
-import Modal from '../Modal';
+
 
 interface AppointmentPOSModalProps {
   isOpen: boolean;

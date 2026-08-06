@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Trash2, Cloud, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import api from '../lib/api';
 import { useAuth } from '../lib/auth';
 
@@ -13,7 +13,7 @@ interface PrescriptionFormProps {
   onSaveStatusChange?: (status: 'IDLE' | 'SAVING' | 'SAVED' | 'ERROR') => void;
 }
 
-export default function PrescriptionForm({ clientId, appointmentId, onSuccess, onCancel, onSaveStatusChange }: PrescriptionFormProps) {
+export default function PrescriptionForm({ clientId, appointmentId, onSaveStatusChange }: PrescriptionFormProps) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const branchId = user?.branchId;

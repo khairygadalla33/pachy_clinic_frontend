@@ -8,14 +8,9 @@ import {
   Camera, 
   X, 
   Calendar, 
-  Check, 
   Calculator, 
   Package,
-  Cpu,
-  AlertCircle,
-  Cloud,
-  CheckCircle2,
-  Loader2
+  Cpu
 } from 'lucide-react';
 import api from '../lib/api';
 
@@ -45,9 +40,6 @@ export default function SessionForm({
   appointmentId,
   clientId,
   serviceId,
-  serviceName,
-  onSuccess,
-  onCancel,
   onSaveStatusChange,
 }: SessionFormProps) {
   const queryClient = useQueryClient();
