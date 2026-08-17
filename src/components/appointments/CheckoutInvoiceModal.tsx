@@ -25,6 +25,12 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
       api.get(`/appointments/${queueItem.appointmentId}/settlement`)
         .then(res => {
           setSettlement(res.data);
+          
+          if (res.data.discount && Number(res.data.discount) > 0) {
+            setDiscountValue(res.data.discount);
+            setDiscountType('value');
+          }
+
           setLoading(false);
         })
         .catch(() => {

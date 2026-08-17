@@ -36,7 +36,7 @@ export default function Clients() {
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       setShowModal(false);
-      navigate(`/clients/${res.data.id}`);
+      toast.success('تمت إضافة العميل بنجاح');
     },
     onError: (err) => {
       console.error(err);
