@@ -27,14 +27,16 @@ export default function ReceptionDashboard() {
   const { data: stats } = useQuery({
     queryKey: ['workflow-stats', branchId],
     queryFn: () => api.get(`/workflow/stats?branchId=${branchId}`).then(r => r.data),
-    refetchInterval: 10000,
+    refetchInterval: 20000,
+    staleTime: 5000,
     enabled: !!branchId,
   });
 
   const { data: doctorGroups } = useQuery({
     queryKey: ['workflow-queue', branchId],
     queryFn: () => api.get(`/workflow/queue/by-doctor?branchId=${branchId}`).then(r => r.data),
-    refetchInterval: 10000,
+    refetchInterval: 20000,
+    staleTime: 5000,
     enabled: !!branchId,
   });
 
@@ -42,6 +44,7 @@ export default function ReceptionDashboard() {
     queryKey: ['appointments-upcoming', branchId],
     queryFn: () => api.get(`/appointments/today?branchId=${branchId}&status=PENDING,CONFIRMED`).then(r => r.data),
     refetchInterval: 30000,
+    staleTime: 10000,
     enabled: !!branchId,
   });
 
