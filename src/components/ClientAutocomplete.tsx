@@ -14,15 +14,26 @@ interface ClientAutocompleteProps {
   onSelect: (client: ClientOption) => void;
   placeholder?: string;
   className?: string;
+  initialClient?: ClientOption | null;
 }
 
-export default function ClientAutocomplete({ onSelect, placeholder = 'اختر العميل', className = '' }: ClientAutocompleteProps) {
-  const [query, setQuery] = useState('');
+export default function ClientAutocomplete({ onSelect, placeholder = 'اختر العميل', className = '', initialClient }: ClientAutocompleteProps) {
+  const [query, setQuery] = useState(initialClient ? initialClient.fullName : '');
   const [results, setResults] = useState<ClientOption[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedClientName, setSelectedClientName] = useState('');
+  const [selectedClientName, setSelectedClientName] = useState(initialClient ? initialClient.fullName : '');
   const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (initialClient) {
+      setQuery(initialClient.fullName);
+      setSelectedClientName(initialClient.fullName);
+    } else {
+      setQuery('');
+      setSelectedClientName('');
+    }
+  }, [initialClient]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

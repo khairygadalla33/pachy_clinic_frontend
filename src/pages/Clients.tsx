@@ -33,7 +33,7 @@ export default function Clients() {
 
   const createMutation = useMutation({
     mutationFn: (newClient: any) => api.post('/clients', newClient),
-    onSuccess: (res) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       setShowModal(false);
       toast.success('تمت إضافة العميل بنجاح');

@@ -8,9 +8,10 @@ interface CheckoutInvoiceModalProps {
   queueItem: any;
   onClose: () => void;
   onSuccess: () => void;
+  onSuccessBookNext?: (client: { id: string, fullName: string, phone: string, photoUrl: string | null }) => void;
 }
 
-export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: CheckoutInvoiceModalProps) {
+export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess, onSuccessBookNext }: CheckoutInvoiceModalProps) {
   const [settlement, setSettlement] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,7 +43,7 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
 
   if (!queueItem) return null;
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (shouldBookNext: boolean = false) => {
     try {
       setIsSubmitting(true);
       const parsedDiscount = Number(discountValue) || 0;
@@ -59,7 +60,12 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
         collectedAmount: parsedCollected
       });
       toast.success('تم تسوية الفاتورة بنجاح');
-      onSuccess();
+      
+      if (shouldBookNext && onSuccessBookNext && queueItem.client) {
+        onSuccessBookNext(queueItem.client);
+      } else {
+        onSuccess();
+      }
       onClose();
     } catch (error) {
       toast.error('فشلت عملية الدفع');
@@ -225,12 +231,21 @@ export default function CheckoutInvoiceModal({ queueItem, onClose, onSuccess }: 
                 إلغاء
               </button>
               <button 
-                onClick={handleCheckout} 
+                onClick={() => handleCheckout(false)} 
                 disabled={isSubmitting}
                 className="flex-1 bg-[#c0389f] hover:bg-[#a62c88] text-white py-2 text-base font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors"
               >
                 {isSubmitting ? 'جاري التنفيذ...' : 'تأكيد الدفع وإنهاء'}
               </button>
+              {onSuccessBookNext && (
+                <button 
+                  onClick={() => handleCheckout(true)} 
+                  disabled={isSubmitting}
+                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 text-base font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors"
+                >
+                  {isSubmitting ? 'جاري التنفيذ...' : 'تأكيد الدفع وحجز موعد قادم'}
+                </button>
+              )}
             </div>
           </div>
         </div>

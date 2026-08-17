@@ -393,7 +393,7 @@ export default function Appointments() {
             <div className="bg-surface-50 dark:bg-surface-800 p-4 rounded-lg space-y-2 text-sm text-surface-800 dark:text-surface-200">
               <p><strong>العميل:</strong> {selectedAppointment.client?.fullName}</p>
               <p><strong>رقم الهاتف:</strong> <span dir="ltr">{selectedAppointment.client?.phone}</span></p>
-              <p><strong>الخدمة:</strong> {selectedAppointment.service?.nameAr || selectedAppointment.service?.name}</p>
+              <p><strong>الخدمة:</strong> {selectedAppointment.appointmentServices?.map((as: any) => as.service?.nameAr || as.service?.name).filter(Boolean).join(' + ') || selectedAppointment.service?.nameAr || selectedAppointment.service?.name || 'بدون خدمة'}</p>
               <p><strong>الطبيب:</strong> د. {selectedAppointment.staff?.fullName}</p>
               <p><strong>التاريخ والوقت:</strong> {new Date(selectedAppointment.scheduledDate).toLocaleDateString('ar-EG')} - <span dir="ltr">{selectedAppointment.startTime}</span></p>
             </div>

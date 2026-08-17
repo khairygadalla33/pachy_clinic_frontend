@@ -18,7 +18,7 @@ interface CalendarViewProps {
 export default function CalendarView({ 
   appointments, currentDate, onDateChange, 
   onAppointmentClick, onEmptyCellClick, timeframe,
-  maxSlotsPerDay = 8, appointmentInterval = 45,
+  maxSlotsPerDay = 8,
   selectedDate, doctorSchedule
 }: CalendarViewProps) {
   
@@ -171,90 +171,43 @@ export default function CalendarView({
               const isDoctorOff = doctorSchedule && (!scheduleForDay || !scheduleForDay.isActive);
               const allowOverbooking = doctorSchedule?.allowOverbooking ?? false;
 
-              let startMinutes = 9 * 60; // default 9:00 AM
-              let endMinutes = 17 * 60;  // default 5:00 PM
-              
-              if (scheduleForDay && scheduleForDay.isActive) {
-                const [sh, sm] = scheduleForDay.startTime.split(':').map(Number);
-                startMinutes = sh * 60 + sm;
-                const [eh, em] = scheduleForDay.endTime.split(':').map(Number);
-                endMinutes = eh * 60 + em;
-              }
 
-              const slotsToRender = doctorSchedule 
-                ? Math.ceil((endMinutes - startMinutes) / appointmentInterval)
-                : maxSlotsPerDay;
 
               return (
               <div 
                 key={dayIdx} 
                 className={cn(
-                  "relative border-r border-surface-200 dark:border-surface-800 last:border-r-0 transition-colors flex flex-col",
+                  "relative border-r border-surface-200 dark:border-surface-800 last:border-r-0 transition-colors flex flex-col p-2 gap-2 min-h-full",
                   dayColumn.date && dayColumn.date.toDateString() === new Date().toDateString() && "bg-primary-50/20 dark:bg-primary-900/10",
                   isDoctorOff && "bg-surface-100 dark:bg-surface-800 opacity-60"
                 )}
               >
-                {Array.from({ length: Math.max(slotsToRender, 1) }).map((_, slotIdx) => {
-                  const slotMinutes = startMinutes + slotIdx * appointmentInterval;
-                  const h = Math.floor(slotMinutes / 60);
-                  const m = slotMinutes % 60;
-                  const calculatedTime = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-                  
-                  // Match appointments by time loosely (within this slot's interval)
-                  const aptsInSlot = dayColumn.appointments.filter(a => {
-                    if (!a.startTime) return false;
-                    const [ah, am] = a.startTime.split(':').map(Number);
-                    const aptMins = ah * 60 + am;
-                    return aptMins >= slotMinutes && aptMins < slotMinutes + appointmentInterval;
-                  });
-
-                  const isOutsideHours = slotMinutes >= endMinutes;
-                  const disabled = isDoctorOff || isOutsideHours;
-                  const canBook = !disabled && (aptsInSlot.length === 0 || allowOverbooking);
-
-                  return (
+                <div className="flex-1 flex flex-col gap-2 relative z-10">
+                  {dayColumn.appointments.map((apt: any) => (
                     <div 
-                      key={slotIdx} 
-                      onClick={() => {
-                        if (canBook && dayColumn.date) onEmptyCellClick(dayColumn.date, calculatedTime);
-                      }}
-                      className={cn(
-                        "min-h-[4rem] border-b border-surface-100 dark:border-surface-800/50 p-1 group hover:bg-primary-50/30 dark:hover:bg-primary-900/10 transition-colors relative flex flex-col gap-1",
-                        canBook ? "cursor-pointer" : "cursor-not-allowed",
-                        disabled && "bg-surface-50 dark:bg-surface-900/50"
-                      )}
+                      key={apt.id}
+                      onClick={(e) => { e.stopPropagation(); onAppointmentClick(apt); }}
+                      className={`p-2 rounded-lg border text-sm shadow-sm hover:scale-[1.02] transition-transform cursor-pointer ${getStatusColor(apt.status)}`}
                     >
-                      <div className="absolute top-1 left-1 opacity-70 text-[10px] font-bold text-[#6b4c9a] z-0">
-                        {calculatedTime}
+                      <div className="flex items-center justify-between mb-1">
+                          <span className="font-bold text-xs">{apt.startTime}</span>
+                          <span className="text-[10px] font-black uppercase opacity-80 tracking-widest">{translateStatus(apt.status)}</span>
                       </div>
-
-                      <div className="flex-1 flex flex-col gap-1 z-10 pt-3">
-                        {aptsInSlot.map((apt: any) => (
-                          <div 
-                            key={apt.id}
-                            onClick={(e) => { e.stopPropagation(); onAppointmentClick(apt); }}
-                            className={`p-1.5 rounded-md border text-xs shadow-sm hover:scale-[1.02] transition-transform cursor-pointer ${getStatusColor(apt.status)}`}
-                          >
-                            <div className="flex items-center justify-between mb-0.5">
-                               <span className="font-bold text-[10px]">{apt.startTime}</span>
-                               <span className="text-[8px] font-black uppercase opacity-60 tracking-widest">{translateStatus(apt.status)}</span>
-                            </div>
-                            <p className="font-medium truncate text-[10px]">{apt.client?.fullName}</p>
-                          </div>
-                        ))}
-
-                        {canBook && (
-                          <div className={cn(
-                            "flex items-center justify-center rounded-md border border-dashed border-[#6b4c9a]/50 text-[#6b4c9a] hover:bg-[#6b4c9a]/10 hover:border-[#6b4c9a] transition-colors py-1 text-[10px] font-bold mt-auto",
-                            aptsInSlot.length > 0 ? "opacity-0 group-hover:opacity-100 h-6" : "h-full opacity-0 group-hover:opacity-100"
-                          )}>
-                             + موعد
-                          </div>
-                        )}
-                      </div>
+                      <p className="font-semibold truncate text-xs">{apt.client?.fullName}</p>
                     </div>
-                  );
-                })}
+                  ))}
+                  
+                  {(!isDoctorOff && (allowOverbooking || dayColumn.appointments.length < maxSlotsPerDay)) && (
+                    <div 
+                      onClick={() => {
+                        if (dayColumn.date) onEmptyCellClick(dayColumn.date);
+                      }}
+                      className="flex items-center justify-center rounded-lg border border-dashed border-[#6b4c9a]/50 text-[#6b4c9a] hover:bg-[#6b4c9a]/10 hover:border-[#6b4c9a] transition-colors py-2 text-xs font-bold mt-2 cursor-pointer mt-auto opacity-50 hover:opacity-100"
+                    >
+                       + حجز موعد
+                    </div>
+                  )}
+                </div>
               </div>
             )})}
           </div>

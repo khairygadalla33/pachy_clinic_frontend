@@ -13,6 +13,7 @@ interface AppointmentPOSModalProps {
   branchId?: string;
   initialDate?: Date;
   initialTime?: string;
+  initialClient?: { id: string, fullName: string, phone: string, photoUrl: string | null } | null;
 }
 
 export default function AppointmentPOSModal({ 
@@ -21,7 +22,8 @@ export default function AppointmentPOSModal({
   isWalkIn = false,
   branchId,
   initialDate,
-  initialTime
+  initialTime,
+  initialClient
 }: AppointmentPOSModalProps) {
   const queryClient = useQueryClient();
   
@@ -30,7 +32,7 @@ export default function AppointmentPOSModal({
   const [searchQuery, setSearchQuery] = useState('');
   
   const [formData, setFormData] = useState({
-    clientId: '',
+    clientId: initialClient?.id || '',
     staffId: '',
     scheduledDate: initialDate ? initialDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
     startTime: initialTime || '10:00',
@@ -62,6 +64,7 @@ export default function AppointmentPOSModal({
     if (isOpen) {
       setFormData(prev => ({
         ...prev,
+        clientId: initialClient?.id || prev.clientId,
         scheduledDate: initialDate ? initialDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         startTime: initialTime || '10:00',
         source: isWalkIn ? 'walkin' : 'phone',
@@ -85,7 +88,7 @@ export default function AppointmentPOSModal({
       setActiveCategory('ALL');
       setSearchQuery('');
     }
-  }, [isOpen, initialDate, initialTime, isWalkIn]);
+  }, [isOpen, initialDate, initialTime, isWalkIn, initialClient]);
 
   // -- Queries --
   const { data: servicesData, isLoading: isLoadingServices } = useQuery({
@@ -406,7 +409,10 @@ export default function AppointmentPOSModal({
                 <User className="w-3.5 h-3.5 text-primary-500" /> العميل <span className="text-red-500">*</span>
               </label>
               <div className="relative z-50">
-                <ClientAutocomplete onSelect={(client) => setFormData({ ...formData, clientId: client.id })} />
+                <ClientAutocomplete 
+                  initialClient={initialClient}
+                  onSelect={(client) => setFormData({ ...formData, clientId: client.id })} 
+                />
               </div>
             </div>
 
@@ -451,7 +457,6 @@ export default function AppointmentPOSModal({
                     <input 
                       type="time"
                       className="input-field text-sm font-medium w-full h-8 py-1 pr-10 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:left-auto [&::-webkit-calendar-picker-indicator]:w-10 [&::-webkit-calendar-picker-indicator]:h-full"
-                      required
                       value={formData.startTime}
                       onChange={e => setFormData({ ...formData, startTime: e.target.value })}
                     />
