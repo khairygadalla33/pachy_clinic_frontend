@@ -1,173 +1,82 @@
 import { useState } from 'react';
-import toast from 'react-hot-toast';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import api from '../lib/api';
-import Card from '../components/Card';
 import Badge from '../components/Badge';
-import { formatDate, translateStatus } from '../lib/utils';
-import { Settings, CheckCircle2, Megaphone, Plus } from 'lucide-react';
-import Modal from '../components/Modal';
-import LoadingSkeleton from '../components/LoadingSkeleton';
+import { CheckCircle2, Megaphone, Settings, Plug, MessageSquare, Users, MessageCircle } from 'lucide-react';
+
+import WhatsAppConnectionTab from '../components/whatsapp/WhatsAppConnectionTab';
+import WhatsAppFeaturesTab from '../components/whatsapp/WhatsAppFeaturesTab';
+import WhatsAppBroadcastTab from '../components/whatsapp/WhatsAppBroadcastTab';
+import WhatsAppLogsTab from '../components/whatsapp/WhatsAppLogsTab';
+import WhatsAppChatwootTab from '../components/whatsapp/WhatsAppChatwootTab';
+import WhatsAppContactsTab from '../components/whatsapp/WhatsAppContactsTab';
 
 export default function WhatsApp() {
-  const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState('campaigns');
+  const [activeTab, setActiveTab] = useState('connection');
   
-  // Modals state
-  const [isCampaignModalOpen, setIsCampaignModalOpen] = useState(false);
-  
-  // Queries
-  const { data: status } = useQuery({ queryKey: ['wa-status'], queryFn: () => api.get('/whatsapp/status').then(r => r.data) });
-  const { data: campaigns = [], isLoading: isLoadingCampaigns } = useQuery({ queryKey: ['wa-campaigns'], queryFn: () => api.get('/whatsapp/campaigns').then(r => r.data) });
-  
-  const [campaignForm, setCampaignForm] = useState({ 
-    name: '', 
-    targetSegment: 'ALL', 
-    customMessage: '',
-    minDelay: 15,
-    maxDelay: 45,
+  const { data: status } = useQuery({ 
+    queryKey: ['wa-status'], 
+    queryFn: () => api.get('/whatsapp/status').then(r => r.data) 
   });
   
-  const createCampaignMutation = useMutation({
-    mutationFn: (data: any) => api.post('/whatsapp/campaigns', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wa-campaigns'] });
-      setIsCampaignModalOpen(false);
-      toast.success('تم إطلاق الحملة بنجاح');
-    }
+  const { data: instances = [] } = useQuery({ 
+    queryKey: ['wa-instances'], 
+    queryFn: () => api.get('/whatsapp/instances').then(r => r.data) 
   });
 
-  const handleCreateCampaign = (e: React.FormEvent) => {
-    e.preventDefault();
-    createCampaignMutation.mutate(campaignForm);
+  const TabButton = ({ id, icon: Icon, label }: { id: string, icon: any, label: string }) => {
+    const isActive = activeTab === id;
+    return (
+      <button 
+        onClick={() => setActiveTab(id)} 
+        className={`flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-md border ${
+          isActive 
+            ? 'bg-emerald-500 text-white border-emerald-500 font-semibold shadow-sm' 
+            : 'bg-white text-emerald-600 border-surface-300 hover:bg-emerald-50 hover:border-emerald-500'
+        }`}
+      >
+        <Icon className="w-4 h-4" />
+        {label}
+      </button>
+    );
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-start items-center">
+      <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-surface-200">
+        <div className="flex items-center gap-3">
+          <img src="/whatsapp-main-icon.png" alt="WhatsApp" className="w-8 h-8" onError={(e) => { e.currentTarget.style.display='none'; }} />
+          <h1 className="text-xl font-bold text-emerald-600">نظام واتساب</h1>
+        </div>
         
         <div className="flex items-center gap-2">
           {status?.connected ? (
-            <Badge variant="success" className="text-sm py-1.5"><CheckCircle2 className="w-4 h-4 mr-1"/> متصل</Badge>
+            <Badge variant="success" className="text-sm py-1.5 px-3">
+              <CheckCircle2 className="w-4 h-4 mr-1 inline-block"/> متصل بـ {status.instances?.length || 0} أرقام
+            </Badge>
           ) : (
-            <Badge variant="danger" className="text-sm py-1.5">غير متصل</Badge>
+            <Badge variant="danger" className="text-sm py-1.5 px-3">غير متصل</Badge>
           )}
         </div>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-1 border-b border-surface-200 dark:border-surface-700">
-        <button onClick={() => setActiveTab('campaigns')} className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-all border-b-2 ${activeTab === 'campaigns' ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-surface-500 hover:text-surface-700'}`}>
-          <Megaphone className="w-4 h-4" />الحملات (Campaigns)
-        </button>
-        <button onClick={() => setActiveTab('templates')} className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-all border-b-2 ${activeTab === 'templates' ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-surface-500 hover:text-surface-700'}`}>
-          <Settings className="w-4 h-4" />القوالب والإعدادات
-        </button>
+      <div className="flex gap-2 overflow-x-auto pb-1 rtl:space-x-reverse">
+        <TabButton id="connection" icon={Plug} label="إعدادات الاتصال" />
+        <TabButton id="features" icon={Settings} label="إعدادات الواتساب" />
+        <TabButton id="broadcast" icon={Megaphone} label="حملات البرودكاست" />
+        <TabButton id="logs" icon={MessageSquare} label="سجل الرسائل" />
+        <TabButton id="chatwoot" icon={MessageCircle} label="Chatwoot" />
+        <TabButton id="contacts" icon={Users} label="جهات الاتصال" />
       </div>
 
-      {activeTab === 'campaigns' && (
-        <Card>
-          <div className="flex justify-start items-center mb-6">
-            <h3 className="font-semibold text-lg">أحدث الحملات</h3>
-            <button onClick={() => setIsCampaignModalOpen(true)} className="btn-primary flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700">
-              <Plus className="w-4 h-4" /> حملة جديدة
-            </button>
-          </div>
-
-          {isLoadingCampaigns ? <LoadingSkeleton rows={3} /> : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-right text-sm">
-                <thead>
-                  <tr className="border-b text-surface-500">
-                    <th className="pb-3 px-4">اسم الحملة</th>
-                    <th className="pb-3 px-4">الشريحة</th>
-                    <th className="pb-3 px-4">المستهدفين</th>
-                    <th className="pb-3 px-4 text-emerald-600">تم الإرسال</th>
-                    <th className="pb-3 px-4 text-rose-600">فشل</th>
-                    <th className="pb-3 px-4">الحالة</th>
-                    <th className="pb-3 px-4">التاريخ</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-surface-100">
-                  {campaigns.length === 0 ? (
-                    <tr><td colSpan={7} className="text-center py-8">لا يوجد حملات</td></tr>
-                  ) : (
-                    campaigns.map((camp: any) => (
-                      <tr key={camp.id}>
-                        <td className="py-3 px-4 font-medium">{camp.name}</td>
-                        <td className="py-3 px-4"><Badge>{camp.filters?.segment || 'الكل'}</Badge></td>
-                        <td className="py-3 px-4 font-bold">{camp.totalRecipients}</td>
-                        <td className="py-3 px-4 font-bold text-emerald-600">{camp.sentCount}</td>
-                        <td className="py-3 px-4 font-bold text-rose-600">{camp.failedCount}</td>
-                        <td className="py-3 px-4">
-                          <Badge variant={camp.status === 'COMPLETED' ? 'success' : camp.status === 'RUNNING' ? 'info' : 'warning'}>{translateStatus(camp.status)}</Badge>
-                        </td>
-                        <td className="py-3 px-4 text-xs">{formatDate(camp.createdAt)}</td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Card>
-      )}
-
-      {activeTab === 'templates' && (
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card>
-            <h3 className="font-semibold text-lg mb-4">قوالب الرسائل</h3>
-            <p className="text-surface-500 text-sm mb-4">أضف القوالب المستخدمة في المحادثات السريعة (في صفحة ملف العميل).</p>
-            <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-surface-200 rounded-xl text-surface-400">
-              سيتم دمج القوالب من الإعدادات قريباً.
-            </div>
-          </Card>
-          <Card>
-            <h3 className="font-semibold text-lg mb-4">رسائل الترحيب والمناسبات</h3>
-            <p className="text-surface-500 text-sm mb-4">رسائل تلقائية يتم إرسالها عند أحداث معينة (مثل إضافة عميل جديد، حجز موعد).</p>
-            <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-surface-200 rounded-xl text-surface-400">
-              جاري تفعيل هذه الميزة...
-            </div>
-          </Card>
-        </div>
-      )}
-
-      <Modal isOpen={isCampaignModalOpen} onClose={() => setIsCampaignModalOpen(false)} title="إطلاق حملة تسويقية جديدة">
-        <form onSubmit={handleCreateCampaign} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">اسم الحملة</label>
-            <input required type="text" value={campaignForm.name} onChange={e => setCampaignForm({...campaignForm, name: e.target.value})} className="input-field w-full" placeholder="مثال: عروض شهر رمضان" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">شريحة العملاء</label>
-            <select value={campaignForm.targetSegment} onChange={e => setCampaignForm({...campaignForm, targetSegment: e.target.value})} className="input-field w-full">
-              <option value="ALL">جميع العملاء</option>
-              <option value="VIP">عملاء مميزين (VIP - أكثر من 10 زيارات)</option>
-              <option value="NEW">عملاء جدد (زيارة واحدة أو أقل)</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">نص الرسالة</label>
-            <p className="text-xs text-surface-500 mb-2">يمكنك استخدام {'{{name}}'} لاستبدالها باسم العميل التلقائي.</p>
-            <textarea required value={campaignForm.customMessage} onChange={e => setCampaignForm({...campaignForm, customMessage: e.target.value})} className="input-field w-full h-32" placeholder="مرحباً {{name}}، ..." />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">تأخير أدنى (ثوانٍ)</label>
-              <input type="number" value={campaignForm.minDelay} onChange={e => setCampaignForm({...campaignForm, minDelay: parseInt(e.target.value) || 0})} className="input-field w-full" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">تأخير أقصى (ثوانٍ)</label>
-              <input type="number" value={campaignForm.maxDelay} onChange={e => setCampaignForm({...campaignForm, maxDelay: parseInt(e.target.value) || 0})} className="input-field w-full" />
-            </div>
-          </div>
-          <div className="flex justify-end gap-3 pt-4 border-t border-surface-200">
-            <button type="button" onClick={() => setIsCampaignModalOpen(false)} className="btn-secondary">إلغاء</button>
-            <button type="submit" disabled={createCampaignMutation.isPending} className="btn-primary bg-emerald-600 hover:bg-emerald-700 border-emerald-600">
-              {createCampaignMutation.isPending ? 'جاري الإطلاق...' : 'إطلاق الحملة'}
-            </button>
-          </div>
-        </form>
-      </Modal>
+      <div className="mt-4">
+        {activeTab === 'connection' && <WhatsAppConnectionTab instances={instances} status={status} />}
+        {activeTab === 'features' && <WhatsAppFeaturesTab instances={instances} />}
+        {activeTab === 'broadcast' && <WhatsAppBroadcastTab instances={instances} />}
+        {activeTab === 'logs' && <WhatsAppLogsTab />}
+        {activeTab === 'chatwoot' && <WhatsAppChatwootTab />}
+        {activeTab === 'contacts' && <WhatsAppContactsTab />}
+      </div>
     </div>
   );
 }

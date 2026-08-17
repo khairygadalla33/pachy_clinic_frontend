@@ -40,7 +40,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-        <Route index element={<Dashboard />} />
+        <Route index element={<Navigate to="/reception" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="users" element={<UserManagement />} />
         <Route path="settings" element={<Settings />} />
@@ -70,7 +70,7 @@ function AppRoutes() {
         <Route path="reports" element={<Reports />} />
         <Route path="audit-logs" element={<AuditLog />} />
         
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/reception" replace />} />
       </Route>
     </Routes>
   );

@@ -14,12 +14,6 @@ import InstallPWA from '../components/InstallPWA';
 
 const navGroups = [
   {
-    title: 'نظرة عامة',
-    items: [
-      { path: '/dashboard', label: 'لوحة التحكم', icon: LayoutDashboard, roles: ['ADMIN', 'DOCTOR', 'NURSE', 'TECHNICIAN', 'RECEPTIONIST'] },
-    ]
-  },
-  {
     title: 'العمليات',
     items: [
       { path: '/reception', label: 'الاستقبال', icon: LayoutDashboard, roles: ['ADMIN', 'RECEPTIONIST'] },
@@ -53,8 +47,9 @@ const navGroups = [
         path: '/reports-group', 
         label: 'التقارير', 
         icon: BarChart3, 
-        roles: ['ADMIN', 'DOCTOR', 'NURSE', 'TECHNICIAN'],
+        roles: ['ADMIN', 'DOCTOR', 'NURSE', 'TECHNICIAN', 'RECEPTIONIST'],
         subItems: [
+          { path: '/dashboard', label: 'لوحة التحكم', roles: ['ADMIN', 'DOCTOR', 'NURSE', 'TECHNICIAN', 'RECEPTIONIST'] },
           { path: '/reports', label: 'التقارير المالية', roles: ['ADMIN'] },
           { path: '/laser-sessions', label: 'جلسات الليزر', roles: ['ADMIN', 'DOCTOR', 'TECHNICIAN'] },
           { path: '/injection-sessions', label: 'جلسات الحقن', roles: ['ADMIN', 'DOCTOR'] },
