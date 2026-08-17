@@ -96,7 +96,16 @@ export default function WorkflowQueuePanel({ doctorGroups, onAction, onViewClien
                   {group.items.length === 0 ? (
                     <p className="text-sm text-surface-400">قائمة الانتظار فارغة.</p>
                   ) : (
-                    group.items.map((item) => (
+                    [...group.items].sort((a, b) => {
+                      if (a.stage === 'WAITING' && b.stage !== 'WAITING') return -1;
+                      if (b.stage === 'WAITING' && a.stage !== 'WAITING') return 1;
+                      if (a.stage === 'WAITING' && b.stage === 'WAITING') return (a.queuePosition || 999) - (b.queuePosition || 999);
+                      
+                      const priority: Record<string, number> = { IN_SESSION: 1, PENDING_CHECKOUT: 2, IN_PREP: 3, ARRIVED: 4, BOOKED: 5 };
+                      const pA = priority[a.stage] || 99;
+                      const pB = priority[b.stage] || 99;
+                      return pA - pB;
+                    }).map((item) => (
                       <div 
                         key={item.id} 
                         className={`flex-shrink-0 w-64 p-4 rounded-xl border-2 shadow-sm transition-all flex flex-col ${item.calledByDoctor ? 'wave-effect bg-red-50' : stageColors[item.stage]}`}

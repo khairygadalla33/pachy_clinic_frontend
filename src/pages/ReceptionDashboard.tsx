@@ -100,18 +100,18 @@ export default function ReceptionDashboard() {
         {/* Shift Custody Box (Taking 1/5 of the space) */}
         <div className="md:col-span-1 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-sm p-3 text-white flex flex-col justify-between min-h-full">
           <div>
-            <h3 className="font-bold text-xs mb-1 flex items-center gap-1.5 text-emerald-100">
-              <Wallet className="w-3.5 h-3.5" /> عهدة الشفت الحالي
+            <h3 className="font-bold text-sm mb-1 flex items-center gap-1.5 text-emerald-100">
+              <Wallet className="w-4 h-4" /> عهدة الشفت الحالي
             </h3>
             <div className="mt-1 flex items-end gap-1">
-              <span className="text-2xl font-bold font-mono tracking-wider leading-none">0</span>
-              <span className="text-xs font-medium text-emerald-100 mb-0.5">ج.م</span>
+              <span className="text-3xl font-bold font-mono tracking-wider leading-none">0</span>
+              <span className="text-sm font-medium text-emerald-100 mb-0.5">ج.م</span>
             </div>
           </div>
           <button 
             onClick={() => setShowEndShiftModal(true)}
-            className="w-full mt-2 bg-white text-emerald-700 hover:bg-emerald-50 font-bold py-1.5 text-xs rounded shadow-sm transition-colors flex items-center justify-center gap-1.5 group">
-            <Power className="w-3.5 h-3.5 text-emerald-500 group-hover:text-red-500 transition-colors" /> إنهاء الشفت
+            className="w-full mt-2 bg-white text-emerald-700 hover:bg-emerald-50 font-bold py-1 text-sm rounded shadow-sm transition-colors flex items-center justify-center gap-1.5 group">
+            <Power className="w-4 h-4 text-emerald-500 group-hover:text-red-500 transition-colors" /> إنهاء الشفت
           </button>
         </div>
       </div>
