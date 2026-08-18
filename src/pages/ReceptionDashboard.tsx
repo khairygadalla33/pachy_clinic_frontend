@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Activity, Clock, Users, LogIn, CheckSquare, Plus, Calendar, Wallet, Power } from 'lucide-react';
+import { Activity, Clock, Users, CheckSquare, Plus, Calendar, Wallet, Power } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/api';
 import { useAuth } from '../lib/auth';
