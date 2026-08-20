@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.PROD ? 'https://pachyclinic-production.up.railway.app/api' : '/api';
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://clinic.deboura.com/api' : '/api');
 
 const api = axios.create({
   baseURL: API_URL,
