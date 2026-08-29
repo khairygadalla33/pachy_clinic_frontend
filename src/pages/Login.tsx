@@ -205,6 +205,33 @@ export default function Login() {
           </div>
         )}
       </div>
+
+      {/* Developer Attribution & Logo (Bottom Right) */}
+      <div className="fixed bottom-4 right-4 z-10 flex items-center gap-3 p-2.5 px-3.5 rounded-2xl bg-white/85 backdrop-blur-md border border-rose-100 shadow-md hover:shadow-lg transition-all duration-300">
+        <img
+          src="/deboura-logo.png"
+          alt="Deboura Cosmetics"
+          className="h-11 w-auto object-contain drop-shadow-sm"
+        />
+        <div className="flex flex-col text-left text-[11px] leading-tight font-sans" dir="ltr">
+          <span className="font-bold text-slate-800">Developed by deboura cosmetics</span>
+          <a
+            href="https://www.deboura.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-rose-600 hover:underline hover:text-rose-700 font-semibold"
+          >
+            www.deboura.com
+          </a>
+          <a
+            href="mailto:khairy@deboura.com"
+            className="text-slate-500 hover:text-slate-800 transition-colors"
+          >
+            khairy@deboura.com
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
+
