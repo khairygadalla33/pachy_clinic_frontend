@@ -148,24 +148,22 @@ export default function ServiceCatalog({
                       </p>
                     )}
 
-                    {/* Price and Options Row (Strictly unbroken lines) */}
-                    <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 mt-3">
+                    {/* Price and Options Row (Strictly single line, color #e05584) */}
+                    <div className="flex items-baseline gap-1.5 mt-3 whitespace-nowrap overflow-hidden">
                       {hasMultiplePricings ? (
                         <>
-                          <div className="inline-flex items-baseline gap-1 whitespace-nowrap">
-                            <span className="text-xs font-semibold text-slate-500">تبدأ من</span>
-                            <span className="text-lg sm:text-xl font-black text-rose-600 font-mono">{minPrice}</span>
-                            <span className="text-xs font-bold text-slate-700">ج.م</span>
-                          </div>
-                          <span className="inline-flex items-center text-[11px] font-bold text-purple-700 bg-purple-100/90 px-2.5 py-0.5 rounded-full whitespace-nowrap">
-                            {pricings.length} خيارات ومناطق
+                          <span className="text-xs font-semibold text-slate-500">تبدأ من</span>
+                          <span className="text-lg sm:text-xl font-black text-rose-600 font-mono">{minPrice}</span>
+                          <span className="text-xs font-bold text-slate-700">ج.م</span>
+                          <span className="text-xs sm:text-sm font-bold text-[#e05584] mr-1">
+                            ({pricings.length} خيارات ومناطق)
                           </span>
                         </>
                       ) : (
-                        <div className="inline-flex items-baseline gap-1 whitespace-nowrap">
+                        <>
                           <span className="text-lg sm:text-xl font-black text-rose-600 font-mono">{minPrice}</span>
                           <span className="text-xs font-bold text-slate-700">ج.م</span>
-                        </div>
+                        </>
                       )}
                     </div>
                   </div>
@@ -229,8 +227,24 @@ export default function ServiceCatalog({
 
       {/* Multiple Pricing / Body Area Selection Bottom-Sheet Modal */}
       {activeAreaModalService && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-950/70 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-300">
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-950/70 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in duration-200"
+          onClick={() => setActiveAreaModalService(null)}
+        >
+          <div
+            className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Top Drag Indicator Lines (indicating sheet pull down) */}
+            <div
+              onClick={() => setActiveAreaModalService(null)}
+              className="w-full pt-3 pb-1 flex flex-col items-center justify-center gap-1 cursor-pointer select-none bg-purple-50/70 hover:bg-purple-100/60 transition-colors"
+              title="اسحبي أو انقري للإغلاق"
+            >
+              <div className="w-12 h-1 bg-slate-400/80 rounded-full" />
+              <div className="w-7 h-1 bg-slate-300 rounded-full" />
+            </div>
+
             {/* Header */}
             <div className="p-4 px-5 border-b border-purple-100 flex items-center justify-between bg-purple-50/50">
               <div>
