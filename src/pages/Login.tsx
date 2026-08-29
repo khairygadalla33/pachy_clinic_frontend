@@ -206,32 +206,31 @@ export default function Login() {
         )}
       </div>
 
-      {/* Developer Attribution & Logo (Centered at bottom) */}
+      {/* Developer Attribution & Logo (Centered at bottom, full card clickable) */}
       <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-10 w-auto max-w-[92vw]">
-        <div className="subtle-badge-entrance flex items-center gap-4 p-3 px-5 rounded-2xl bg-white/90 backdrop-blur-md border border-rose-100/90 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] whitespace-nowrap">
+        <a
+          href="https://deboura.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="subtle-badge-entrance flex items-center gap-4 p-3 px-5 rounded-2xl bg-white/90 backdrop-blur-md border border-rose-100/90 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] hover:bg-white cursor-pointer group whitespace-nowrap"
+        >
           <img
             src="/deboura-logo.png"
             alt="Deboura Cosmetics"
-            className="h-12 w-auto object-contain drop-shadow-sm"
+            className="h-12 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
           />
           <div className="flex flex-col text-left text-[12px] leading-snug font-sans" dir="ltr">
-            <span className="font-bold text-slate-800">Developed by deboura cosmetics</span>
-            <a
-              href="https://www.deboura.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-rose-600 hover:underline hover:text-rose-700 font-semibold"
-            >
+            <span className="font-bold text-slate-800 group-hover:text-rose-600 transition-colors">
+              Developed by deboura cosmetics
+            </span>
+            <span className="text-rose-600 font-semibold underline underline-offset-2">
               www.deboura.com
-            </a>
-            <a
-              href="mailto:khairy@deboura.com"
-              className="text-slate-500 hover:text-slate-800 transition-colors"
-            >
+            </span>
+            <span className="text-slate-500">
               khairy@deboura.com
-            </a>
+            </span>
           </div>
-        </div>
+        </a>
       </div>
     </div>
   );
