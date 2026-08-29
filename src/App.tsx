@@ -39,42 +39,46 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AppRoutes() {
   return (
     <Routes>
+      {/* Public Routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/khairy-testing-app" element={<PublicBookingApp />} />
       <Route path="/booking" element={<PublicBookingApp />} />
-      <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-        <Route index element={<Navigate to="/reception" replace />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="users" element={<UserManagement />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="services" element={<Services />} />
-        <Route path="appointments" element={<Appointments />} />
-        <Route path="reception" element={<ReceptionDashboard />} />
-        <Route path="doctor-workstation" element={<DoctorWorkstation />} />
+
+      {/* Protected App Routes */}
+      <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+        <Route path="/" element={<Navigate to="/reception" replace />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/users" element={<UserManagement />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/appointments" element={<Appointments />} />
+        <Route path="/reception" element={<ReceptionDashboard />} />
+        <Route path="/doctor-workstation" element={<DoctorWorkstation />} />
         
-        {/* Phase 3: Clients */}
-        <Route path="clients" element={<Clients />} />
-        <Route path="clients/:id" element={<ClientProfile />} />
+        {/* Clients */}
+        <Route path="/clients" element={<Clients />} />
+        <Route path="/clients/:id" element={<ClientProfile />} />
 
         {/* Sessions */}
-        <Route path="laser-sessions" element={<LaserSessions />} />
-        <Route path="injection-sessions" element={<InjectionSessions />} />
-        <Route path="skincare-sessions" element={<SkinCareSessions />} />
-        <Route path="whatsapp" element={<WhatsApp />} />
+        <Route path="/laser-sessions" element={<LaserSessions />} />
+        <Route path="/injection-sessions" element={<InjectionSessions />} />
+        <Route path="/skincare-sessions" element={<SkinCareSessions />} />
+        <Route path="/whatsapp" element={<WhatsApp />} />
         
-        {/* Phase 7 & 8 */}
-        <Route path="invoices" element={<Invoices />} />
-        <Route path="treasury" element={<Treasury />} />
-        <Route path="packages" element={<Packages />} />
-        <Route path="inventory" element={<Inventory />} />
-        <Route path="devices" element={<Devices />} />
+        {/* Finance & Management */}
+        <Route path="/invoices" element={<Invoices />} />
+        <Route path="/treasury" element={<Treasury />} />
+        <Route path="/packages" element={<Packages />} />
+        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/devices" element={<Devices />} />
         
-        {/* Phase 9 & 10 */}
-        <Route path="reports" element={<Reports />} />
-        <Route path="audit-logs" element={<AuditLog />} />
-        
-        <Route path="*" element={<Navigate to="/reception" replace />} />
+        {/* Reports & Logs */}
+        <Route path="/reports" element={<Reports />} />
+        <Route path="/audit-logs" element={<AuditLog />} />
       </Route>
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }
