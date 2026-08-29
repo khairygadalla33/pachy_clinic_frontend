@@ -57,21 +57,16 @@ export default function PublicBookingApp() {
       })
       .catch((err) => {
         console.error('Failed to load public booking catalog, using fallback', err);
-        // Fallback default sample data if backend connection fails
         setCatalog({
           branches: [
-            { id: 'b1', name: 'فرع الدقي - الرئيسي', address: 'ميدان المساحة، الدقي', isDefault: true },
-            { id: 'b2', name: 'فرع التجمع الخامس', address: 'شارع التسعين الشمالي', isDefault: false },
+            { id: 'b1', name: 'الفرع الرئيسي', address: 'القاهرة', isDefault: true },
           ],
           categories: [
             { id: 'c1', name: 'LASER_HAIR_REMOVAL', nameAr: 'ازالة الشعر بالليزر', type: 'LASER_HAIR_REMOVAL', sortOrder: 1 },
             { id: 'c2', name: 'SKIN_CARE', nameAr: 'العناية بالبشرة والتقشير', type: 'SKIN_CARE', sortOrder: 2 },
             { id: 'c3', name: 'INJECTIONS', nameAr: 'الحقن التجميلي', type: 'INJECTIONS', sortOrder: 3 },
           ],
-          doctors: [
-            { id: 'd1', fullName: 'د. يمنى خالد', specialization: 'أخصائية جلدية وتجميل' },
-            { id: 'd2', fullName: 'د. مريم أحمد', specialization: 'أخصائية الليزر والعناية بالبشرة' },
-          ],
+          doctors: [],
           settings: {
             clinicName: 'باتشي كلينك',
             whatsappNumber: '201000000000',
@@ -126,25 +121,27 @@ export default function PublicBookingApp() {
   const totalDuration = selectedServices.reduce((sum, s) => sum + (s.duration || 30), 0);
 
   return (
-    <div className="min-h-screen bg-slate-200/70 flex justify-center font-cairo dir-rtl">
+    <div className="min-h-screen bg-slate-200/80 flex justify-center font-cairo dir-rtl">
       {/* Mobile-First Container */}
-      <div className="w-full max-w-md bg-slate-50 min-h-screen shadow-2xl flex flex-col relative overflow-x-hidden">
+      <div className="w-full max-w-md bg-white min-h-screen shadow-2xl flex flex-col relative overflow-x-hidden">
         
         {/* ===================== TAB 1: PACHY CLINIC ===================== */}
         {activeTab === 'PACHY' && (
-          <div className="flex-1 pb-32">
-            {/* Top Sticky Header */}
-            <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-rose-100/80 px-4 py-3 shadow-xs">
+          <div className="flex-1 pb-28 bg-slate-50/60">
+            {/* Top Sticky Header with Official PACHY Logo */}
+            <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-purple-100 px-4 py-3 shadow-xs">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-500 text-white flex items-center justify-center font-black text-lg shadow-sm shadow-rose-200">
-                    🌸
-                  </div>
+                <div className="flex items-center gap-3">
+                  <img
+                    src="/pachy-logo.png"
+                    alt="Pachy Clinic"
+                    className="h-11 w-11 object-contain drop-shadow-sm hover:scale-105 transition-transform"
+                  />
                   <div>
-                    <h1 className="text-base font-black text-slate-900 leading-none">
+                    <h1 className="text-lg font-black text-slate-900 leading-none">
                       باتشي كلينك
                     </h1>
-                    <p className="text-[11px] text-rose-600 font-bold mt-0.5">
+                    <p className="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-l from-rose-500 to-purple-600 mt-1">
                       Pachy Beauty & Laser Clinic
                     </p>
                   </div>
@@ -156,7 +153,7 @@ export default function PublicBookingApp() {
                     <select
                       value={selectedBranchId}
                       onChange={(e) => setSelectedBranchId(e.target.value)}
-                      className="text-xs font-bold py-1.5 pl-3 pr-7 rounded-xl bg-rose-50 text-rose-700 border border-rose-200/80 focus:outline-none appearance-none cursor-pointer"
+                      className="text-xs font-bold py-1.5 pl-3 pr-7 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 focus:outline-none appearance-none cursor-pointer"
                     >
                       {catalog.branches.map((b) => (
                         <option key={b.id} value={b.id}>
@@ -164,31 +161,31 @@ export default function PublicBookingApp() {
                         </option>
                       ))}
                     </select>
-                    <MapPin className="w-3.5 h-3.5 text-rose-500 absolute right-2.5 top-2.5 pointer-events-none" />
+                    <MapPin className="w-3.5 h-3.5 text-purple-500 absolute right-2.5 top-2.5 pointer-events-none" />
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Hero Welcome Banner */}
+            {/* Soft, Elegant Top Hero Card (Reduced Intensity) */}
             <div className="p-4 pt-3">
-              <div className="p-4 rounded-3xl bg-gradient-to-br from-rose-600 via-pink-600 to-rose-700 text-white shadow-lg shadow-rose-200 relative overflow-hidden">
+              <div className="p-5 rounded-3xl bg-gradient-to-r from-rose-50/90 via-purple-50/80 to-pink-50/90 border border-purple-100/90 shadow-xs relative overflow-hidden">
                 <div className="relative z-10">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-bold text-rose-100 mb-2">
-                    <Sparkles className="w-3 h-3 text-yellow-300" />
-                    <span>حجز موعد أونلاين فوري</span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 border border-purple-100 text-xs font-bold text-purple-700 mb-2 shadow-2xs">
+                    <Sparkles className="w-3.5 h-3.5 text-rose-500" />
+                    <span>حجز موعد أونلاين سريع</span>
                   </span>
-                  <h2 className="text-lg font-black leading-snug">
-                    تألقي بأحدث خدمات الليزر والعناية بالبشرة
+                  <h2 className="text-base sm:text-lg font-black text-slate-800 leading-snug">
+                    تألقي بأحدث خدمات الليزر والعناية بالبشرة ✨
                   </h2>
-                  <p className="text-xs text-rose-100 mt-1 font-medium leading-relaxed">
-                    اختاري خدماتكِ المفضلة ونسقي موعدكِ المناسب في ثوانٍ معدودة.
+                  <p className="text-xs text-slate-600 mt-1 font-medium leading-relaxed">
+                    اختاري خدماتكِ ونسقي موعدكِ المناسب في خطوات سهلة وسريعة.
                   </p>
                 </div>
 
-                {/* Decorative background shapes */}
-                <div className="absolute -left-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none" />
-                <div className="absolute right-0 -top-8 w-32 h-32 bg-pink-400/20 rounded-full blur-2xl pointer-events-none" />
+                {/* Gentle background glow */}
+                <div className="absolute -left-6 -bottom-6 w-24 h-24 bg-rose-200/30 rounded-full blur-xl pointer-events-none" />
+                <div className="absolute right-0 -top-8 w-28 h-28 bg-purple-200/30 rounded-full blur-xl pointer-events-none" />
               </div>
             </div>
 
@@ -196,12 +193,12 @@ export default function PublicBookingApp() {
             <div className="px-4">
               {loading ? (
                 <div className="py-16 text-center space-y-3">
-                  <div className="w-10 h-10 border-4 border-rose-200 border-t-rose-600 rounded-full animate-spin mx-auto" />
-                  <p className="text-xs font-bold text-slate-500">جاري تحميل قائمة الخدمات...</p>
+                  <div className="w-10 h-10 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto" />
+                  <p className="text-sm font-bold text-slate-600">جاري تحميل قائمة الخدمات والأسعار...</p>
                 </div>
               ) : (
                 <>
-                  {/* Services Catalog with Category Pills & Search */}
+                  {/* Services Catalog with Clearer & Larger Typography */}
                   <ServiceCatalog
                     categories={catalog.categories}
                     services={allServices}
@@ -222,19 +219,19 @@ export default function PublicBookingApp() {
             {/* Floating Bottom Cart Bar */}
             {selectedServices.length > 0 && (
               <div className="fixed bottom-20 left-0 right-0 max-w-md mx-auto px-4 z-30 animate-in slide-in-from-bottom duration-300">
-                <div className="p-3.5 px-4 rounded-2xl bg-slate-900/95 backdrop-blur-md text-white shadow-2xl flex items-center justify-between border border-slate-700">
+                <div className="p-4 rounded-2xl bg-slate-900/95 backdrop-blur-md text-white shadow-2xl flex items-center justify-between border border-slate-800">
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                      <span className="text-xs text-slate-300 font-medium">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                      <span className="text-xs text-slate-300 font-bold">
                         تم اختيار {selectedServices.length} خدمات
                       </span>
                     </div>
-                    <div className="flex items-baseline gap-1 mt-0.5">
-                      <span className="text-lg font-black text-rose-400">{totalPrice}</span>
+                    <div className="flex items-baseline gap-1.5 mt-0.5">
+                      <span className="text-xl font-black text-rose-400">{totalPrice}</span>
                       <span className="text-xs font-bold text-slate-300">ج.م</span>
-                      <span className="text-[10px] text-slate-400 mr-2 flex items-center gap-0.5">
-                        <Clock className="w-3 h-3 text-slate-400" />
+                      <span className="text-xs text-slate-400 mr-2 flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-purple-400" />
                         {totalDuration} دقيقة
                       </span>
                     </div>
@@ -243,7 +240,7 @@ export default function PublicBookingApp() {
                   <button
                     type="button"
                     onClick={() => setShowWizard(true)}
-                    className="py-2.5 px-5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold text-xs shadow-md shadow-rose-500/30 flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95"
+                    className="py-3 px-5 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white font-bold text-sm shadow-md shadow-purple-500/25 flex items-center gap-2 transition-all hover:scale-105 active:scale-95"
                   >
                     <span>متابعة الحجز</span>
                     <ChevronLeft className="w-4 h-4" />
@@ -265,20 +262,20 @@ export default function PublicBookingApp() {
             onClick={() => setActiveTab('PACHY')}
             className={`flex-1 py-1.5 flex flex-col items-center justify-center rounded-2xl transition-all ${
               activeTab === 'PACHY'
-                ? 'text-rose-600 font-black scale-105'
+                ? 'text-purple-600 font-black scale-105'
                 : 'text-slate-500 hover:text-slate-800 font-bold'
             }`}
           >
             <div
-              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
                 activeTab === 'PACHY'
-                  ? 'bg-rose-50 text-rose-600 shadow-xs'
+                  ? 'bg-gradient-to-r from-rose-50 to-purple-50 text-purple-600 shadow-2xs'
                   : 'bg-transparent text-slate-400'
               }`}
             >
               <CalendarCheck className="w-5 h-5" />
             </div>
-            <span className="text-[11px] mt-1">باتشي كلينك</span>
+            <span className="text-xs mt-1">باتشي كلينك</span>
           </button>
 
           {/* Tab 2: Deboura Cosmetics */}
@@ -287,20 +284,20 @@ export default function PublicBookingApp() {
             onClick={() => setActiveTab('DEBOURA')}
             className={`flex-1 py-1.5 flex flex-col items-center justify-center rounded-2xl transition-all ${
               activeTab === 'DEBOURA'
-                ? 'text-rose-600 font-black scale-105'
+                ? 'text-purple-600 font-black scale-105'
                 : 'text-slate-500 hover:text-slate-800 font-bold'
             }`}
           >
             <div
-              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
                 activeTab === 'DEBOURA'
-                  ? 'bg-rose-50 text-rose-600 shadow-xs'
+                  ? 'bg-gradient-to-r from-rose-50 to-purple-50 text-purple-600 shadow-2xs'
                   : 'bg-transparent text-slate-400'
               }`}
             >
               <ShoppingBag className="w-5 h-5" />
             </div>
-            <span className="text-[11px] mt-1">ديبورا كوزموتكس</span>
+            <span className="text-xs mt-1">ديبورا كوزموتكس</span>
           </button>
         </div>
 
