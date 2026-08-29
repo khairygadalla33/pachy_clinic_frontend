@@ -25,6 +25,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       const refreshToken = localStorage.getItem('refresh_token');
+      const isPublicPath = ['/login', '/khairy-testing-app', '/booking'].includes(window.location.pathname);
 
       if (refreshToken) {
         try {
@@ -36,13 +37,13 @@ api.interceptors.response.use(
         } catch {
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
-          if (window.location.pathname !== '/login') {
+          if (!isPublicPath) {
             window.location.href = '/login';
           }
         }
       } else {
         localStorage.removeItem('access_token');
-        if (window.location.pathname !== '/login') {
+        if (!isPublicPath) {
           window.location.href = '/login';
         }
       }
