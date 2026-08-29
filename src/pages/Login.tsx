@@ -206,14 +206,14 @@ export default function Login() {
         )}
       </div>
 
-      {/* Developer Attribution & Logo (Bottom Right) */}
-      <div className="fixed bottom-4 right-4 z-10 flex items-center gap-3 p-2.5 px-3.5 rounded-2xl bg-white/85 backdrop-blur-md border border-rose-100 shadow-md hover:shadow-lg transition-all duration-300">
+      {/* Developer Attribution & Logo (Bottom Right - 10% larger with subtle one-time entrance) */}
+      <div className="subtle-badge-entrance fixed bottom-5 right-5 z-10 flex items-center gap-4 p-3 px-4 rounded-2xl bg-white/90 backdrop-blur-md border border-rose-100/90 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
         <img
           src="/deboura-logo.png"
           alt="Deboura Cosmetics"
-          className="h-11 w-auto object-contain drop-shadow-sm"
+          className="h-12 w-auto object-contain drop-shadow-sm"
         />
-        <div className="flex flex-col text-left text-[11px] leading-tight font-sans" dir="ltr">
+        <div className="flex flex-col text-left text-[12px] leading-snug font-sans" dir="ltr">
           <span className="font-bold text-slate-800">Developed by deboura cosmetics</span>
           <a
             href="https://www.deboura.com"
