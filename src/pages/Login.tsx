@@ -74,8 +74,8 @@ export default function Login() {
   });
 
   return (
-    <div className="min-h-screen bg-rose-50 flex items-center justify-center p-4 dir-rtl font-cairo">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-rose-100 transition-all duration-300">
+    <div className="min-h-screen bg-rose-50 flex items-center justify-center p-4 dir-rtl font-cairo relative">
+      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-rose-100 transition-all duration-300 -translate-y-6 sm:-translate-y-8">
         
         {!selectedUser ? (
           <>
@@ -206,29 +206,31 @@ export default function Login() {
         )}
       </div>
 
-      {/* Developer Attribution & Logo (Bottom Right - 10% larger with subtle one-time entrance) */}
-      <div className="subtle-badge-entrance fixed bottom-5 right-5 z-10 flex items-center gap-4 p-3 px-4 rounded-2xl bg-white/90 backdrop-blur-md border border-rose-100/90 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-        <img
-          src="/deboura-logo.png"
-          alt="Deboura Cosmetics"
-          className="h-12 w-auto object-contain drop-shadow-sm"
-        />
-        <div className="flex flex-col text-left text-[12px] leading-snug font-sans" dir="ltr">
-          <span className="font-bold text-slate-800">Developed by deboura cosmetics</span>
-          <a
-            href="https://www.deboura.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-rose-600 hover:underline hover:text-rose-700 font-semibold"
-          >
-            www.deboura.com
-          </a>
-          <a
-            href="mailto:khairy@deboura.com"
-            className="text-slate-500 hover:text-slate-800 transition-colors"
-          >
-            khairy@deboura.com
-          </a>
+      {/* Developer Attribution & Logo (Centered at bottom) */}
+      <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-10 w-auto max-w-[92vw]">
+        <div className="subtle-badge-entrance flex items-center gap-4 p-3 px-5 rounded-2xl bg-white/90 backdrop-blur-md border border-rose-100/90 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] whitespace-nowrap">
+          <img
+            src="/deboura-logo.png"
+            alt="Deboura Cosmetics"
+            className="h-12 w-auto object-contain drop-shadow-sm"
+          />
+          <div className="flex flex-col text-left text-[12px] leading-snug font-sans" dir="ltr">
+            <span className="font-bold text-slate-800">Developed by deboura cosmetics</span>
+            <a
+              href="https://www.deboura.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-rose-600 hover:underline hover:text-rose-700 font-semibold"
+            >
+              www.deboura.com
+            </a>
+            <a
+              href="mailto:khairy@deboura.com"
+              className="text-slate-500 hover:text-slate-800 transition-colors"
+            >
+              khairy@deboura.com
+            </a>
+          </div>
         </div>
       </div>
     </div>
