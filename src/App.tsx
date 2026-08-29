@@ -27,6 +27,7 @@ import LaserSessions from './pages/LaserSessions';
 import InjectionSessions from './pages/InjectionSessions';
 import SkinCareSessions from './pages/SkinCareSessions';
 import WhatsApp from './pages/WhatsApp';
+import PublicBookingApp from './pages/PublicBookingApp';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -39,6 +40,8 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/khairy-testing-app" element={<PublicBookingApp />} />
+      <Route path="/booking" element={<PublicBookingApp />} />
       <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
         <Route index element={<Navigate to="/reception" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
