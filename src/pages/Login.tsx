@@ -212,6 +212,10 @@ export default function Login() {
           href="https://deboura.com/"
           target="_blank"
           rel="noopener noreferrer"
+          onClick={(e) => {
+            e.preventDefault();
+            window.open('https://deboura.com/', '_blank');
+          }}
           className="subtle-badge-entrance flex items-center gap-4 p-3 px-5 rounded-2xl bg-white/90 backdrop-blur-md border border-rose-100/90 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] hover:bg-white cursor-pointer group whitespace-nowrap"
         >
           <img
