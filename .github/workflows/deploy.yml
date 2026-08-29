@@ -1,0 +1,65 @@
+name: Deploy Pachy Clinic Frontend to Oracle Cloud
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy Frontend to Oracle Cloud
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔑 Setup SSH Key Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: 🚀 Sync Frontend Code to Server
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+        run: |
+          TARGET_USER=$(echo "${SSH_USER:-ubuntu}" | tr -d '[:space:]')
+          TARGET_HOST=$(echo "${SSH_HOST:-152.70.42.89}" | tr -d '[:space:]')
+
+          echo "Ensuring /opt/pachyclinic/frontend exists on server..."
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "${TARGET_USER}@${TARGET_HOST}" "mkdir -p /opt/pachyclinic/frontend"
+
+          echo "Syncing frontend files to ${TARGET_USER}@${TARGET_HOST}:/opt/pachyclinic/frontend/..."
+          rsync -rltzv --no-owner --no-group --delete \
+            -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+            --exclude '.env' \
+            --exclude 'node_modules' \
+            --exclude 'dist' \
+            --exclude '.git' \
+            ./ "${TARGET_USER}@${TARGET_HOST}":/opt/pachyclinic/frontend/
+
+      - name: 🐳 Build & Restart Frontend Container
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+        run: |
+          TARGET_USER=$(echo "${SSH_USER:-ubuntu}" | tr -d '[:space:]')
+          TARGET_HOST=$(echo "${SSH_HOST:-152.70.42.89}" | tr -d '[:space:]')
+
+          echo "Connecting to ${TARGET_USER}@${TARGET_HOST} to rebuild frontend..."
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "${TARGET_USER}@${TARGET_HOST}" "
+            set -e
+            echo '=================================================='
+            echo '🚀 Building Pachy Clinic Frontend Container...'
+            echo '=================================================='
+            cd /opt/pachyclinic
+            docker compose up -d --build frontend
+            docker image prune -f
+            sleep 3
+            docker ps --filter 'name=pachyclinic-frontend'
+            echo '=================================================='
+            echo '✅ Frontend Deployment completed successfully!'
+            echo '=================================================='
+          "
